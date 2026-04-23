@@ -345,7 +345,7 @@ with tab2:
         return c.get(val, '')
 
     st.dataframe(
-        tabla.style.applymap(color_urgencia, subset=['Urgencia']),
+        tabla.style.map(color_urgencia, subset=['Urgencia']),
         use_container_width=True, hide_index=True
     )
 
