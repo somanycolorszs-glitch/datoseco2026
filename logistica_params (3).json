@@ -1,0 +1,778 @@
+{
+  "red_logistica": {
+    "ALCALA": {
+      "lat": 4.6742,
+      "lon": -75.7758,
+      "dist_aerea_km": 159.7,
+      "dist_carretera_km": 215.6,
+      "lead_time_horas": 5.9,
+      "lead_time_dias": 0.25
+    },
+    "ANDALUCIA": {
+      "lat": 3.8,
+      "lon": -76.3,
+      "dist_aerea_km": 46.5,
+      "dist_carretera_km": 62.8,
+      "lead_time_horas": 3.1,
+      "lead_time_dias": 0.13
+    },
+    "ANSERMANUEVO": {
+      "lat": 4.8011,
+      "lon": -75.9889,
+      "dist_aerea_km": 161.7,
+      "dist_carretera_km": 218.3,
+      "lead_time_horas": 6.0,
+      "lead_time_dias": 0.25
+    },
+    "ARGELIA": {
+      "lat": 4.0675,
+      "lon": -75.9297,
+      "dist_aerea_km": 95.7,
+      "dist_carretera_km": 129.2,
+      "lead_time_horas": 4.3,
+      "lead_time_dias": 0.18
+    },
+    "BOLIVAR": {
+      "lat": 4.3417,
+      "lon": -76.2031,
+      "dist_aerea_km": 105.5,
+      "dist_carretera_km": 142.4,
+      "lead_time_horas": 4.6,
+      "lead_time_dias": 0.19
+    },
+    "BUENAVENTURA": {
+      "lat": 3.8801,
+      "lon": -77.0311,
+      "dist_aerea_km": 73.1,
+      "dist_carretera_km": 98.6,
+      "lead_time_horas": 3.8,
+      "lead_time_dias": 0.16
+    },
+    "BUGA": {
+      "lat": 3.9003,
+      "lon": -76.2979,
+      "dist_aerea_km": 56.3,
+      "dist_carretera_km": 75.9,
+      "lead_time_horas": 3.4,
+      "lead_time_dias": 0.14
+    },
+    "BUGALAGRANDE": {
+      "lat": 4.2125,
+      "lon": -76.1578,
+      "dist_aerea_km": 94.2,
+      "dist_carretera_km": 127.2,
+      "lead_time_horas": 4.3,
+      "lead_time_dias": 0.18
+    },
+    "CAICEDONIA": {
+      "lat": 4.3369,
+      "lon": -75.8278,
+      "dist_aerea_km": 125.7,
+      "dist_carretera_km": 169.7,
+      "lead_time_horas": 5.1,
+      "lead_time_dias": 0.21
+    },
+    "CALI": {
+      "lat": 3.4516,
+      "lon": -76.532,
+      "dist_aerea_km": 0.0,
+      "dist_carretera_km": 0.0,
+      "lead_time_horas": 2.0,
+      "lead_time_dias": 0.08
+    },
+    "CANDELARIA": {
+      "lat": 3.4081,
+      "lon": -76.3494,
+      "dist_aerea_km": 20.8,
+      "dist_carretera_km": 28.1,
+      "lead_time_horas": 2.5,
+      "lead_time_dias": 0.1
+    },
+    "CARTAGO": {
+      "lat": 4.7458,
+      "lon": -75.9119,
+      "dist_aerea_km": 159.5,
+      "dist_carretera_km": 215.3,
+      "lead_time_horas": 5.9,
+      "lead_time_dias": 0.25
+    },
+    "DAGUA": {
+      "lat": 3.6581,
+      "lon": -76.6928,
+      "dist_aerea_km": 29.1,
+      "dist_carretera_km": 39.3,
+      "lead_time_horas": 2.7,
+      "lead_time_dias": 0.11
+    },
+    "DARIEN": {
+      "lat": 3.8,
+      "lon": -76.3,
+      "dist_aerea_km": 46.5,
+      "dist_carretera_km": 62.8,
+      "lead_time_horas": 3.1,
+      "lead_time_dias": 0.13
+    },
+    "EL AGUILA": {
+      "lat": 4.9125,
+      "lon": -76.0897,
+      "dist_aerea_km": 169.7,
+      "dist_carretera_km": 229.1,
+      "lead_time_horas": 6.2,
+      "lead_time_dias": 0.26
+    },
+    "EL CAIRO": {
+      "lat": 4.9347,
+      "lon": -76.2506,
+      "dist_aerea_km": 167.8,
+      "dist_carretera_km": 226.6,
+      "lead_time_horas": 6.1,
+      "lead_time_dias": 0.25
+    },
+    "EL CERRITO": {
+      "lat": 3.6889,
+      "lon": -76.2978,
+      "dist_aerea_km": 37.0,
+      "dist_carretera_km": 50.0,
+      "lead_time_horas": 2.9,
+      "lead_time_dias": 0.12
+    },
+    "EL DOVIO": {
+      "lat": 4.52,
+      "lon": -76.5642,
+      "dist_aerea_km": 118.9,
+      "dist_carretera_km": 160.5,
+      "lead_time_horas": 4.9,
+      "lead_time_dias": 0.2
+    },
+    "FLORIDA": {
+      "lat": 3.3269,
+      "lon": -76.2335,
+      "dist_aerea_km": 35.9,
+      "dist_carretera_km": 48.5,
+      "lead_time_horas": 2.9,
+      "lead_time_dias": 0.12
+    },
+    "GINEBRA": {
+      "lat": 3.7283,
+      "lon": -76.2644,
+      "dist_aerea_km": 42.8,
+      "dist_carretera_km": 57.7,
+      "lead_time_horas": 3.0,
+      "lead_time_dias": 0.12
+    },
+    "GUACARI": {
+      "lat": 3.7803,
+      "lon": -76.3347,
+      "dist_aerea_km": 42.6,
+      "dist_carretera_km": 57.5,
+      "lead_time_horas": 3.0,
+      "lead_time_dias": 0.12
+    },
+    "JAMUNDI": {
+      "lat": 3.2614,
+      "lon": -76.5397,
+      "dist_aerea_km": 21.2,
+      "dist_carretera_km": 28.6,
+      "lead_time_horas": 2.5,
+      "lead_time_dias": 0.1
+    },
+    "LA CUMBRE": {
+      "lat": 3.6519,
+      "lon": -76.5644,
+      "dist_aerea_km": 22.6,
+      "dist_carretera_km": 30.5,
+      "lead_time_horas": 2.6,
+      "lead_time_dias": 0.11
+    },
+    "LA UNION": {
+      "lat": 4.5333,
+      "lon": -76.1,
+      "dist_aerea_km": 129.5,
+      "dist_carretera_km": 174.8,
+      "lead_time_horas": 5.2,
+      "lead_time_dias": 0.22
+    },
+    "LA VICTORIA": {
+      "lat": 4.5256,
+      "lon": -75.8881,
+      "dist_aerea_km": 139.2,
+      "dist_carretera_km": 187.9,
+      "lead_time_horas": 5.4,
+      "lead_time_dias": 0.22
+    },
+    "OBANDO": {
+      "lat": 4.5747,
+      "lon": -75.9797,
+      "dist_aerea_km": 139.1,
+      "dist_carretera_km": 187.8,
+      "lead_time_horas": 5.4,
+      "lead_time_dias": 0.22
+    },
+    "PALMIRA": {
+      "lat": 3.5394,
+      "lon": -76.3036,
+      "dist_aerea_km": 27.2,
+      "dist_carretera_km": 36.7,
+      "lead_time_horas": 2.7,
+      "lead_time_dias": 0.11
+    },
+    "PRADERA": {
+      "lat": 3.4167,
+      "lon": -76.2458,
+      "dist_aerea_km": 32.0,
+      "dist_carretera_km": 43.2,
+      "lead_time_horas": 2.8,
+      "lead_time_dias": 0.12
+    },
+    "RESTREPO": {
+      "lat": 3.8222,
+      "lon": -76.5258,
+      "dist_aerea_km": 41.2,
+      "dist_carretera_km": 55.6,
+      "lead_time_horas": 3.0,
+      "lead_time_dias": 0.12
+    },
+    "RIOFRIO": {
+      "lat": 4.0953,
+      "lon": -76.2847,
+      "dist_aerea_km": 76.7,
+      "dist_carretera_km": 103.5,
+      "lead_time_horas": 3.9,
+      "lead_time_dias": 0.16
+    },
+    "ROLDANILLO": {
+      "lat": 4.4094,
+      "lon": -76.1556,
+      "dist_aerea_km": 114.4,
+      "dist_carretera_km": 154.4,
+      "lead_time_horas": 4.8,
+      "lead_time_dias": 0.2
+    },
+    "SAN PEDRO": {
+      "lat": 3.9853,
+      "lon": -76.4058,
+      "dist_aerea_km": 61.0,
+      "dist_carretera_km": 82.3,
+      "lead_time_horas": 3.5,
+      "lead_time_dias": 0.15
+    },
+    "SEVILLA": {
+      "lat": 4.2683,
+      "lon": -75.9361,
+      "dist_aerea_km": 112.3,
+      "dist_carretera_km": 151.6,
+      "lead_time_horas": 4.8,
+      "lead_time_dias": 0.2
+    },
+    "TORO": {
+      "lat": 4.6014,
+      "lon": -76.0806,
+      "dist_aerea_km": 137.3,
+      "dist_carretera_km": 185.4,
+      "lead_time_horas": 5.4,
+      "lead_time_dias": 0.22
+    },
+    "TRUJILLO": {
+      "lat": 4.2281,
+      "lon": -76.3264,
+      "dist_aerea_km": 89.3,
+      "dist_carretera_km": 120.6,
+      "lead_time_horas": 4.2,
+      "lead_time_dias": 0.18
+    },
+    "TULUA": {
+      "lat": 4.084,
+      "lon": -76.196,
+      "dist_aerea_km": 79.6,
+      "dist_carretera_km": 107.4,
+      "lead_time_horas": 4.0,
+      "lead_time_dias": 0.17
+    },
+    "ULLOA": {
+      "lat": 4.7131,
+      "lon": -75.8878,
+      "dist_aerea_km": 157.4,
+      "dist_carretera_km": 212.5,
+      "lead_time_horas": 5.9,
+      "lead_time_dias": 0.25
+    },
+    "VERSALLES": {
+      "lat": 4.5744,
+      "lon": -76.2511,
+      "dist_aerea_km": 128.7,
+      "dist_carretera_km": 173.7,
+      "lead_time_horas": 5.2,
+      "lead_time_dias": 0.22
+    },
+    "VIJES": {
+      "lat": 3.6942,
+      "lon": -76.5169,
+      "dist_aerea_km": 27.0,
+      "dist_carretera_km": 36.5,
+      "lead_time_horas": 2.7,
+      "lead_time_dias": 0.11
+    },
+    "YOTOCO": {
+      "lat": 3.8689,
+      "lon": -76.3942,
+      "dist_aerea_km": 48.9,
+      "dist_carretera_km": 66.0,
+      "lead_time_horas": 3.2,
+      "lead_time_dias": 0.13
+    },
+    "YUMBO": {
+      "lat": 3.5955,
+      "lon": -76.4944,
+      "dist_aerea_km": 16.5,
+      "dist_carretera_km": 22.3,
+      "lead_time_horas": 2.4,
+      "lead_time_dias": 0.1
+    },
+    "ZARZAL": {
+      "lat": 4.3936,
+      "lon": -76.0711,
+      "dist_aerea_km": 116.6,
+      "dist_carretera_km": 157.4,
+      "lead_time_horas": 4.9,
+      "lead_time_dias": 0.2
+    }
+  },
+  "inventario_inicial": {
+    "ALCALA": {
+      "demanda_semanal_casos": 1.71,
+      "lead_time_dias": 0.25,
+      "stock_aceta_tab": 102,
+      "stock_ringer_bolsas": 6,
+      "rop_aceta_tab": 69,
+      "rop_ringer_bolsas": 5,
+      "ss_aceta_tab": 68,
+      "ss_ringer_bolsas": 5
+    },
+    "ANDALUCIA": {
+      "demanda_semanal_casos": 1.46,
+      "lead_time_dias": 0.13,
+      "stock_aceta_tab": 87,
+      "stock_ringer_bolsas": 5,
+      "rop_aceta_tab": 59,
+      "rop_ringer_bolsas": 4,
+      "ss_aceta_tab": 58,
+      "ss_ringer_bolsas": 4
+    },
+    "ANSERMANUEVO": {
+      "demanda_semanal_casos": 1.68,
+      "lead_time_dias": 0.25,
+      "stock_aceta_tab": 101,
+      "stock_ringer_bolsas": 6,
+      "rop_aceta_tab": 68,
+      "rop_ringer_bolsas": 5,
+      "ss_aceta_tab": 67,
+      "ss_ringer_bolsas": 5
+    },
+    "ARGELIA": {
+      "demanda_semanal_casos": 2.49,
+      "lead_time_dias": 0.18,
+      "stock_aceta_tab": 149,
+      "stock_ringer_bolsas": 10,
+      "rop_aceta_tab": 101,
+      "rop_ringer_bolsas": 7,
+      "ss_aceta_tab": 100,
+      "ss_ringer_bolsas": 7
+    },
+    "BOLIVAR": {
+      "demanda_semanal_casos": 1.83,
+      "lead_time_dias": 0.19,
+      "stock_aceta_tab": 109,
+      "stock_ringer_bolsas": 7,
+      "rop_aceta_tab": 74,
+      "rop_ringer_bolsas": 5,
+      "ss_aceta_tab": 73,
+      "ss_ringer_bolsas": 5
+    },
+    "BUENAVENTURA": {
+      "demanda_semanal_casos": 3.32,
+      "lead_time_dias": 0.16,
+      "stock_aceta_tab": 199,
+      "stock_ringer_bolsas": 13,
+      "rop_aceta_tab": 135,
+      "rop_ringer_bolsas": 9,
+      "ss_aceta_tab": 133,
+      "ss_ringer_bolsas": 9
+    },
+    "BUGA": {
+      "demanda_semanal_casos": 6.51,
+      "lead_time_dias": 0.14,
+      "stock_aceta_tab": 390,
+      "stock_ringer_bolsas": 26,
+      "rop_aceta_tab": 263,
+      "rop_ringer_bolsas": 18,
+      "ss_aceta_tab": 260,
+      "ss_ringer_bolsas": 18
+    },
+    "BUGALAGRANDE": {
+      "demanda_semanal_casos": 2.0,
+      "lead_time_dias": 0.18,
+      "stock_aceta_tab": 119,
+      "stock_ringer_bolsas": 8,
+      "rop_aceta_tab": 81,
+      "rop_ringer_bolsas": 5,
+      "ss_aceta_tab": 80,
+      "ss_ringer_bolsas": 5
+    },
+    "CAICEDONIA": {
+      "demanda_semanal_casos": 2.27,
+      "lead_time_dias": 0.21,
+      "stock_aceta_tab": 135,
+      "stock_ringer_bolsas": 9,
+      "rop_aceta_tab": 92,
+      "rop_ringer_bolsas": 6,
+      "ss_aceta_tab": 91,
+      "ss_ringer_bolsas": 6
+    },
+    "CALI": {
+      "demanda_semanal_casos": 140.95,
+      "lead_time_dias": 0.08,
+      "stock_aceta_tab": 8457,
+      "stock_ringer_bolsas": 570,
+      "rop_aceta_tab": 5670,
+      "rop_ringer_bolsas": 383,
+      "ss_aceta_tab": 5638,
+      "ss_ringer_bolsas": 381
+    },
+    "CANDELARIA": {
+      "demanda_semanal_casos": 4.59,
+      "lead_time_dias": 0.1,
+      "stock_aceta_tab": 275,
+      "stock_ringer_bolsas": 18,
+      "rop_aceta_tab": 185,
+      "rop_ringer_bolsas": 12,
+      "ss_aceta_tab": 184,
+      "ss_ringer_bolsas": 12
+    },
+    "CARTAGO": {
+      "demanda_semanal_casos": 7.37,
+      "lead_time_dias": 0.25,
+      "stock_aceta_tab": 442,
+      "stock_ringer_bolsas": 29,
+      "rop_aceta_tab": 300,
+      "rop_ringer_bolsas": 20,
+      "ss_aceta_tab": 295,
+      "ss_ringer_bolsas": 20
+    },
+    "DAGUA": {
+      "demanda_semanal_casos": 2.64,
+      "lead_time_dias": 0.11,
+      "stock_aceta_tab": 158,
+      "stock_ringer_bolsas": 10,
+      "rop_aceta_tab": 106,
+      "rop_ringer_bolsas": 7,
+      "ss_aceta_tab": 105,
+      "ss_ringer_bolsas": 7
+    },
+    "DARIEN": {
+      "demanda_semanal_casos": 2.33,
+      "lead_time_dias": 0.13,
+      "stock_aceta_tab": 140,
+      "stock_ringer_bolsas": 9,
+      "rop_aceta_tab": 94,
+      "rop_ringer_bolsas": 6,
+      "ss_aceta_tab": 93,
+      "ss_ringer_bolsas": 6
+    },
+    "EL AGUILA": {
+      "demanda_semanal_casos": 1.2,
+      "lead_time_dias": 0.26,
+      "stock_aceta_tab": 72,
+      "stock_ringer_bolsas": 4,
+      "rop_aceta_tab": 49,
+      "rop_ringer_bolsas": 3,
+      "ss_aceta_tab": 48,
+      "ss_ringer_bolsas": 3
+    },
+    "EL CAIRO": {
+      "demanda_semanal_casos": 1.03,
+      "lead_time_dias": 0.25,
+      "stock_aceta_tab": 61,
+      "stock_ringer_bolsas": 4,
+      "rop_aceta_tab": 42,
+      "rop_ringer_bolsas": 3,
+      "ss_aceta_tab": 41,
+      "ss_ringer_bolsas": 3
+    },
+    "EL CERRITO": {
+      "demanda_semanal_casos": 2.6,
+      "lead_time_dias": 0.12,
+      "stock_aceta_tab": 156,
+      "stock_ringer_bolsas": 10,
+      "rop_aceta_tab": 105,
+      "rop_ringer_bolsas": 7,
+      "ss_aceta_tab": 104,
+      "ss_ringer_bolsas": 7
+    },
+    "EL DOVIO": {
+      "demanda_semanal_casos": 1.0,
+      "lead_time_dias": 0.2,
+      "stock_aceta_tab": 60,
+      "stock_ringer_bolsas": 4,
+      "rop_aceta_tab": 41,
+      "rop_ringer_bolsas": 3,
+      "ss_aceta_tab": 40,
+      "ss_ringer_bolsas": 3
+    },
+    "FLORIDA": {
+      "demanda_semanal_casos": 5.06,
+      "lead_time_dias": 0.12,
+      "stock_aceta_tab": 303,
+      "stock_ringer_bolsas": 20,
+      "rop_aceta_tab": 204,
+      "rop_ringer_bolsas": 14,
+      "ss_aceta_tab": 202,
+      "ss_ringer_bolsas": 14
+    },
+    "GINEBRA": {
+      "demanda_semanal_casos": 1.8,
+      "lead_time_dias": 0.12,
+      "stock_aceta_tab": 108,
+      "stock_ringer_bolsas": 7,
+      "rop_aceta_tab": 73,
+      "rop_ringer_bolsas": 5,
+      "ss_aceta_tab": 72,
+      "ss_ringer_bolsas": 5
+    },
+    "GUACARI": {
+      "demanda_semanal_casos": 2.05,
+      "lead_time_dias": 0.12,
+      "stock_aceta_tab": 123,
+      "stock_ringer_bolsas": 8,
+      "rop_aceta_tab": 83,
+      "rop_ringer_bolsas": 6,
+      "ss_aceta_tab": 82,
+      "ss_ringer_bolsas": 6
+    },
+    "JAMUNDI": {
+      "demanda_semanal_casos": 3.61,
+      "lead_time_dias": 0.1,
+      "stock_aceta_tab": 216,
+      "stock_ringer_bolsas": 14,
+      "rop_aceta_tab": 145,
+      "rop_ringer_bolsas": 10,
+      "ss_aceta_tab": 144,
+      "ss_ringer_bolsas": 10
+    },
+    "LA CUMBRE": {
+      "demanda_semanal_casos": 1.0,
+      "lead_time_dias": 0.11,
+      "stock_aceta_tab": 60,
+      "stock_ringer_bolsas": 4,
+      "rop_aceta_tab": 40,
+      "rop_ringer_bolsas": 3,
+      "ss_aceta_tab": 40,
+      "ss_ringer_bolsas": 3
+    },
+    "LA UNION": {
+      "demanda_semanal_casos": 3.22,
+      "lead_time_dias": 0.22,
+      "stock_aceta_tab": 193,
+      "stock_ringer_bolsas": 13,
+      "rop_aceta_tab": 131,
+      "rop_ringer_bolsas": 9,
+      "ss_aceta_tab": 129,
+      "ss_ringer_bolsas": 9
+    },
+    "LA VICTORIA": {
+      "demanda_semanal_casos": 1.35,
+      "lead_time_dias": 0.22,
+      "stock_aceta_tab": 80,
+      "stock_ringer_bolsas": 5,
+      "rop_aceta_tab": 55,
+      "rop_ringer_bolsas": 4,
+      "ss_aceta_tab": 54,
+      "ss_ringer_bolsas": 4
+    },
+    "OBANDO": {
+      "demanda_semanal_casos": 1.48,
+      "lead_time_dias": 0.22,
+      "stock_aceta_tab": 88,
+      "stock_ringer_bolsas": 6,
+      "rop_aceta_tab": 60,
+      "rop_ringer_bolsas": 4,
+      "ss_aceta_tab": 59,
+      "ss_ringer_bolsas": 4
+    },
+    "PALMIRA": {
+      "demanda_semanal_casos": 14.01,
+      "lead_time_dias": 0.11,
+      "stock_aceta_tab": 840,
+      "stock_ringer_bolsas": 56,
+      "rop_aceta_tab": 565,
+      "rop_ringer_bolsas": 38,
+      "ss_aceta_tab": 561,
+      "ss_ringer_bolsas": 38
+    },
+    "PRADERA": {
+      "demanda_semanal_casos": 2.8,
+      "lead_time_dias": 0.12,
+      "stock_aceta_tab": 167,
+      "stock_ringer_bolsas": 11,
+      "rop_aceta_tab": 113,
+      "rop_ringer_bolsas": 8,
+      "ss_aceta_tab": 112,
+      "ss_ringer_bolsas": 8
+    },
+    "RESTREPO": {
+      "demanda_semanal_casos": 1.25,
+      "lead_time_dias": 0.12,
+      "stock_aceta_tab": 75,
+      "stock_ringer_bolsas": 5,
+      "rop_aceta_tab": 50,
+      "rop_ringer_bolsas": 3,
+      "ss_aceta_tab": 50,
+      "ss_ringer_bolsas": 3
+    },
+    "RIOFRIO": {
+      "demanda_semanal_casos": 2.48,
+      "lead_time_dias": 0.16,
+      "stock_aceta_tab": 148,
+      "stock_ringer_bolsas": 10,
+      "rop_aceta_tab": 100,
+      "rop_ringer_bolsas": 7,
+      "ss_aceta_tab": 99,
+      "ss_ringer_bolsas": 7
+    },
+    "ROLDANILLO": {
+      "demanda_semanal_casos": 3.16,
+      "lead_time_dias": 0.2,
+      "stock_aceta_tab": 189,
+      "stock_ringer_bolsas": 12,
+      "rop_aceta_tab": 128,
+      "rop_ringer_bolsas": 9,
+      "ss_aceta_tab": 126,
+      "ss_ringer_bolsas": 9
+    },
+    "SAN PEDRO": {
+      "demanda_semanal_casos": 1.76,
+      "lead_time_dias": 0.15,
+      "stock_aceta_tab": 105,
+      "stock_ringer_bolsas": 7,
+      "rop_aceta_tab": 72,
+      "rop_ringer_bolsas": 5,
+      "ss_aceta_tab": 71,
+      "ss_ringer_bolsas": 5
+    },
+    "SEVILLA": {
+      "demanda_semanal_casos": 2.93,
+      "lead_time_dias": 0.2,
+      "stock_aceta_tab": 175,
+      "stock_ringer_bolsas": 11,
+      "rop_aceta_tab": 119,
+      "rop_ringer_bolsas": 8,
+      "ss_aceta_tab": 117,
+      "ss_ringer_bolsas": 8
+    },
+    "TORO": {
+      "demanda_semanal_casos": 1.99,
+      "lead_time_dias": 0.22,
+      "stock_aceta_tab": 119,
+      "stock_ringer_bolsas": 8,
+      "rop_aceta_tab": 81,
+      "rop_ringer_bolsas": 5,
+      "ss_aceta_tab": 80,
+      "ss_ringer_bolsas": 5
+    },
+    "TRUJILLO": {
+      "demanda_semanal_casos": 1.58,
+      "lead_time_dias": 0.18,
+      "stock_aceta_tab": 95,
+      "stock_ringer_bolsas": 6,
+      "rop_aceta_tab": 64,
+      "rop_ringer_bolsas": 4,
+      "ss_aceta_tab": 63,
+      "ss_ringer_bolsas": 4
+    },
+    "TULUA": {
+      "demanda_semanal_casos": 6.99,
+      "lead_time_dias": 0.17,
+      "stock_aceta_tab": 419,
+      "stock_ringer_bolsas": 28,
+      "rop_aceta_tab": 283,
+      "rop_ringer_bolsas": 19,
+      "ss_aceta_tab": 280,
+      "ss_ringer_bolsas": 19
+    },
+    "ULLOA": {
+      "demanda_semanal_casos": 1.64,
+      "lead_time_dias": 0.25,
+      "stock_aceta_tab": 98,
+      "stock_ringer_bolsas": 6,
+      "rop_aceta_tab": 67,
+      "rop_ringer_bolsas": 4,
+      "ss_aceta_tab": 66,
+      "ss_ringer_bolsas": 4
+    },
+    "VERSALLES": {
+      "demanda_semanal_casos": 1.62,
+      "lead_time_dias": 0.22,
+      "stock_aceta_tab": 97,
+      "stock_ringer_bolsas": 6,
+      "rop_aceta_tab": 66,
+      "rop_ringer_bolsas": 4,
+      "ss_aceta_tab": 65,
+      "ss_ringer_bolsas": 4
+    },
+    "VIJES": {
+      "demanda_semanal_casos": 1.68,
+      "lead_time_dias": 0.11,
+      "stock_aceta_tab": 100,
+      "stock_ringer_bolsas": 6,
+      "rop_aceta_tab": 68,
+      "rop_ringer_bolsas": 5,
+      "ss_aceta_tab": 67,
+      "ss_ringer_bolsas": 5
+    },
+    "YOTOCO": {
+      "demanda_semanal_casos": 3.34,
+      "lead_time_dias": 0.13,
+      "stock_aceta_tab": 200,
+      "stock_ringer_bolsas": 13,
+      "rop_aceta_tab": 135,
+      "rop_ringer_bolsas": 9,
+      "ss_aceta_tab": 134,
+      "ss_ringer_bolsas": 9
+    },
+    "YUMBO": {
+      "demanda_semanal_casos": 4.84,
+      "lead_time_dias": 0.1,
+      "stock_aceta_tab": 290,
+      "stock_ringer_bolsas": 19,
+      "rop_aceta_tab": 194,
+      "rop_ringer_bolsas": 13,
+      "ss_aceta_tab": 193,
+      "ss_ringer_bolsas": 13
+    },
+    "ZARZAL": {
+      "demanda_semanal_casos": 2.45,
+      "lead_time_dias": 0.2,
+      "stock_aceta_tab": 146,
+      "stock_ringer_bolsas": 9,
+      "rop_aceta_tab": 99,
+      "rop_ringer_bolsas": 7,
+      "ss_aceta_tab": 98,
+      "ss_ringer_bolsas": 7
+    }
+  },
+  "supuestos": {
+    "factor_tortuosidad": 1.35,
+    "velocidad_kmph": 55,
+    "horas_carga_descarga": 2.0,
+    "stock_seguridad_semanas": 2,
+    "aceta_por_caso": 20,
+    "ringer_por_caso_grave": 9,
+    "tasa_gravedad": 0.15,
+    "fuentes": {
+      "coordenadas": "IGAC Colombia",
+      "tortuosidad": "INVIAS 2022 — vías primarias Valle del Cauca",
+      "velocidad": "INVIAS 2022 — velocidad promedio vías primarias",
+      "stock_seguridad": "Resolución MINSALUD 1403/2007",
+      "protocolos": "Guía MINSALUD manejo dengue 2022"
+    }
+  }
+}
