@@ -18,7 +18,7 @@ warnings.filterwarnings('ignore')
 # CONFIGURACIÓN
 # ─────────────────────────────────────────────
 st.set_page_config(
-    page_title="Data Sentinel — Última Milla",
+    page_title="Denguard — Última Milla",
     page_icon="🛡️",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -893,7 +893,7 @@ def consultar_sivigila_reciente(municipio, limite=200):
         r = requests.get(BASE, params={
             "$where": "cod_dpto_o='76' AND (cod_eve='210' OR cod_eve='211')",
             "$order": "ano DESC, semana DESC", "$limit": limite,
-        }, timeout=10)
+        }, timeout=60)
         if r.status_code != 200:
             return None, f"HTTP {r.status_code}", None
         df_live = pd.DataFrame(r.json())
@@ -921,7 +921,7 @@ def consultar_sivigila_reciente(municipio, limite=200):
 # ─────────────────────────────────────────────
 # ENCABEZADO
 # ─────────────────────────────────────────────
-st.title("🛡️ Data Sentinel: Logística Farmacéutica de Última Milla")
+st.title("🛡️ Denguard: Logística Farmacéutica de Última Milla")
 st.markdown(
     "**Ecosistema Predictivo Spatial-Aware** — De la predicción epidemiológica "
     "a la orden de despacho · Valle del Cauca · 42 municipios · SIVIGILA 2007–2018"
