@@ -25,6 +25,428 @@ st.set_page_config(
 )
 
 # ─────────────────────────────────────────────
+# INYECCIÓN DE CSS PERSONALIZADO
+# ─────────────────────────────────────────────
+st.markdown("""
+<style>
+/* ═══════════════════════════════════════════
+   DATA SENTINEL — Industrial Medical Precision
+   CSS inyectado vía st.markdown unsafe_allow_html
+   ═══════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap');
+
+:root {
+  --navy:       #0B1622;
+  --navy-mid:   #112030;
+  --navy-light: #1A3045;
+  --teal:       #0ABFBC;
+  --teal-dim:   #0abfbc33;
+  --green:      #22C55E;
+  --red:        #EF4444;
+  --amber:      #F59E0B;
+  --white:      #F0F4F8;
+  --muted:      #8899AA;
+  --border:     #1E3550;
+  --glass:      rgba(17, 32, 48, 0.85);
+}
+
+/* ── Base ── */
+html, body, [data-testid="stAppViewContainer"] {
+  background: var(--navy) !important;
+  color: var(--white) !important;
+  font-family: 'DM Sans', sans-serif !important;
+}
+
+[data-testid="stSidebar"] {
+  background: var(--navy-mid) !important;
+  border-right: 1px solid var(--border) !important;
+}
+
+/* ── Título principal ── */
+.ds-hero {
+  padding: 2rem 0 1rem;
+  animation: fadeSlideDown 0.7s ease both;
+}
+.ds-hero h1 {
+  font-family: 'Space Mono', monospace !important;
+  font-size: 1.8rem !important;
+  font-weight: 700 !important;
+  color: var(--teal) !important;
+  letter-spacing: -0.02em;
+  margin: 0 !important;
+  line-height: 1.1 !important;
+}
+.ds-hero p {
+  color: var(--muted) !important;
+  font-size: 0.85rem !important;
+  margin-top: 0.4rem !important;
+  font-family: 'DM Sans', sans-serif !important;
+}
+
+/* ── KPI badge strip ── */
+.ds-kpi-strip {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin: 1rem 0;
+  animation: fadeSlideUp 0.6s 0.2s ease both;
+}
+.ds-kpi {
+  background: var(--navy-light);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  flex: 1;
+  min-width: 110px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.ds-kpi:hover {
+  border-color: var(--teal);
+  transform: translateY(-2px);
+}
+.ds-kpi::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 3px; height: 100%;
+  background: var(--teal);
+  border-radius: 8px 0 0 8px;
+}
+.ds-kpi .label {
+  font-size: 0.65rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-family: 'Space Mono', monospace;
+}
+.ds-kpi .value {
+  font-family: 'Space Mono', monospace;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--teal);
+  margin-top: 0.15rem;
+}
+
+/* ── Tabs ── */
+[data-testid="stTabs"] > div:first-child {
+  border-bottom: 1px solid var(--border) !important;
+  gap: 0 !important;
+}
+button[data-baseweb="tab"] {
+  font-family: 'Space Mono', monospace !important;
+  font-size: 0.72rem !important;
+  color: var(--muted) !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 0.6rem 1rem !important;
+  transition: color 0.2s !important;
+  letter-spacing: 0.04em !important;
+}
+button[data-baseweb="tab"]:hover {
+  color: var(--teal) !important;
+}
+button[data-baseweb="tab"][aria-selected="true"] {
+  color: var(--teal) !important;
+  border-bottom: 2px solid var(--teal) !important;
+}
+
+/* ── Metric cards ── */
+[data-testid="stMetric"] {
+  background: var(--navy-light) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 10px !important;
+  padding: 1rem 1.2rem !important;
+  transition: border-color 0.2s, box-shadow 0.2s !important;
+}
+[data-testid="stMetric"]:hover {
+  border-color: var(--teal) !important;
+  box-shadow: 0 0 0 1px var(--teal-dim) !important;
+}
+[data-testid="stMetricLabel"] {
+  font-size: 0.68rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+  color: var(--muted) !important;
+  font-family: 'Space Mono', monospace !important;
+}
+[data-testid="stMetricValue"] {
+  font-family: 'Space Mono', monospace !important;
+  font-size: 1.4rem !important;
+  color: var(--white) !important;
+}
+
+/* ── Dataframe ── */
+[data-testid="stDataFrame"] {
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+}
+
+/* ── Selectbox / inputs ── */
+[data-testid="stSelectbox"] > div,
+[data-testid="stNumberInput"] > div {
+  background: var(--navy-light) !important;
+  border-color: var(--border) !important;
+  border-radius: 8px !important;
+}
+[data-testid="stSelectbox"] label,
+[data-testid="stNumberInput"] label,
+[data-testid="stSlider"] label {
+  font-family: 'Space Mono', monospace !important;
+  font-size: 0.7rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
+  color: var(--muted) !important;
+}
+
+/* ── Buttons ── */
+[data-testid="stButton"] > button {
+  background: var(--teal) !important;
+  color: var(--navy) !important;
+  font-family: 'Space Mono', monospace !important;
+  font-size: 0.75rem !important;
+  font-weight: 700 !important;
+  border: none !important;
+  border-radius: 8px !important;
+  padding: 0.6rem 1.4rem !important;
+  letter-spacing: 0.05em !important;
+  transition: opacity 0.2s, transform 0.15s !important;
+}
+[data-testid="stButton"] > button:hover {
+  opacity: 0.88 !important;
+  transform: translateY(-1px) !important;
+}
+
+/* ── Expander ── */
+[data-testid="stExpander"] {
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+  background: var(--navy-light) !important;
+}
+[data-testid="stExpander"] summary {
+  font-family: 'Space Mono', monospace !important;
+  font-size: 0.72rem !important;
+  color: var(--muted) !important;
+  letter-spacing: 0.05em !important;
+}
+
+/* ── Alert / info boxes ── */
+[data-testid="stAlert"] {
+  border-radius: 8px !important;
+  border-left-width: 3px !important;
+  font-size: 0.82rem !important;
+}
+
+/* ── Sidebar headers ── */
+[data-testid="stSidebar"] h1,
+[data-testid="stSidebar"] h2,
+[data-testid="stSidebar"] h3 {
+  font-family: 'Space Mono', monospace !important;
+  font-size: 0.72rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.1em !important;
+  color: var(--teal) !important;
+}
+
+/* ── Section headers ── */
+.ds-section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 1.5rem 0 0.8rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--border);
+}
+.ds-section-header span {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+.ds-section-header::before {
+  content: '';
+  width: 12px; height: 12px;
+  background: var(--teal);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* ── Status badge ── */
+.ds-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+.ds-badge-critico { background: #EF444422; color: #EF4444; border: 1px solid #EF444444; }
+.ds-badge-alerta  { background: #F59E0B22; color: #F59E0B; border: 1px solid #F59E0B44; }
+.ds-badge-normal  { background: #22C55E22; color: #22C55E; border: 1px solid #22C55E44; }
+.ds-badge-info    { background: #0ABFBC22; color: #0ABFBC; border: 1px solid #0ABFBC44; }
+
+/* ── Urgencia summary bar ── */
+.ds-urgencia-bar {
+  display: flex;
+  gap: 0.5rem;
+  margin: 0.8rem 0;
+  animation: fadeSlideUp 0.5s 0.3s ease both;
+}
+.ds-urgencia-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.8rem;
+  border-radius: 8px;
+  border: 1px solid;
+  transition: transform 0.2s;
+}
+.ds-urgencia-item:hover { transform: scale(1.02); }
+.ds-urgencia-item .count {
+  font-family: 'Space Mono', monospace;
+  font-size: 1.8rem;
+  font-weight: 700;
+  line-height: 1;
+}
+.ds-urgencia-item .label {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-top: 0.25rem;
+  opacity: 0.75;
+}
+.ds-urg-critico { background: #EF444411; border-color: #EF4444; color: #EF4444; }
+.ds-urg-alerta  { background: #F59E0B11; border-color: #F59E0B; color: #F59E0B; }
+.ds-urg-normal  { background: #22C55E11; border-color: #22C55E; color: #22C55E; }
+
+/* ── Terminal-style info box ── */
+.ds-terminal {
+  background: #060E18;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem 1.2rem;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--teal);
+  line-height: 1.8;
+  position: relative;
+}
+.ds-terminal::before {
+  content: '● ● ●';
+  position: absolute;
+  top: 0.5rem; left: 0.8rem;
+  font-size: 0.5rem;
+  color: var(--border);
+  letter-spacing: 0.3em;
+}
+.ds-terminal-body {
+  margin-top: 1rem;
+  color: #8ECAE6;
+}
+.ds-terminal-comment { color: #3A5068; }
+.ds-terminal-value   { color: var(--teal); }
+.ds-terminal-warn    { color: var(--amber); }
+.ds-terminal-ok      { color: var(--green); }
+.ds-terminal-err     { color: var(--red); }
+
+/* ── MD5 hash display ── */
+.ds-hash {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--muted);
+  background: #060E18;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+}
+
+/* ── Scan line animation (header decoration) ── */
+.ds-scanline {
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--teal), transparent);
+  background-size: 200% 100%;
+  animation: scanline 2.5s linear infinite;
+  margin: 0.3rem 0 1rem;
+  opacity: 0.5;
+}
+
+/* ── Pulse dot ── */
+.ds-pulse {
+  display: inline-block;
+  width: 8px; height: 8px;
+  background: var(--green);
+  border-radius: 50%;
+  animation: pulse 1.8s ease-in-out infinite;
+  vertical-align: middle;
+  margin-right: 0.4rem;
+}
+
+/* ── Animations ── */
+@keyframes fadeSlideDown {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes scanline {
+  0%   { background-position: -100% 0; }
+  100% { background-position: 300% 0; }
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.4; transform: scale(1.3); }
+}
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(6px) scale(0.95); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.ds-animate-in {
+  animation: countUp 0.5s ease both;
+}
+
+/* ── Divider ── */
+hr {
+  border-color: var(--border) !important;
+  margin: 1.2rem 0 !important;
+}
+
+/* ── Caption / small text ── */
+[data-testid="stCaptionContainer"] {
+  color: var(--muted) !important;
+  font-size: 0.7rem !important;
+}
+
+/* ── Slider track ── */
+[data-testid="stSlider"] [role="slider"] {
+  background: var(--teal) !important;
+}
+
+/* ── Success/Info/Warning/Error boxes ── */
+div[data-testid="stAlert"][data-baseweb="notification"] {
+  font-family: 'DM Sans', sans-serif !important;
+}
+
+/* ── Map container ── */
+[data-testid="stIFrame"] {
+  border-radius: 10px !important;
+  overflow: hidden !important;
+  border: 1px solid var(--border) !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
+# ─────────────────────────────────────────────
 # UTILIDADES ALCOA+
 # ─────────────────────────────────────────────
 def md5_archivo(path):
