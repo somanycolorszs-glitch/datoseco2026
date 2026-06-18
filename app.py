@@ -14,6 +14,19 @@ from datetime import datetime, timezone
 import warnings
 warnings.filterwarnings('ignore')
 
+# ── Dependencias opcionales (agente IA + menú de navegación tipo pilar) ──
+try:
+    import anthropic
+    ANTHROPIC_DISPONIBLE = True
+except ImportError:
+    ANTHROPIC_DISPONIBLE = False
+
+try:
+    from streamlit_option_menu import option_menu
+    OPTION_MENU_DISPONIBLE = True
+except ImportError:
+    OPTION_MENU_DISPONIBLE = False
+
 # ─────────────────────────────────────────────
 # CONFIGURACIÓN
 # ─────────────────────────────────────────────
@@ -193,47 +206,49 @@ h3 { font-size: 1.05rem !important; font-weight: 600 !important; }
   font-size: 0.68rem !important;
 }
 
-/* ── Navegación principal (reemplaza los tabs nativos) ── */
-[data-testid="stRadio"] > label { display: none !important; }
-[data-testid="stRadio"] > div[role="radiogroup"] {
+/* ── Navegación tipo "pilar" — vertical, en el sidebar (colapsable) ── */
+/* Si streamlit-option-menu está instalado se usa ese componente (con
+   íconos); este CSS solo aplica como respaldo si no está disponible,
+   convirtiendo un st.radio en una columna de pastillas verticales. */
+[data-testid="stSidebar"] [data-testid="stRadio"] > label { display: none !important; }
+[data-testid="stSidebar"] [data-testid="stRadio"] > div[role="radiogroup"] {
   display: flex !important;
-  flex-wrap: wrap !important;
-  gap: 0.4rem !important;
-  background: var(--ink2) !important;
-  border: 1px solid var(--border2) !important;
-  border-radius: 12px !important;
-  padding: 0.45rem !important;
-  margin-bottom: 1rem !important;
+  flex-direction: column !important;
+  gap: 0.35rem !important;
 }
-[data-testid="stRadio"] > div[role="radiogroup"] > label {
+[data-testid="stSidebar"] [data-testid="stRadio"] > div[role="radiogroup"] > label {
   font-family: 'JetBrains Mono', monospace !important;
-  font-size: 0.7rem !important;
+  font-size: 0.72rem !important;
   font-weight: 500 !important;
-  letter-spacing: 0.04em !important;
+  letter-spacing: 0.02em !important;
   color: var(--muted) !important;
-  background: transparent !important;
-  border: 1px solid transparent !important;
-  border-radius: 8px !important;
-  padding: 0.5rem 0.9rem !important;
+  background: var(--surface) !important;
+  border: 1px solid var(--border2) !important;
+  border-radius: 9px !important;
+  padding: 0.6rem 0.85rem !important;
   margin: 0 !important;
   cursor: pointer !important;
-  transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease !important;
+  transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease, transform 0.15s ease !important;
 }
-[data-testid="stRadio"] > div[role="radiogroup"] > label:hover {
+[data-testid="stSidebar"] [data-testid="stRadio"] > div[role="radiogroup"] > label:hover {
   color: var(--accent) !important;
-  border-color: var(--border2) !important;
+  border-color: var(--accent) !important;
+  transform: translateX(2px) !important;
 }
-[data-testid="stRadio"] > div[role="radiogroup"] > label[data-checked="true"],
-[data-testid="stRadio"] > div[role="radiogroup"] > label:has(input:checked) {
+[data-testid="stSidebar"] [data-testid="stRadio"] > div[role="radiogroup"] > label:has(input:checked) {
   color: var(--ink) !important;
   background: var(--accent) !important;
+  border-color: var(--accent) !important;
   box-shadow: 0 0 16px rgba(0,255,224,0.35) !important;
 }
-[data-testid="stRadio"] [data-testid="stMarkdownContainer"] p {
+[data-testid="stSidebar"] [data-testid="stRadio"] [data-testid="stMarkdownContainer"] p {
   font-size: inherit !important;
   color: inherit !important;
 }
-[data-testid="stRadio"] svg { display: none !important; }
+[data-testid="stSidebar"] [data-testid="stRadio"] svg { display: none !important; }
+
+/* Contenedor del menú tipo pilar (streamlit-option-menu) */
+[data-testid="stSidebar"] .nav-link { margin-bottom: 4px !important; }
 
 /* ── Botones ── */
 [data-testid="stButton"] > button {
@@ -884,6 +899,232 @@ def construir_mapa(semana):
     return mapa
 
 # ─────────────────────────────────────────────
+# AGENTE IA — HERRAMIENTAS (tool-use real sobre los datos del sistema)
+# ─────────────────────────────────────────────
+# El agente NUNCA inventa cifras: cada pregunta que requiere un dato se
+# resuelve llamando una de estas funciones, que leen directamente de los
+# mismos objetos que usa el resto del dashboard (modelo, histórico SIVIGILA,
+# parámetros logísticos). `semana_actual` se resuelve en tiempo de llamada
+# (no de definición), así que toma el valor que el usuario fijó en el
+# sidebar al momento de preguntar.
+
+def _normalizar_municipio(nombre):
+    nombre = (nombre or '').strip().upper()
+    if nombre in MUNICIPIOS:
+        return nombre
+    coincidencias = [m for m in MUNICIPIOS if nombre in m or m in nombre]
+    return coincidencias[0] if coincidencias else None
+
+
+def tool_prediccion_municipio(municipio):
+    mun = _normalizar_municipio(municipio)
+    if not mun:
+        return {"error": f"Municipio '{municipio}' no reconocido.",
+                "municipios_disponibles": sorted(MUNICIPIOS)}
+    h  = df_hist[df_hist['municipio_ocurrencia'] == mun].sort_values('fecha')
+    s  = h['casos'].tail(12).reset_index(drop=True)
+    si, _, md = imputar_semanas_faltantes(s)
+    g  = lambda i: int(si.iloc[i]) if len(si) > abs(i) else 3
+    pred, _ = predecir(mun, g(-1), g(-2), g(-3), semana_actual, md)
+    cadena = evaluar_cadena(
+        mun, pred,
+        INVENTARIO_BASE.get(mun, {}).get('stock_aceta_tab', 50),
+        INVENTARIO_BASE.get(mun, {}).get('stock_ringer_bolsas', 5)
+    )
+    return {
+        "municipio": mun,
+        "semana_epidemiologica_consultada": semana_actual,
+        "casos_predichos_proxima_semana": pred,
+        "modo_degradado": bool(md),
+        "urgencia_logistica": cadena['urgencia'] if cadena else None,
+        "despachar_en_dias": cadena['despachar_en_dias'] if cadena else None,
+        "tabletas_acetaminofen_requeridas": cadena['req_aceta'] if cadena else None,
+        "bolsas_ringer_requeridas": cadena['req_ringer'] if cadena else None,
+        "ahorro_estimado_cop": cadena['ahorro'] if cadena else None,
+    }
+
+
+def tool_resumen_departamental():
+    df_r = calcular_resumen_todos(semana_actual)
+    return {
+        "semana_epidemiologica": semana_actual,
+        "total_municipios_evaluados": len(df_r),
+        "municipios_criticos": df_r[df_r['urgencia'] == 'CRÍTICO']['municipio'].tolist(),
+        "municipios_alerta": df_r[df_r['urgencia'] == 'ALERTA']['municipio'].tolist(),
+        "total_casos_predichos_departamento": int(df_r['pred_casos'].sum()),
+        "ahorro_total_estimado_cop": int(df_r['ahorro'].sum()),
+        "municipio_mayor_riesgo": (
+            df_r.sort_values('pred_casos', ascending=False).iloc[0]['municipio']
+            if len(df_r) else None
+        ),
+    }
+
+
+def tool_metricas_modelo():
+    return {
+        "algoritmo": "Random Forest Regressor", "version_modelo": VERSION,
+        "mae_casos_semana": METRICAS['mae'], "rmse_casos_semana": METRICAS['rmse'],
+        "r2_holdout_2018": METRICAS['r2'],
+        "entrenado_con": paquete['entrenado_con'], "evaluado_en": paquete['evaluado_en'],
+        "fecha_entreno": paquete['fecha_entreno'],
+        "municipios_cubiertos": len(MUNICIPIOS),
+    }
+
+
+def tool_historico_municipio(municipio, semanas=12):
+    mun = _normalizar_municipio(municipio)
+    if not mun:
+        return {"error": f"Municipio '{municipio}' no reconocido.",
+                "municipios_disponibles": sorted(MUNICIPIOS)}
+    semanas = max(1, min(int(semanas or 12), 104))
+    h = df_hist[df_hist['municipio_ocurrencia'] == mun].sort_values('fecha').tail(semanas)
+    return {
+        "municipio": mun,
+        "semanas_consultadas": len(h),
+        "casos_por_semana": [
+            {"fecha": str(r['fecha'].date()), "casos": int(r['casos'])}
+            for _, r in h.iterrows()
+        ],
+        "promedio": round(float(h['casos'].mean()), 1) if len(h) else None,
+        "pico": int(h['casos'].max()) if len(h) else None,
+    }
+
+
+def tool_logistica_municipio(municipio):
+    mun = _normalizar_municipio(municipio)
+    if not mun:
+        return {"error": f"Municipio '{municipio}' no reconocido.",
+                "municipios_disponibles": sorted(MUNICIPIOS)}
+    red = RED_LOGISTICA.get(mun, {})
+    inv = INVENTARIO_BASE.get(mun, {})
+    return {
+        "municipio": mun,
+        "distancia_carretera_km": red.get('dist_carretera_km'),
+        "lead_time_horas": red.get('lead_time_horas'),
+        "lead_time_dias": red.get('lead_time_dias'),
+        "stock_actual_aceta_tab": inv.get('stock_aceta_tab'),
+        "punto_reorden_aceta_tab": inv.get('rop_aceta_tab'),
+        "stock_seguridad_aceta_tab": inv.get('ss_aceta_tab'),
+        "stock_actual_ringer_bolsas": inv.get('stock_ringer_bolsas'),
+        "punto_reorden_ringer_bolsas": inv.get('rop_ringer_bolsas'),
+        "stock_seguridad_ringer_bolsas": inv.get('ss_ringer_bolsas'),
+    }
+
+
+HERRAMIENTAS_AGENTE = [
+    {
+        "name": "consultar_prediccion_municipio",
+        "description": "Predicción de casos de dengue para la próxima semana en un "
+                        "municipio del Valle del Cauca, junto con urgencia logística "
+                        "e insumos requeridos (acetaminofén, lactato de Ringer).",
+        "input_schema": {
+            "type": "object",
+            "properties": {"municipio": {"type": "string",
+                            "description": "Nombre del municipio, ej. CALI, BUGA, TULUA"}},
+            "required": ["municipio"],
+        },
+    },
+    {
+        "name": "consultar_resumen_departamental",
+        "description": "Resumen del estado logístico (CRÍTICO/ALERTA/NORMAL) de los "
+                        "42 municipios del Valle del Cauca para la semana actual.",
+        "input_schema": {"type": "object", "properties": {}},
+    },
+    {
+        "name": "consultar_metricas_modelo",
+        "description": "Métricas oficiales de desempeño del modelo predictivo "
+                        "(MAE, RMSE, R²) y ficha técnica del Random Forest.",
+        "input_schema": {"type": "object", "properties": {}},
+    },
+    {
+        "name": "consultar_historico_municipio",
+        "description": "Histórico real de casos de dengue (SIVIGILA 2007–2018) de un "
+                        "municipio en sus últimas N semanas reportadas.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "municipio": {"type": "string"},
+                "semanas": {"type": "integer",
+                            "description": "Número de semanas a consultar (por defecto 12)"},
+            },
+            "required": ["municipio"],
+        },
+    },
+    {
+        "name": "consultar_logistica_municipio",
+        "description": "Parámetros logísticos de un municipio: distancia desde el "
+                        "centro de distribución, lead time, stock actual, punto de "
+                        "reorden y stock de seguridad.",
+        "input_schema": {
+            "type": "object",
+            "properties": {"municipio": {"type": "string"}},
+            "required": ["municipio"],
+        },
+    },
+]
+
+_DESPACHO_HERRAMIENTAS = {
+    "consultar_prediccion_municipio": lambda a: tool_prediccion_municipio(a.get("municipio", "")),
+    "consultar_resumen_departamental": lambda a: tool_resumen_departamental(),
+    "consultar_metricas_modelo": lambda a: tool_metricas_modelo(),
+    "consultar_historico_municipio": lambda a: tool_historico_municipio(
+        a.get("municipio", ""), a.get("semanas", 12)),
+    "consultar_logistica_municipio": lambda a: tool_logistica_municipio(a.get("municipio", "")),
+}
+
+SYSTEM_PROMPT_AGENTE = """Eres el agente de IA de Denguard, un sistema de soporte a
+decisiones logístico-epidemiológicas para dengue en el Valle del Cauca, Colombia.
+
+Reglas estrictas:
+- NUNCA inventes cifras (casos, costos, stock, métricas). Si la pregunta requiere
+  un dato del sistema, SIEMPRE llama la herramienta correspondiente antes de
+  responder, incluso si crees saber la respuesta.
+- Si una herramienta devuelve un error (ej. municipio no reconocido), explícalo
+  al usuario y sugiere municipios válidos si la herramienta los provee.
+- Responde siempre en español, de forma clara y concisa, citando las cifras
+  exactas que devolvieron las herramientas.
+- Si la pregunta no tiene relación con dengue, predicciones, logística o los
+  datos del sistema, dilo amablemente y redirige al alcance de la app.
+"""
+
+
+def ejecutar_herramienta(nombre, args):
+    try:
+        funcion = _DESPACHO_HERRAMIENTAS.get(nombre)
+        if not funcion:
+            return {"error": f"Herramienta desconocida: {nombre}"}
+        return funcion(args or {})
+    except Exception as e:
+        return {"error": str(e)}
+
+
+def ejecutar_agente(client, historial_api, max_iter=5):
+    """Loop de tool-use: llama al modelo, ejecuta las herramientas que pida,
+    y repite hasta que responda con texto final (o se agoten los intentos)."""
+    for _ in range(max_iter):
+        resp = client.messages.create(
+            model="claude-sonnet-4-6",
+            max_tokens=1024,
+            system=SYSTEM_PROMPT_AGENTE,
+            tools=HERRAMIENTAS_AGENTE,
+            messages=historial_api,
+        )
+        bloques_tool = [b for b in resp.content if b.type == "tool_use"]
+        historial_api = historial_api + [{"role": "assistant", "content": resp.content}]
+        if not bloques_tool:
+            texto = "".join(b.text for b in resp.content if b.type == "text").strip()
+            return texto or "(sin respuesta)", historial_api
+        resultados = []
+        for b in bloques_tool:
+            resultado = ejecutar_herramienta(b.name, b.input)
+            resultados.append({
+                "type": "tool_result", "tool_use_id": b.id,
+                "content": json.dumps(resultado, ensure_ascii=False, default=str),
+            })
+        historial_api = historial_api + [{"role": "user", "content": resultados}]
+    return "No pude completar la respuesta tras varias consultas. Intenta reformular la pregunta.", historial_api
+
+# ─────────────────────────────────────────────
 # ENCABEZADO
 # ─────────────────────────────────────────────
 st.title("🛡️ Denguard: Logística Farmacéutica de Última Milla")
@@ -904,8 +1145,51 @@ st.caption(
 st.divider()
 
 # ─────────────────────────────────────────────
-# PANEL LATERAL
+# NAVEGACIÓN — menú lateral tipo "pilar" (vertical, dentro del sidebar
+# colapsable nativo de Streamlit)
 # ─────────────────────────────────────────────
+SECCIONES = [
+    "📊 Dashboard",
+    "🚚 Cadena de Abastecimiento",
+    "📡 Nowcasting",
+    "📈 Serie Histórica",
+    "🗺️ Mapa",
+    "🔍 Validación Retrospectiva",
+    "🔬 Auditoría ALCOA+",
+    "🤖 Agente IA",
+]
+ICONOS_SECCION = ["graph-up-arrow", "truck", "broadcast", "clock-history",
+                   "geo-alt", "search", "shield-check", "robot"]
+
+st.sidebar.header("🧭 Navegación")
+if OPTION_MENU_DISPONIBLE:
+    with st.sidebar:
+        seccion_activa = option_menu(
+            menu_title=None,
+            options=SECCIONES,
+            icons=ICONOS_SECCION,
+            default_index=0,
+            styles={
+                "container": {"padding": "0!important", "background-color": "transparent"},
+                "icon": {"color": "#00ffe0", "font-size": "13px"},
+                "nav-link": {
+                    "font-family": "JetBrains Mono, monospace", "font-size": "12.5px",
+                    "color": "#5a7a99", "background-color": "#0f1c2d",
+                    "border": "1px solid rgba(0,255,224,0.18)", "border-radius": "9px",
+                    "margin": "0 0 4px 0", "padding": "10px 12px",
+                },
+                "nav-link-selected": {
+                    "background-color": "#00ffe0", "color": "#05090f",
+                    "font-weight": "600",
+                },
+            },
+        )
+else:
+    seccion_activa = st.sidebar.radio(
+        "Navegación", SECCIONES, label_visibility="collapsed"
+    )
+
+st.sidebar.divider()
 st.sidebar.header("📍 Parámetros de Simulación")
 municipio_sel = st.sidebar.selectbox(
     "Municipio objetivo:", sorted(MUNICIPIOS),
@@ -924,7 +1208,7 @@ if modo_degradado:
 
 ult = lambda i: int(serie_imp.iloc[i]) if len(serie_imp) > abs(i) else 3
 
-with st.sidebar.expander("📈 Inercia Epidemiológica", expanded=True):
+with st.sidebar.expander("📈 Inercia Epidemiológica", expanded=False):
     casos_t1      = st.number_input("Casos semana anterior (t-1)",
                                      min_value=0, value=ult(-1))
     casos_t2      = st.number_input("Casos hace 2 semanas (t-2)",
@@ -933,7 +1217,7 @@ with st.sidebar.expander("📈 Inercia Epidemiológica", expanded=True):
                                      min_value=0, value=ult(-3))
     semana_actual = st.slider("Semana epidemiológica actual", 1, 52, 20)
 
-with st.sidebar.expander("💊 Stock Actual ⚠️ Simulado", expanded=True):
+with st.sidebar.expander("💊 Stock Actual ⚠️ Simulado", expanded=False):
     inv_base           = INVENTARIO_BASE.get(municipio_sel, {})
     stock_aceta_input  = st.number_input(
         "Acetaminofén disponible (tab)",
@@ -963,32 +1247,11 @@ orden_urg  = {'CRÍTICO': 0, 'ALERTA': 1, 'NORMAL': 2}
 df_sorted  = df_resumen.sort_values('urgencia', key=lambda x: x.map(orden_urg))
 
 # ─────────────────────────────────────────────
-# NAVEGACIÓN PRINCIPAL
+# CONTENIDO DE LA SECCIÓN ACTIVA
 # ─────────────────────────────────────────────
-# FIX "todo muy crowded" + lentitud: `st.tabs` nativo de Streamlit RENDERIZA
-# el contenido de TODAS las pestañas en cada rerun, aunque el usuario solo
-# esté viendo una (es una limitación conocida de Streamlit: el código
-# dentro de cada `with tab:` se ejecuta siempre). Eso significa que, por
-# ejemplo, mover el slider de "semana epidemiológica" disparaba también el
-# armado completo del mapa folium, la validación retrospectiva y toda la
-# UI de nowcasting — aunque el usuario estuviera mirando el Dashboard.
-#
-# Ahora la navegación es un selector tipo "panel": solo se ejecuta y
-# renderiza el código de la sección activa. El resto de secciones no se
-# calculan hasta que el usuario las selecciona, lo que además de ordenar
-# visualmente la app (menos saturada) la hace notablemente más rápida.
-SECCIONES = [
-    "📊 Dashboard",
-    "🚚 Cadena de Abastecimiento",
-    "📡 Nowcasting",
-    "📈 Serie Histórica",
-    "🗺️ Mapa",
-    "🔍 Validación Retrospectiva",
-    "🔬 Auditoría ALCOA+",
-]
-seccion_activa = st.radio(
-    "Navegación", SECCIONES, horizontal=True, label_visibility="collapsed"
-)
+# Solo se ejecuta el código de la sección elegida en el menú lateral — las
+# demás secciones (mapa, validación retrospectiva, nowcasting, etc.) no se
+# calculan ni se renderizan hasta que el usuario las selecciona.
 st.markdown('<div class="ds-animate-in">', unsafe_allow_html=True)
 
 # ══════════════════════════════════════════════
@@ -1818,5 +2081,97 @@ Esto es lo que diferencia un sistema de soporte a decisiones clínicas
 de un dashboard de visualización. La norma (Res. MINSALUD 1403/2007)
 y la evidencia (SIVIGILA + modelo) hablan el mismo idioma.
         """)
+
+# ══════════════════════════════════════════════
+# SECCIÓN 8 — AGENTE IA
+# ══════════════════════════════════════════════
+elif seccion_activa == SECCIONES[7]:
+    st.subheader("🤖 Agente IA — Pregúntale a Denguard")
+    st.caption(
+        "Agente con acceso a herramientas en tiempo real sobre el modelo, el "
+        "histórico SIVIGILA y la cadena logística — no improvisa cifras, las consulta."
+    )
+
+    with st.expander("⚙️ Arquitectura del agente — para el jurado", expanded=False):
+        st.markdown("""
+Esto **no** es un chatbot que alucina números: es un agente con **tool-use real**
+sobre Claude (Anthropic). Cada vez que el usuario pregunta algo, el modelo
+decide si necesita datos del sistema y llama una o varias de estas herramientas
+*antes* de redactar la respuesta:
+
+| Herramienta | Qué consulta |
+|---|---|
+| `consultar_prediccion_municipio` | Predicción de la próxima semana + urgencia logística |
+| `consultar_resumen_departamental` | Estado CRÍTICO / ALERTA / NORMAL de los 42 municipios |
+| `consultar_metricas_modelo` | MAE, RMSE, R² y ficha técnica del Random Forest |
+| `consultar_historico_municipio` | Casos reales SIVIGILA por semana |
+| `consultar_logistica_municipio` | Distancia, lead time, stock, ROP, SS |
+
+```
+Pregunta del usuario
+     ↓
+Claude decide qué herramienta(s) necesita
+     ↓
+Denguard ejecuta la(s) función(es) sobre los datos reales del sistema
+     ↓
+El resultado (JSON) vuelve a Claude como "tool_result"
+     ↓
+Claude redacta la respuesta final citando las cifras obtenidas
+```
+
+Si una pregunta no tiene una herramienta para resolverla, el agente lo dice
+en vez de inventar un número.
+        """)
+
+    api_key = ""
+    try:
+        api_key = st.secrets.get("ANTHROPIC_API_KEY", "")
+    except Exception:
+        api_key = ""
+    if not api_key:
+        api_key = st.text_input(
+            "Anthropic API Key", type="password",
+            help="Se usa solo en esta sesión de navegador, no se guarda ni se envía a ningún otro lado."
+        )
+
+    if not ANTHROPIC_DISPONIBLE:
+        st.error("Falta instalar el SDK de Anthropic: `pip install anthropic`")
+    elif not api_key:
+        st.info("👆 Ingresa tu API Key de Anthropic para activar el agente.")
+    else:
+        if "agente_chat" not in st.session_state:
+            st.session_state.agente_chat = []      # historial visible (solo texto)
+        if "agente_api_msgs" not in st.session_state:
+            st.session_state.agente_api_msgs = []   # historial completo (incluye tool calls)
+
+        for m in st.session_state.agente_chat:
+            with st.chat_message(m["role"]):
+                st.markdown(m["content"])
+
+        pregunta = st.chat_input(
+            "Ej: ¿Qué municipios están en CRÍTICO esta semana? · "
+            "¿Cuántos casos se predicen para Buga?"
+        )
+        if pregunta:
+            st.session_state.agente_chat.append({"role": "user", "content": pregunta})
+            st.session_state.agente_api_msgs.append({"role": "user", "content": pregunta})
+            with st.chat_message("user"):
+                st.markdown(pregunta)
+            with st.chat_message("assistant"):
+                with st.spinner("Consultando herramientas..."):
+                    try:
+                        cliente_ia = anthropic.Anthropic(api_key=api_key)
+                        texto, st.session_state.agente_api_msgs = ejecutar_agente(
+                            cliente_ia, st.session_state.agente_api_msgs
+                        )
+                    except Exception as e:
+                        texto = f"❌ Error consultando al agente: {e}"
+                st.markdown(texto)
+            st.session_state.agente_chat.append({"role": "assistant", "content": texto})
+
+        if st.session_state.agente_chat and st.button("🗑️ Limpiar conversación"):
+            st.session_state.agente_chat = []
+            st.session_state.agente_api_msgs = []
+            st.rerun()
 
 st.markdown('</div>', unsafe_allow_html=True)
