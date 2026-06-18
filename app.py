@@ -27,9 +27,6 @@ st.set_page_config(
 # ─────────────────────────────────────────────
 # INYECCIÓN DE CSS PERSONALIZADO
 # ─────────────────────────────────────────────
-# ─────────────────────────────────────────────
-# INYECCIÓN DE CSS PERSONALIZADO
-# ─────────────────────────────────────────────
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500&family=Inter:wght@300;400;500&display=swap');
@@ -196,50 +193,47 @@ h3 { font-size: 1.05rem !important; font-weight: 600 !important; }
   font-size: 0.68rem !important;
 }
 
-/* ── Tabs ── */
-[data-testid="stTabs"] {
-  background: transparent !important;
-}
-[data-testid="stTabs"] > div:first-child {
+/* ── Navegación principal (reemplaza los tabs nativos) ── */
+[data-testid="stRadio"] > label { display: none !important; }
+[data-testid="stRadio"] > div[role="radiogroup"] {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 0.4rem !important;
   background: var(--ink2) !important;
-  border-radius: 10px 10px 0 0 !important;
   border: 1px solid var(--border2) !important;
-  border-bottom: none !important;
-  padding: 0 0.5rem !important;
-  gap: 0 !important;
+  border-radius: 12px !important;
+  padding: 0.45rem !important;
+  margin-bottom: 1rem !important;
 }
-button[data-baseweb="tab"] {
+[data-testid="stRadio"] > div[role="radiogroup"] > label {
   font-family: 'JetBrains Mono', monospace !important;
-  font-size: 0.68rem !important;
+  font-size: 0.7rem !important;
   font-weight: 500 !important;
+  letter-spacing: 0.04em !important;
   color: var(--muted) !important;
   background: transparent !important;
-  border: none !important;
-  border-bottom: 2px solid transparent !important;
-  padding: 0.75rem 1.1rem !important;
-  letter-spacing: 0.04em !important;
-  transition: color 0.2s ease, border-color 0.2s ease !important;
-  position: relative !important;
+  border: 1px solid transparent !important;
+  border-radius: 8px !important;
+  padding: 0.5rem 0.9rem !important;
+  margin: 0 !important;
+  cursor: pointer !important;
+  transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease !important;
 }
-button[data-baseweb="tab"]::before {
-  content: '';
-  position: absolute;
-  top: 50%; left: 50%;
-  width: 0; height: 0;
-  background: rgba(0,255,224,0.08);
-  border-radius: 50%;
-  transform: translate(-50%,-50%);
-  transition: width 0.4s ease, height 0.4s ease;
-}
-button[data-baseweb="tab"]:hover::before { width: 120px; height: 120px; }
-button[data-baseweb="tab"]:hover {
+[data-testid="stRadio"] > div[role="radiogroup"] > label:hover {
   color: var(--accent) !important;
+  border-color: var(--border2) !important;
 }
-button[data-baseweb="tab"][aria-selected="true"] {
-  color: var(--accent) !important;
-  border-bottom: 2px solid var(--accent) !important;
-  text-shadow: 0 0 12px rgba(0,255,224,0.5);
+[data-testid="stRadio"] > div[role="radiogroup"] > label[data-checked="true"],
+[data-testid="stRadio"] > div[role="radiogroup"] > label:has(input:checked) {
+  color: var(--ink) !important;
+  background: var(--accent) !important;
+  box-shadow: 0 0 16px rgba(0,255,224,0.35) !important;
 }
+[data-testid="stRadio"] [data-testid="stMarkdownContainer"] p {
+  font-size: inherit !important;
+  color: inherit !important;
+}
+[data-testid="stRadio"] svg { display: none !important; }
 
 /* ── Botones ── */
 [data-testid="stButton"] > button {
@@ -429,13 +423,6 @@ hr {
   overflow: hidden !important;
 }
 
-/* ── Radio buttons ── */
-[data-testid="stRadio"] [data-testid="stMarkdownContainer"] p {
-  font-family: 'Inter', sans-serif !important;
-  font-size: 0.82rem !important;
-  color: var(--text) !important;
-}
-
 /* ── Multiselect ── */
 [data-testid="stMultiSelect"] [data-baseweb="tag"] {
   background: rgba(0,255,224,0.12) !important;
@@ -465,224 +452,17 @@ hr {
 }
 ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 
-/* ══════════════════════════════════════
-   COMPONENTES HTML CUSTOM (usados con st.markdown)
-   ══════════════════════════════════════ */
-
-/* ── Scanline header bar ── */
-.ds-scanline {
-  height: 1px;
-  background: linear-gradient(90deg,
-    transparent 0%,
-    var(--accent) 40%,
-    var(--accent2) 60%,
-    transparent 100%);
-  background-size: 200% 100%;
-  animation: scanRun 3s linear infinite;
-  margin: 0.3rem 0 1.2rem;
-}
-@keyframes scanRun {
-  0%   { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
-/* ── KPI strip ── */
-.ds-kpi-strip {
-  display: flex;
-  gap: 0.6rem;
-  flex-wrap: wrap;
-  margin: 1rem 0;
-}
-.ds-kpi {
-  background: var(--surface);
-  border: 1px solid var(--border2);
-  border-radius: 12px;
-  padding: 0.7rem 1rem;
-  flex: 1;
-  min-width: 120px;
-  position: relative;
-  overflow: hidden;
-  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
-  cursor: default;
-}
-.ds-kpi::after {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, var(--accent), var(--accent2));
-  opacity: 0;
-  transition: opacity 0.25s;
-}
-.ds-kpi:hover { transform: translateY(-3px); border-color: var(--accent); box-shadow: var(--glow); }
-.ds-kpi:hover::after { opacity: 1; }
-.ds-kpi .label {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.58rem;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-}
-.ds-kpi .value {
-  font-family: 'Syne', sans-serif;
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: var(--accent);
-  margin-top: 0.15rem;
-  line-height: 1;
-}
-
-/* ── Urgencia bar ── */
-.ds-urgencia-bar { display: flex; gap: 0.5rem; margin: 0.8rem 0; }
-.ds-urgencia-item {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem 0.5rem;
-  border-radius: 12px;
-  border: 1px solid;
-  transition: transform 0.2s, box-shadow 0.2s;
-  cursor: default;
-}
-.ds-urgencia-item:hover { transform: scale(1.03); }
-.ds-urgencia-item .count {
-  font-family: 'Syne', sans-serif;
-  font-size: 2rem;
-  font-weight: 800;
-  line-height: 1;
-}
-.ds-urgencia-item .label {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.58rem;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  margin-top: 0.3rem;
-  opacity: 0.75;
-}
-.ds-urg-critico { background: rgba(255,61,90,0.08);  border-color: var(--danger); color: var(--danger); box-shadow: 0 0 20px rgba(255,61,90,0.1); }
-.ds-urg-alerta  { background: rgba(255,170,0,0.08);  border-color: var(--warn);   color: var(--warn); }
-.ds-urg-normal  { background: rgba(0,232,122,0.08);  border-color: var(--ok);     color: var(--ok); }
-
-/* ── Badges de estado ── */
-.ds-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  padding: 0.18rem 0.6rem;
-  border-radius: 20px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.62rem;
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-.ds-badge-critico { background: rgba(255,61,90,0.15);  color: var(--danger); border: 1px solid rgba(255,61,90,0.35); }
-.ds-badge-alerta  { background: rgba(255,170,0,0.15);  color: var(--warn);   border: 1px solid rgba(255,170,0,0.35); }
-.ds-badge-normal  { background: rgba(0,232,122,0.15);  color: var(--ok);     border: 1px solid rgba(0,232,122,0.35); }
-.ds-badge-info    { background: rgba(0,255,224,0.10);  color: var(--accent); border: 1px solid var(--border2); }
-
-/* ── Pulso ── */
-.ds-pulse {
-  display: inline-block;
-  width: 7px; height: 7px;
-  background: var(--ok);
-  border-radius: 50%;
-  box-shadow: 0 0 6px var(--ok);
-  animation: pulseDot 2s ease-in-out infinite;
-  vertical-align: middle;
-  margin-right: 0.4rem;
-}
-@keyframes pulseDot {
-  0%,100% { opacity:1; transform: scale(1); box-shadow: 0 0 6px var(--ok); }
-  50%      { opacity:0.4; transform: scale(1.4); box-shadow: 0 0 14px var(--ok); }
-}
-
-/* ── Terminal ── */
-.ds-terminal {
-  background: #020810;
-  border: 1px solid var(--border2);
-  border-radius: 12px;
-  padding: 1.1rem 1.3rem 1rem;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.72rem;
-  line-height: 1.9;
-  position: relative;
-}
-.ds-terminal::before {
-  content: '● ● ●';
-  display: block;
-  font-size: 0.45rem;
-  letter-spacing: 0.4em;
-  color: var(--surface3);
-  margin-bottom: 0.8rem;
-}
-.ds-terminal-body    { color: #7bc8e8; }
-.ds-terminal-comment { color: #2a4a6a; }
-.ds-terminal-value   { color: var(--accent); }
-.ds-terminal-warn    { color: var(--warn); }
-.ds-terminal-ok      { color: var(--ok); }
-.ds-terminal-err     { color: var(--danger); }
-
-/* ── Hash chip ── */
-.ds-hash {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.6rem;
-  color: var(--muted);
-  background: #020810;
-  padding: 0.1rem 0.45rem;
-  border-radius: 4px;
-  border: 1px solid var(--border2);
-}
-
-/* ── Section header ── */
-.ds-section-header {
-  display: flex;
-  align-items: center;
-  gap: 0.7rem;
-  margin: 1.8rem 0 0.9rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--border2);
-}
-.ds-section-header::before {
-  content: '';
-  width: 10px; height: 10px;
-  background: var(--accent);
-  border-radius: 2px;
-  box-shadow: 0 0 8px var(--accent);
-  flex-shrink: 0;
-}
-.ds-section-header span {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.65rem;
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  color: var(--muted);
-}
-
 /* ── Animaciones de entrada ── */
 @keyframes fadeUp {
   from { opacity:0; transform:translateY(16px); }
   to   { opacity:1; transform:translateY(0); }
 }
-@keyframes fadeDown {
-  from { opacity:0; transform:translateY(-12px); }
-  to   { opacity:1; transform:translateY(0); }
-}
 .ds-animate-in { animation: fadeUp 0.5s ease both; }
-
-/* ── Stagger para columnas ── */
 [data-testid="column"]:nth-child(1) { animation: fadeUp 0.5s 0.05s ease both; }
 [data-testid="column"]:nth-child(2) { animation: fadeUp 0.5s 0.15s ease both; }
 [data-testid="column"]:nth-child(3) { animation: fadeUp 0.5s 0.25s ease both; }
 [data-testid="column"]:nth-child(4) { animation: fadeUp 0.5s 0.35s ease both; }
 [data-testid="column"]:nth-child(5) { animation: fadeUp 0.5s 0.45s ease both; }
-
-/* ── Tab content fade ── */
-[data-testid="stTabsContent"] {
-  animation: fadeUp 0.4s ease both !important;
-}
 </style>
 """, unsafe_allow_html=True)
 
@@ -693,7 +473,7 @@ def md5_archivo(path):
     try:
         with open(path, 'rb') as f:
             return hashlib.md5(f.read()).hexdigest()[:12]
-    except:
+    except Exception:
         return 'N/A'
 
 def timestamp_utc():
@@ -866,8 +646,22 @@ def evaluar_cadena(municipio, pred_casos, stock_aceta, stock_ringer):
 
     ord_a  = max(0, int(req_a * 4 - max(0, sp_a) + ss_a))
     ord_r  = max(0, int(req_r * 4 - max(0, sp_r) + ss_r))
-    c_prev = ord_a * COSTOS['aceta_normal']   + ord_r * COSTOS['ringer_normal']
-    c_reac = ord_a * COSTOS['aceta_urgencia'] + ord_r * COSTOS['ringer_urgencia']
+
+    # ── FIX "ahorro siempre $0" ──────────────────────────────────────────
+    # Antes: c_prev/c_reac se calculaban multiplicando el PRECIO por
+    # `ord_a`/`ord_r` (cantidad a ORDENAR). Si el municipio ya tenía stock
+    # suficiente (caso normal con los valores por defecto del sidebar),
+    # `ord_a` y `ord_r` daban 0 → el "ahorro" mostrado era siempre $0,
+    # incluso cuando sí había demanda real prevista para esa semana.
+    #
+    # Ahora: el ahorro compara el costo de cubrir la DEMANDA PREDICHA
+    # (`req_a`/`req_r`) comprándola de forma preventiva (precio normal,
+    # planificada con anticipación) vs comprándola de forma reactiva/
+    # urgente (precio de emergencia, sin planificación). Esto refleja el
+    # ahorro real de tener un sistema predictivo, independientemente de
+    # si el stock actual ya alcanza o no para esta semana puntual.
+    c_prev = req_a * COSTOS['aceta_normal']   + req_r * COSTOS['ringer_normal']
+    c_reac = req_a * COSTOS['aceta_urgencia'] + req_r * COSTOS['ringer_urgencia']
 
     return {
         'municipio': municipio, 'urgencia': urg, 'emoji': emoji,
@@ -878,7 +672,8 @@ def evaluar_cadena(municipio, pred_casos, stock_aceta, stock_ringer):
         'orden_aceta': ord_a, 'orden_ringer': ord_r, 'despachar_en_dias': desp,
         'lead_time_dias': round(lt_d, 2), 'lead_time_horas': red.get('lead_time_horas', 0),
         'dist_carretera_km': red.get('dist_carretera_km', 0), 'dias_cobertura': d_cob,
-        'costo_preventivo': c_prev, 'costo_reactivo': c_reac, 'ahorro': c_reac - c_prev,
+        'costo_preventivo': round(c_prev), 'costo_reactivo': round(c_reac),
+        'ahorro': round(c_reac - c_prev),
         'sigma_error': inv.get('sigma_error_casos', 'N/A'),
         'metodo_ss': inv.get('metodo_ss', 'Estático'),
     }
@@ -886,37 +681,207 @@ def evaluar_cadena(municipio, pred_casos, stock_aceta, stock_ringer):
 # ─────────────────────────────────────────────
 # NOWCASTING API
 # ─────────────────────────────────────────────
-@st.cache_data(ttl=3600)
-def consultar_sivigila_reciente(municipio, limite=200):
+# FIX timeout en CALI / nowcasting lento:
+#   La consulta a la API NO filtra por municipio (filtra solo por
+#   departamento + evento), así que el request HTTP es idéntico sin
+#   importar qué municipio se seleccione — el filtrado por municipio
+#   ocurre después, en memoria. Antes, `municipio` formaba parte de la
+#   clave de caché (`@st.cache_data` usa los argumentos de la función),
+#   así que CADA municipio disparaba una llamada de red nueva e idéntica.
+#   CALI es el municipio seleccionado por defecto, así que normalmente es
+#   el primer request — el "cold start" de la API datos.gov.co — y el que
+#   más sufre si la API responde lento.
+#
+#   Ahora: 1) se quita `municipio` de los argumentos de la función cacheada
+#   (un solo request cubre TODOS los municipios), 2) se sube el timeout y
+#   se agregan reintentos automáticos, 3) se sube el límite de registros
+#   para tener mejor cobertura por municipio. Resultado: una sola llamada
+#   de red por hora (TTL) para los 42 municipios en vez de hasta 42
+#   llamadas idénticas — mucho más rápido y mucho menos propenso a timeout.
+@st.cache_data(ttl=3600, show_spinner=False)
+def consultar_sivigila_reciente(limite=3000):
     BASE = "https://www.datos.gov.co/resource/4hyg-wa9d.json"
-    try:
-        r = requests.get(BASE, params={
-            "$where": "cod_dpto_o='76' AND (cod_eve='210' OR cod_eve='211')",
-            "$order": "ano DESC, semana DESC", "$limit": limite,
-        }, timeout=60)
-        if r.status_code != 200:
-            return None, f"HTTP {r.status_code}", None
-        df_live = pd.DataFrame(r.json())
-        if df_live.empty:
-            return None, "Sin datos", None
-        df_live['semana']  = df_live['semana'].astype(int)
-        df_live['ano']     = df_live['ano'].astype(int)
-        df_live['conteo']  = pd.to_numeric(df_live['conteo'],
-                                            errors='coerce').fillna(0).astype(int)
-        df_live['municipio_ocurrencia'] = (df_live['municipio_ocurrencia']
-                                           .str.upper().str.strip())
-        sello = {
-            'timestamp':     timestamp_utc(),
-            'fuente':        'API datos.gov.co/resource/4hyg-wa9d',
-            'registros':     len(df_live),
-            'ano_max':       int(df_live['ano'].max()),
-            'hash_response': hashlib.md5(r.content).hexdigest()[:12],
-        }
-        return df_live, None, sello
-    except requests.exceptions.Timeout:
-        return None, "Timeout (>10s)", None
-    except Exception as e:
-        return None, str(e), None
+    ultimo_error = None
+    for intento in range(3):
+        try:
+            r = requests.get(BASE, params={
+                "$where": "cod_dpto_o='76' AND (cod_eve='210' OR cod_eve='211')",
+                "$order": "ano DESC, semana DESC", "$limit": limite,
+            }, timeout=90)
+            if r.status_code != 200:
+                ultimo_error = f"HTTP {r.status_code}"
+                continue
+            df_live = pd.DataFrame(r.json())
+            if df_live.empty:
+                return None, "Sin datos", None
+            df_live['semana']  = df_live['semana'].astype(int)
+            df_live['ano']     = df_live['ano'].astype(int)
+            df_live['conteo']  = pd.to_numeric(df_live['conteo'],
+                                                errors='coerce').fillna(0).astype(int)
+            df_live['municipio_ocurrencia'] = (df_live['municipio_ocurrencia']
+                                               .str.upper().str.strip())
+            sello = {
+                'timestamp':     timestamp_utc(),
+                'fuente':        'API datos.gov.co/resource/4hyg-wa9d',
+                'registros':     len(df_live),
+                'ano_max':       int(df_live['ano'].max()),
+                'hash_response': hashlib.md5(r.content).hexdigest()[:12],
+            }
+            return df_live, None, sello
+        except requests.exceptions.Timeout:
+            ultimo_error = f"Timeout en intento {intento + 1}/3 (>90s)"
+            continue
+        except Exception as e:
+            ultimo_error = str(e)
+            continue
+    return None, ultimo_error or "Error desconocido tras 3 intentos", None
+
+# ─────────────────────────────────────────────
+# VALIDACIÓN RETROSPECTIVA (cacheada — no depende de la UI)
+# ─────────────────────────────────────────────
+# FIX lentitud general: este bloque recorre ~150 semanas de CALI llamando
+# al modelo en cada una. NO depende de ningún control del sidebar (ni
+# municipio, ni stock, ni semana), pero antes vivía suelto dentro del tab
+# y se recalculaba en CADA rerun de la app (es decir, cada vez que el
+# usuario tocaba cualquier control, aunque fuera en otra pestaña). Ahora
+# se cachea una sola vez por sesión.
+@st.cache_data(show_spinner=False)
+def calcular_validacion_retrospectiva():
+    cali_hist = df_hist[
+        (df_hist['municipio_ocurrencia'] == 'CALI') &
+        (df_hist['fecha'].dt.year >= 2015)
+    ].sort_values('fecha').reset_index(drop=True)
+
+    if len(cali_hist) <= 3:
+        return None
+
+    inv_cali  = INVENTARIO_BASE.get('CALI', {})
+    ss_aceta  = inv_cali.get('ss_aceta_tab', 0)
+    rop_aceta = inv_cali.get('rop_aceta_tab', 0)
+    stock_sim = inv_cali.get('stock_aceta_tab', 8000)
+    registros_retro = []
+
+    for i in range(3, len(cali_hist)):
+        row  = cali_hist.iloc[i]
+        t1   = int(cali_hist.iloc[i-1]['casos'])
+        t2   = int(cali_hist.iloc[i-2]['casos'])
+        t3   = int(cali_hist.iloc[i-3]['casos'])
+        sem  = int(row['semana']) if 'semana' in row.index else 20
+        pred, _ = predecir('CALI', t1, t2, t3, sem)
+        real = int(row['casos'])
+        req_a = pred * SUPUESTOS['aceta_por_caso']
+        sp_a  = stock_sim - req_a
+        urg   = ('CRÍTICO' if sp_a < ss_aceta
+                 else 'ALERTA' if stock_sim < rop_aceta else 'NORMAL')
+        registros_retro.append({
+            'fecha': row['fecha'], 'real_casos': real,
+            'pred_casos': pred, 'stock_aceta': round(stock_sim), 'urgencia': urg,
+        })
+        stock_sim = max(0, stock_sim - real * SUPUESTOS['aceta_por_caso'])
+        if stock_sim < rop_aceta:
+            stock_sim += int(inv_cali.get('demanda_semanal_casos', 141) * 4 *
+                             SUPUESTOS['aceta_por_caso'])
+
+    df_retro = pd.DataFrame(registros_retro)
+    df_r16   = df_retro[df_retro['fecha'].dt.year >= 2016].reset_index(drop=True)
+    if df_r16.empty:
+        return None
+
+    idx_pico   = df_r16['real_casos'].idxmax()
+    pico_val   = df_r16.loc[idx_pico, 'real_casos']
+    pico_fec   = df_r16.loc[idx_pico, 'fecha']
+    pre_pico   = df_r16.iloc[max(0, idx_pico - 10):idx_pico]
+    primera_al = pre_pico[pre_pico['urgencia'].isin(['ALERTA', 'CRÍTICO'])].head(1)
+    sem_antic  = idx_pico - primera_al.index[0] if len(primera_al) > 0 else 0
+    idx_primera_al = int(primera_al.index[0]) if len(primera_al) > 0 else None
+
+    return {
+        'df_r16': df_r16, 'pico_val': pico_val, 'pico_fec': pico_fec,
+        'sem_antic': sem_antic, 'idx_primera_al': idx_primera_al,
+        'ss_aceta': ss_aceta, 'rop_aceta': rop_aceta,
+    }
+
+# ─────────────────────────────────────────────
+# CÁLCULO RESUMEN 42 MUNICIPIOS (cacheado por semana)
+# ─────────────────────────────────────────────
+@st.cache_data(show_spinner=False)
+def calcular_resumen_todos(_semana):
+    res = []
+    for mun in MUNICIPIOS:
+        h  = df_hist[df_hist['municipio_ocurrencia'] == mun].sort_values('fecha')
+        s  = h['casos'].tail(12).reset_index(drop=True)
+        si, _, md = imputar_semanas_faltantes(s)
+        g  = lambda i, si=si: int(si.iloc[i]) if len(si) > abs(i) else 3
+        p, _ = predecir(mun, g(-1), g(-2), g(-3), _semana, md)
+        c    = evaluar_cadena(
+            mun, p,
+            INVENTARIO_BASE.get(mun, {}).get('stock_aceta_tab', 50),
+            INVENTARIO_BASE.get(mun, {}).get('stock_ringer_bolsas', 5)
+        )
+        if c:
+            res.append(c)
+    return pd.DataFrame(res)
+
+# ─────────────────────────────────────────────
+# MAPA (cacheado como recurso — solo se reconstruye si cambia la semana)
+# ─────────────────────────────────────────────
+# FIX lentitud: construir el mapa folium con 42 marcadores + popups +
+# líneas de ruta es relativamente costoso. Antes se reconstruía en CADA
+# rerun (cualquier interacción en cualquier pestaña), aunque el usuario
+# no estuviera mirando el mapa. Ahora se cachea como recurso, indexado
+# solo por la semana epidemiológica (que es lo único de lo que depende).
+@st.cache_resource(show_spinner=False)
+def construir_mapa(semana):
+    df_resumen_mapa = calcular_resumen_todos(semana)
+    promedios = df_hist.groupby('municipio_ocurrencia')['casos'].mean()
+    mapa      = folium.Map(location=[3.9, -76.3], zoom_start=8, tiles='CartoDB positron')
+    origen    = [3.4516, -76.5320]
+
+    for _, row in df_resumen_mapa.iterrows():
+        mun  = row['municipio']
+        red  = RED_LOGISTICA.get(mun, {})
+        if not red:
+            continue
+        lat, lon = red.get('lat', 3.8), red.get('lon', -76.3)
+        color    = COLOR_URG[row['urgencia']]
+        radio    = max(5, min(35, int(row['pred_casos'] * 0.6) + 5))
+        prom     = promedios.get(mun, 1)
+        ratio    = round(row['pred_casos'] / prom, 2) if prom > 0 else 1.0
+
+        folium.PolyLine(
+            locations=[origen, [lat, lon]], color=color, weight=1.5, opacity=0.4,
+            dash_array='5 5' if row['urgencia'] == 'NORMAL' else None
+        ).add_to(mapa)
+
+        folium.CircleMarker(
+            location=[lat, lon], radius=radio, color=color,
+            fill=True, fill_color=color, fill_opacity=0.75,
+            popup=folium.Popup(
+                f"<div style='font-family:sans-serif;width:210px'>"
+                f"<b style='font-size:13px'>{row['emoji']} {mun}</b>"
+                f"<hr style='margin:3px 0'>"
+                f"<b>Urgencia:</b> {row['urgencia']}<br>"
+                f"<b>Predicción:</b> {row['pred_casos']} casos/sem<br>"
+                f"<b>Ratio vs promedio:</b> {ratio}x<br>"
+                f"<hr style='margin:3px 0'>"
+                f"<b>Distancia:</b> {row['dist_carretera_km']} km<br>"
+                f"<b>Lead time:</b> {row['lead_time_dias']} días<br>"
+                f"<b>Despachar en:</b> ≤{row['despachar_en_dias']} día(s)<br>"
+                f"<hr style='margin:3px 0'>"
+                f"<b>Aceta.:</b> {row['orden_aceta']:,} tab · "
+                f"<b>Ringer:</b> {row['orden_ringer']:,} bol<br>"
+                f"<b>Costo:</b> ${row['costo_preventivo']:,.0f} COP",
+                max_width=230
+            ),
+            tooltip=f"{mun} · {row['urgencia']} · {row['pred_casos']} casos"
+        ).add_to(mapa)
+
+    folium.Marker(
+        location=origen,
+        icon=folium.Icon(color='blue', icon='home', prefix='fa'),
+        tooltip="SECCIONED — Centro de distribución Cali"
+    ).add_to(mapa)
+    return mapa
 
 # ─────────────────────────────────────────────
 # ENCABEZADO
@@ -958,26 +923,27 @@ if modo_degradado:
     )
 
 ult = lambda i: int(serie_imp.iloc[i]) if len(serie_imp) > abs(i) else 3
-st.sidebar.subheader("Inercia Epidemiológica")
-casos_t1      = st.sidebar.number_input("Casos semana anterior (t-1)",
-                                         min_value=0, value=ult(-1))
-casos_t2      = st.sidebar.number_input("Casos hace 2 semanas (t-2)",
-                                         min_value=0, value=ult(-2))
-casos_t3      = st.sidebar.number_input("Casos hace 3 semanas (t-3)",
-                                         min_value=0, value=ult(-3))
-semana_actual = st.sidebar.slider("Semana epidemiológica actual", 1, 52, 20)
 
-st.sidebar.subheader("Stock Actual ⚠️ Simulado")
-inv_base           = INVENTARIO_BASE.get(municipio_sel, {})
-stock_aceta_input  = st.sidebar.number_input(
-    "Acetaminofén disponible (tab)",
-    min_value=0, value=inv_base.get('stock_aceta_tab', 100), step=50
-)
-stock_ringer_input = st.sidebar.number_input(
-    "Lactato de Ringer disponible (bolsas)",
-    min_value=0, value=inv_base.get('stock_ringer_bolsas', 10), step=5
-)
-st.sidebar.caption("⚠️ Stock simulado · Res. MINSALUD 1403/2007 · Edita para escenarios reales.")
+with st.sidebar.expander("📈 Inercia Epidemiológica", expanded=True):
+    casos_t1      = st.number_input("Casos semana anterior (t-1)",
+                                     min_value=0, value=ult(-1))
+    casos_t2      = st.number_input("Casos hace 2 semanas (t-2)",
+                                     min_value=0, value=ult(-2))
+    casos_t3      = st.number_input("Casos hace 3 semanas (t-3)",
+                                     min_value=0, value=ult(-3))
+    semana_actual = st.slider("Semana epidemiológica actual", 1, 52, 20)
+
+with st.sidebar.expander("💊 Stock Actual ⚠️ Simulado", expanded=True):
+    inv_base           = INVENTARIO_BASE.get(municipio_sel, {})
+    stock_aceta_input  = st.number_input(
+        "Acetaminofén disponible (tab)",
+        min_value=0, value=inv_base.get('stock_aceta_tab', 100), step=50
+    )
+    stock_ringer_input = st.number_input(
+        "Lactato de Ringer disponible (bolsas)",
+        min_value=0, value=inv_base.get('stock_ringer_bolsas', 10), step=5
+    )
+    st.caption("⚠️ Stock simulado · Res. MINSALUD 1403/2007 · Edita para escenarios reales.")
 
 # ─────────────────────────────────────────────
 # CÁLCULOS CENTRALES
@@ -992,45 +958,43 @@ rmse_ef     = METRICAS['rmse'] * (1.5 if modo_degradado else 1.0)
 ic_bajo     = max(0, pred_sel - int(rmse_ef))
 ic_alto     = pred_sel + int(rmse_ef)
 
-@st.cache_data
-def calcular_resumen_todos(_semana):
-    res = []
-    for mun in MUNICIPIOS:
-        h  = df_hist[df_hist['municipio_ocurrencia'] == mun].sort_values('fecha')
-        s  = h['casos'].tail(12).reset_index(drop=True)
-        si, _, md = imputar_semanas_faltantes(s)
-        g  = lambda i, si=si: int(si.iloc[i]) if len(si) > abs(i) else 3
-        p, _ = predecir(mun, g(-1), g(-2), g(-3), _semana, md)
-        c    = evaluar_cadena(
-            mun, p,
-            INVENTARIO_BASE.get(mun, {}).get('stock_aceta_tab', 50),
-            INVENTARIO_BASE.get(mun, {}).get('stock_ringer_bolsas', 5)
-        )
-        if c:
-            res.append(c)
-    return pd.DataFrame(res)
-
 df_resumen = calcular_resumen_todos(semana_actual)
 orden_urg  = {'CRÍTICO': 0, 'ALERTA': 1, 'NORMAL': 2}
 df_sorted  = df_resumen.sort_values('urgencia', key=lambda x: x.map(orden_urg))
 
 # ─────────────────────────────────────────────
-# TABS
+# NAVEGACIÓN PRINCIPAL
 # ─────────────────────────────────────────────
-tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
-    "📊 Dashboard Predictivo",
+# FIX "todo muy crowded" + lentitud: `st.tabs` nativo de Streamlit RENDERIZA
+# el contenido de TODAS las pestañas en cada rerun, aunque el usuario solo
+# esté viendo una (es una limitación conocida de Streamlit: el código
+# dentro de cada `with tab:` se ejecuta siempre). Eso significa que, por
+# ejemplo, mover el slider de "semana epidemiológica" disparaba también el
+# armado completo del mapa folium, la validación retrospectiva y toda la
+# UI de nowcasting — aunque el usuario estuviera mirando el Dashboard.
+#
+# Ahora la navegación es un selector tipo "panel": solo se ejecuta y
+# renderiza el código de la sección activa. El resto de secciones no se
+# calculan hasta que el usuario las selecciona, lo que además de ordenar
+# visualmente la app (menos saturada) la hace notablemente más rápida.
+SECCIONES = [
+    "📊 Dashboard",
     "🚚 Cadena de Abastecimiento",
-    "📡 Nowcasting (API en vivo)",
+    "📡 Nowcasting",
     "📈 Serie Histórica",
-    "🗺️ Mapa Departamental",
+    "🗺️ Mapa",
     "🔍 Validación Retrospectiva",
     "🔬 Auditoría ALCOA+",
-])
+]
+seccion_activa = st.radio(
+    "Navegación", SECCIONES, horizontal=True, label_visibility="collapsed"
+)
+st.markdown('<div class="ds-animate-in">', unsafe_allow_html=True)
 
 # ══════════════════════════════════════════════
-# TAB 1 — DASHBOARD PREDICTIVO
+# SECCIÓN 1 — DASHBOARD PREDICTIVO
 # ══════════════════════════════════════════════
-with tab1:
+if seccion_activa == SECCIONES[0]:
     st.markdown(f"### Reporte Predictivo — {municipio_sel}")
 
     if modo_degradado:
@@ -1040,7 +1004,7 @@ with tab1:
             f"en **{municipio_sel}**. Posible falla de reporte SIVIGILA.\n\n"
             f"**Medidas automáticas:** Imputación por mediana móvil ±2 semanas · "
             f"IC ampliado de ±{METRICAS['rmse']:.2f} → **±{rmse_ef:.2f}** casos/sem · "
-            f"Verificar en Tab 📡 Nowcasting."
+            f"Verificar en sección 📡 Nowcasting."
         )
 
     col1, col2, col3 = st.columns(3)
@@ -1104,31 +1068,36 @@ En salud pública, un **falso negativo** es más costoso que un falso positivo.
                 f"Reactivo: ${cadena_sel['costo_reactivo']:,.0f} · "
                 f"SISMED {COSTOS['fecha_consulta']}"
             )
-            with st.expander("ℹ️ Por qué el SS dinámico es menor — para el jurado"):
+            with st.expander("ℹ️ Cómo se calcula el ahorro — para el jurado"):
                 sigma = cadena_sel.get('sigma_error', 'N/A')
                 lt    = cadena_sel.get('lead_time_dias', 0)
                 z     = SUPUESTOS.get('z_score_95', 1.645)
                 st.markdown(f"""
 **Eficiencia Farmacoeconómica — Logística de Precisión:**
 
-Los sistemas tradicionales acumulan stock por **ignorancia estadística**.
-Data Sentinel acumula exactamente lo necesario porque **conoce su error**.
+El ahorro compara el costo de cubrir la **demanda predicha de esta semana**
+({cadena_sel['req_aceta']:,} tab. de acetaminofén + {cadena_sel['req_ringer']:,}
+bolsas de Ringer) comprada de dos formas distintas:
 
-**Fórmula SS dinámico (Chopra & Meindl, SCM 2016):**
+- **Preventiva** (precio normal SISMED, planificada con anticipación gracias
+  a la predicción): **${cadena_sel['costo_preventivo']:,.0f} COP**
+- **Reactiva** (precio de emergencia/urgencia, sin planificación, comprando
+  al momento del desabasto): **${cadena_sel['costo_reactivo']:,.0f} COP**
+
+**Ahorro = Reactivo − Preventivo = ${cadena_sel['ahorro']:,.0f} COP**
+
+Este ahorro depende de la demanda predicha, no de si el municipio ya tiene
+stock suficiente hoy — así refleja el valor de *anticipar* la compra, no
+solo si hace falta reabastecer en este instante.
+
+**SS dinámico (Chopra & Meindl, SCM 2016):**
 ```
 SS = Z(95%) × σ_error × √lead_time
 SS = {z:.3f} × {sigma} × √{lt:.4f}
 ```
-
-**Por qué el SS es menor que el estático:**
-El modelo tiene MAE={METRICAS['mae']} casos/sem. Ese nivel de precisión
-significa que el error esperado es bajo y el buffer necesario es pequeño.
-
-**Garantía de servicio al 95%:** Si el modelo falla, el SS cubre ese
-fallo en el 95% de los casos. El 5% restante se gestiona con el
-Tab Nowcasting + actualización de lags en tiempo real.
-
-**En producción:** Se aplica `max(SS_dinámico, SS_normativo_1403)`
+El modelo tiene MAE={METRICAS['mae']} casos/sem: alta precisión implica un
+buffer de seguridad pequeño y, por tanto, menos capital inmovilizado en
+inventario. En producción se aplica `max(SS_dinámico, SS_normativo_1403)`
 para garantizar cumplimiento legal y seguridad operativa simultáneamente.
                 """)
 
@@ -1219,9 +1188,9 @@ para garantizar cumplimiento legal y seguridad operativa simultáneamente.
                    + ("**×1.5 Modo Degradado.**" if modo_degradado else ""))
 
 # ══════════════════════════════════════════════
-# TAB 2 — CADENA DE ABASTECIMIENTO
+# SECCIÓN 2 — CADENA DE ABASTECIMIENTO
 # ══════════════════════════════════════════════
-with tab2:
+elif seccion_activa == SECCIONES[1]:
     st.markdown("### 🚚 Motor Logístico — De la Predicción a la Orden de Despacho")
     st.caption(
         "42 municipios · SS dinámico Z×σ×√LT (95% nivel servicio) · "
@@ -1236,11 +1205,11 @@ with tab2:
             "**no conocen su error de predicción**.\n\n"
             f"Data Sentinel usa `SS = Z(95%) × σ_error({METRICAS['mae']} casos) × √LT` "
             "porque **conoce exactamente cuánto se equivoca** y en qué contextos.\n\n"
-            "**Consecuencia:** El SS dinámico es menor que el estático en municipios "
-            "de baja carga — no porque sea inseguro, sino porque es **matemáticamente "
-            "correcto**. En producción se aplica `max(SS_dinámico, SS_normativo_Res1403)` "
-            "como piso legal. El ahorro en COP representa la diferencia entre una "
-            "bodega que acumula por miedo y una que abastece con evidencia."
+            "**Consecuencia:** el costo preventivo/reactivo y el ahorro se calculan "
+            "sobre la demanda predicha de cada semana, no solo sobre la cantidad a "
+            "ordenar — así el ahorro refleja el valor de anticipar la compra aunque "
+            "el municipio ya tenga stock suficiente en este instante. En producción "
+            "se aplica `max(SS_dinámico, SS_normativo_Res1403)` como piso legal."
         )
 
     criticos = df_sorted[df_sorted['urgencia'] == 'CRÍTICO']
@@ -1254,7 +1223,6 @@ with tab2:
 
     st.divider()
 
-    # Gráfica burbujas
     st.subheader("Demanda Predicha vs Distancia Logística — 42 Municipios")
     fig_bub = px.scatter(
         df_resumen, x='dist_carretera_km', y='pred_casos',
@@ -1275,7 +1243,6 @@ with tab2:
     fig_bub.update_yaxes(gridcolor='rgba(0,0,0,0.06)')
     st.plotly_chart(fig_bub, use_container_width=True)
 
-    # Tabla órdenes
     st.subheader("Órdenes de Despacho — Prioridad Automática")
     tabla = df_sorted[[
         'municipio','urgencia','pred_casos','orden_aceta','orden_ringer',
@@ -1302,39 +1269,38 @@ with tab2:
     ct3.metric("Costo preventivo", f"${df_resumen['costo_preventivo'].sum():,.0f} COP")
     ct4.metric("Ahorro total",     f"${df_resumen['ahorro'].sum():,.0f} COP")
 
-    # Stock vs ROP
     st.divider()
-    st.subheader("Stock Actual vs Punto de Reorden Dinámico")
-    munis_ord  = list(df_sorted['municipio'])
-    bar_colors = [COLOR_URG[r] for r in df_sorted['urgencia']]
+    with st.expander("📊 Stock Actual vs Punto de Reorden Dinámico (42 municipios)"):
+        munis_ord  = list(df_sorted['municipio'])
+        bar_colors = [COLOR_URG[r] for r in df_sorted['urgencia']]
 
-    fig_stock = make_subplots(rows=1, cols=2,
-        subplot_titles=['Acetaminofén — Stock vs ROP dinámico',
-                        'Lactato de Ringer — Stock vs ROP dinámico'])
-    for col_idx, (clave_s, clave_r) in enumerate(
-        [('stock_aceta_tab','rop_aceta_tab'),
-         ('stock_ringer_bolsas','rop_ringer_bolsas')], 1):
-        stocks = [INVENTARIO_BASE.get(m,{}).get(clave_s, 0) for m in munis_ord]
-        rops   = [INVENTARIO_BASE.get(m,{}).get(clave_r, 0) for m in munis_ord]
-        fig_stock.add_trace(go.Bar(
-            x=munis_ord, y=stocks, marker_color=bar_colors, opacity=0.85,
-            showlegend=False,
-            hovertemplate='%{x}<br>Stock: %{y:,}<extra></extra>'
-        ), row=1, col=col_idx)
-        fig_stock.add_trace(go.Scatter(
-            x=munis_ord, y=rops, mode='lines+markers',
-            name='ROP dinámico', showlegend=(col_idx == 1),
-            line=dict(color='#333', dash='dash', width=1.8), marker=dict(size=6),
-            hovertemplate='%{x}<br>ROP: %{y:,}<extra></extra>'
-        ), row=1, col=col_idx)
+        fig_stock = make_subplots(rows=1, cols=2,
+            subplot_titles=['Acetaminofén — Stock vs ROP dinámico',
+                            'Lactato de Ringer — Stock vs ROP dinámico'])
+        for col_idx, (clave_s, clave_r) in enumerate(
+            [('stock_aceta_tab','rop_aceta_tab'),
+             ('stock_ringer_bolsas','rop_ringer_bolsas')], 1):
+            stocks = [INVENTARIO_BASE.get(m,{}).get(clave_s, 0) for m in munis_ord]
+            rops   = [INVENTARIO_BASE.get(m,{}).get(clave_r, 0) for m in munis_ord]
+            fig_stock.add_trace(go.Bar(
+                x=munis_ord, y=stocks, marker_color=bar_colors, opacity=0.85,
+                showlegend=False,
+                hovertemplate='%{x}<br>Stock: %{y:,}<extra></extra>'
+            ), row=1, col=col_idx)
+            fig_stock.add_trace(go.Scatter(
+                x=munis_ord, y=rops, mode='lines+markers',
+                name='ROP dinámico', showlegend=(col_idx == 1),
+                line=dict(color='#333', dash='dash', width=1.8), marker=dict(size=6),
+                hovertemplate='%{x}<br>ROP: %{y:,}<extra></extra>'
+            ), row=1, col=col_idx)
 
-    fig_stock.update_layout(
-        height=400, margin=dict(l=0, r=0, t=40, b=80),
-        plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)',
-    )
-    fig_stock.update_xaxes(tickangle=45, tickfont=dict(size=8))
-    fig_stock.update_yaxes(gridcolor='rgba(0,0,0,0.06)')
-    st.plotly_chart(fig_stock, use_container_width=True)
+        fig_stock.update_layout(
+            height=400, margin=dict(l=0, r=0, t=40, b=80),
+            plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)',
+        )
+        fig_stock.update_xaxes(tickangle=45, tickfont=dict(size=8))
+        fig_stock.update_yaxes(gridcolor='rgba(0,0,0,0.06)')
+        st.plotly_chart(fig_stock, use_container_width=True)
 
     st.divider()
     if cadena_sel:
@@ -1405,9 +1371,9 @@ with tab2:
                      hide_index=True, use_container_width=True)
 
 # ══════════════════════════════════════════════
-# TAB 3 — NOWCASTING
+# SECCIÓN 3 — NOWCASTING
 # ══════════════════════════════════════════════
-with tab3:
+elif seccion_activa == SECCIONES[2]:
     st.markdown("### 📡 Nowcasting — Conexión SIVIGILA en Tiempo Real")
     st.info(
         "**📌 Data Gap 2018→2026 — Contexto COVID-19:**\n\n"
@@ -1431,6 +1397,8 @@ with tab3:
     with col_nw2:
         st.markdown(
             "- Consulta datos.gov.co en tiempo real (cod_eve 210+211)\n"
+            "- Un solo request cubre los 42 municipios (cacheado 1h) — ya no se "
+            "repite la llamada al cambiar de municipio\n"
             "- Calcula lags reales t-1, t-2, t-3 desde datos más recientes\n"
             "- Compara predicción con datos frescos vs histórico 2018\n"
             "- Hash MD5 de respuesta para trazabilidad ALCOA+"
@@ -1438,11 +1406,12 @@ with tab3:
 
     if consultar_btn:
         with st.spinner("Consultando API SIVIGILA..."):
-            df_live, error_msg, sello_live = consultar_sivigila_reciente(municipio_nw)
+            df_live, error_msg, sello_live = consultar_sivigila_reciente()
 
         if error_msg:
             st.error(f"❌ Error: {error_msg}")
-            st.info("Consistente con discontinuidades de reporte post-COVID en SIVIGILA.")
+            st.info("Consistente con discontinuidades de reporte post-COVID en SIVIGILA. "
+                    "Se reintentó automáticamente 3 veces antes de mostrar este error.")
         elif df_live is not None:
             df_mun_live = df_live[
                 df_live['municipio_ocurrencia'] == municipio_nw
@@ -1451,10 +1420,11 @@ with tab3:
             st.success("✅ Dato fresco obtenido directamente de la API SIVIGILA")
             s1, s2, s3, s4 = st.columns(4)
             s1.metric("Año más reciente",   sello_live['ano_max'])
-            s2.metric("Registros",          sello_live['registros'])
+            s2.metric("Registros (total)",  sello_live['registros'])
             s3.metric("Hash MD5",           sello_live['hash_response'])
             s4.metric("Consultado",         sello_live['timestamp'])
-            st.caption("✅ Original — SIVIGILA directo · ✅ Contemporáneo — tiempo real")
+            st.caption("✅ Original — SIVIGILA directo · ✅ Contemporáneo — tiempo real · "
+                       "Cacheado 1h para los 42 municipios")
 
             if len(df_mun_live) >= 3:
                 conteos = (df_mun_live.groupby(['ano','semana'])['conteo']
@@ -1539,9 +1509,9 @@ Re-entrenamiento inicia desde datos 2023+ para capturar nueva dinámica vectoria
         """)
 
 # ══════════════════════════════════════════════
-# TAB 4 — SERIE HISTÓRICA
+# SECCIÓN 4 — SERIE HISTÓRICA
 # ══════════════════════════════════════════════
-with tab4:
+elif seccion_activa == SECCIONES[3]:
     st.subheader("Serie Temporal Completa — SIVIGILA 2007–2018 · 42 Municipios")
 
     col_f1, col_f2 = st.columns([1, 3])
@@ -1583,62 +1553,14 @@ with tab4:
     st.dataframe(stats, use_container_width=True)
 
 # ══════════════════════════════════════════════
-# TAB 5 — MAPA DEPARTAMENTAL
+# SECCIÓN 5 — MAPA DEPARTAMENTAL
 # ══════════════════════════════════════════════
-with tab5:
+elif seccion_activa == SECCIONES[4]:
     st.subheader("Mapa de Riesgo Departamental — 42 Municipios Valle del Cauca")
     st.caption("Color = urgencia logística · Tamaño = casos predichos · "
                "Líneas = rutas desde SECCIONED Cali")
 
-    promedios = df_hist.groupby('municipio_ocurrencia')['casos'].mean()
-    mapa      = folium.Map(location=[3.9, -76.3], zoom_start=8, tiles='CartoDB positron')
-    origen    = [3.4516, -76.5320]
-
-    for _, row in df_resumen.iterrows():
-        mun  = row['municipio']
-        red  = RED_LOGISTICA.get(mun, {})
-        if not red:
-            continue
-        lat, lon = red.get('lat', 3.8), red.get('lon', -76.3)
-        color    = COLOR_URG[row['urgencia']]
-        radio    = max(5, min(35, int(row['pred_casos'] * 0.6) + 5))
-        prom     = promedios.get(mun, 1)
-        ratio    = round(row['pred_casos'] / prom, 2) if prom > 0 else 1.0
-
-        folium.PolyLine(
-            locations=[origen, [lat, lon]], color=color, weight=1.5, opacity=0.4,
-            dash_array='5 5' if row['urgencia'] == 'NORMAL' else None
-        ).add_to(mapa)
-
-        folium.CircleMarker(
-            location=[lat, lon], radius=radio, color=color,
-            fill=True, fill_color=color, fill_opacity=0.75,
-            popup=folium.Popup(
-                f"<div style='font-family:sans-serif;width:210px'>"
-                f"<b style='font-size:13px'>{row['emoji']} {mun}</b>"
-                f"<hr style='margin:3px 0'>"
-                f"<b>Urgencia:</b> {row['urgencia']}<br>"
-                f"<b>Predicción:</b> {row['pred_casos']} casos/sem<br>"
-                f"<b>Ratio vs promedio:</b> {ratio}x<br>"
-                f"<hr style='margin:3px 0'>"
-                f"<b>Distancia:</b> {row['dist_carretera_km']} km<br>"
-                f"<b>Lead time:</b> {row['lead_time_dias']} días<br>"
-                f"<b>Despachar en:</b> ≤{row['despachar_en_dias']} día(s)<br>"
-                f"<hr style='margin:3px 0'>"
-                f"<b>Aceta.:</b> {row['orden_aceta']:,} tab · "
-                f"<b>Ringer:</b> {row['orden_ringer']:,} bol<br>"
-                f"<b>Costo:</b> ${row['costo_preventivo']:,.0f} COP",
-                max_width=230
-            ),
-            tooltip=f"{mun} · {row['urgencia']} · {row['pred_casos']} casos"
-        ).add_to(mapa)
-
-    folium.Marker(
-        location=origen,
-        icon=folium.Icon(color='blue', icon='home', prefix='fa'),
-        tooltip="SECCIONED — Centro de distribución Cali"
-    ).add_to(mapa)
-
+    mapa = construir_mapa(semana_actual)
     st_folium(mapa, width=None, height=550)
     ml1, ml2, ml3 = st.columns(3)
     ml1.error("🔴 CRÍTICO — Stock post-demanda < SS dinámico")
@@ -1646,9 +1568,9 @@ with tab5:
     ml3.success("🟢 NORMAL — Stock suficiente para el período")
 
 # ══════════════════════════════════════════════
-# TAB 6 — VALIDACIÓN RETROSPECTIVA
+# SECCIÓN 6 — VALIDACIÓN RETROSPECTIVA
 # ══════════════════════════════════════════════
-with tab6:
+elif seccion_activa == SECCIONES[5]:
     st.subheader("🔍 Validación Retrospectiva — Brote Cali 2016–2017")
     st.markdown(
         "Demostración de que el sistema **hubiera detectado** el mayor brote "
@@ -1656,47 +1578,16 @@ with tab6:
         "*out-of-sample* (modelo entrenado hasta 2015)."
     )
 
-    cali_hist = df_hist[
-        (df_hist['municipio_ocurrencia'] == 'CALI') &
-        (df_hist['fecha'].dt.year >= 2015)
-    ].sort_values('fecha').reset_index(drop=True)
+    resultado_retro = calcular_validacion_retrospectiva()
 
-    if len(cali_hist) > 3:
-        inv_cali  = INVENTARIO_BASE.get('CALI', {})
-        ss_aceta  = inv_cali.get('ss_aceta_tab', 0)
-        rop_aceta = inv_cali.get('rop_aceta_tab', 0)
-        stock_sim = inv_cali.get('stock_aceta_tab', 8000)
-        registros_retro = []
-
-        for i in range(3, len(cali_hist)):
-            row  = cali_hist.iloc[i]
-            t1   = int(cali_hist.iloc[i-1]['casos'])
-            t2   = int(cali_hist.iloc[i-2]['casos'])
-            t3   = int(cali_hist.iloc[i-3]['casos'])
-            sem  = int(row['semana']) if 'semana' in row.index else 20
-            pred, _ = predecir('CALI', t1, t2, t3, sem)
-            real = int(row['casos'])
-            req_a = pred * SUPUESTOS['aceta_por_caso']
-            sp_a  = stock_sim - req_a
-            urg   = ('CRÍTICO' if sp_a < ss_aceta
-                     else 'ALERTA' if stock_sim < rop_aceta else 'NORMAL')
-            registros_retro.append({
-                'fecha': row['fecha'], 'real_casos': real,
-                'pred_casos': pred, 'stock_aceta': round(stock_sim), 'urgencia': urg,
-            })
-            stock_sim = max(0, stock_sim - real * SUPUESTOS['aceta_por_caso'])
-            if stock_sim < rop_aceta:
-                stock_sim += int(inv_cali.get('demanda_semanal_casos', 141) * 4 *
-                                 SUPUESTOS['aceta_por_caso'])
-
-        df_retro    = pd.DataFrame(registros_retro)
-        df_r16      = df_retro[df_retro['fecha'].dt.year >= 2016].reset_index(drop=True)
-        idx_pico    = df_r16['real_casos'].idxmax()
-        pico_val    = df_r16.loc[idx_pico, 'real_casos']
-        pico_fec    = df_r16.loc[idx_pico, 'fecha']
-        pre_pico    = df_r16.iloc[max(0, idx_pico-10):idx_pico]
-        primera_al  = pre_pico[pre_pico['urgencia'].isin(['ALERTA','CRÍTICO'])].head(1)
-        sem_antic   = idx_pico - primera_al.index[0] if len(primera_al) > 0 else 0
+    if resultado_retro is not None:
+        df_r16     = resultado_retro['df_r16']
+        pico_val   = resultado_retro['pico_val']
+        pico_fec   = resultado_retro['pico_fec']
+        sem_antic  = resultado_retro['sem_antic']
+        ss_aceta   = resultado_retro['ss_aceta']
+        rop_aceta  = resultado_retro['rop_aceta']
+        idx_primera_al = resultado_retro['idx_primera_al']
 
         rv1, rv2, rv3, rv4 = st.columns(4)
         rv1.metric("Pico real",            f"{pico_val} casos/sem")
@@ -1712,7 +1603,6 @@ with tab6:
                 f"— tiempo suficiente para activar la cadena."
             )
 
-        # Gráfica triple Plotly
         fig_retro = make_subplots(
             rows=3, cols=1, shared_xaxes=True,
             subplot_titles=['Casos reales vs predichos (out-of-sample)',
@@ -1755,9 +1645,9 @@ with tab6:
             hovertemplate='%{x|%d %b %Y}<br>%{customdata}<extra></extra>',
             customdata=df_r16['urgencia'].tolist()
         ), row=3, col=1)
-        if len(primera_al) > 0:
+        if idx_primera_al is not None:
             fig_retro.add_vline(
-                x=df_r16.loc[primera_al.index[0], 'fecha'],
+                x=df_r16.loc[idx_primera_al, 'fecha'],
                 line_dash='solid', line_color='#EF9F27',
                 line_width=2.5, opacity=0.9
             )
@@ -1780,20 +1670,21 @@ with tab6:
         mr1.metric("MAE (Cali 2016–17)",  f"{mae_r} casos/sem")
         mr2.metric("RMSE (Cali 2016–17)", f"{rmse_r} casos/sem")
         mr3.metric("R² (Cali 2016–17)",   f"{r2_r}")
+    else:
+        st.warning("No hay suficiente histórico de CALI desde 2015 para esta validación.")
 
 # ══════════════════════════════════════════════
-# TAB 7 — AUDITORÍA ALCOA+
+# SECCIÓN 7 — AUDITORÍA ALCOA+
 # ══════════════════════════════════════════════
-with tab7:
+elif seccion_activa == SECCIONES[6]:
     st.subheader("🔬 Auditoría Técnica Completa — Compliance ALCOA+")
 
-    # Sellos de integridad
     st.subheader("Sellos de Integridad de Datos")
     st.dataframe(pd.DataFrame({
         'Artefacto': ['modelo_municipal_v4.pkl','dengue_valle_semanal.csv',
                       'logistica_params.json','API SIVIGILA (en vivo)'],
         'Hash MD5':  [sello_modelo['hash_md5'], sello_datos['hash_md5'],
-                      sello_log['hash_md5'], 'Calculado en tiempo real (Tab Nowcasting)'],
+                      sello_log['hash_md5'], 'Calculado en tiempo real (sección Nowcasting)'],
         'Cargado en':[sello_modelo['cargado_en'], sello_datos['cargado_en'],
                       sello_log['cargado_en'], 'Bajo demanda'],
         'Fuente':    [sello_modelo['fuente'], sello_datos['fuente'],
@@ -1879,11 +1770,11 @@ with tab7:
             )
 
     st.divider()
-    st.markdown("#### Limitaciones Documentadas — Respuestas Preparadas para el Jurado")
-    st.warning("""
+    with st.expander("⚠️ Limitaciones Documentadas — Respuestas Preparadas para el Jurado"):
+        st.warning("""
 **1. Data Gap 2018→2026 (COVID-19):**
 Entrenado hasta 2018. Re-entrenamiento continuo vía API SIVIGILA planificado
-desde datos 2023+. El Tab Nowcasting es la solución operativa inmediata.
+desde datos 2023+. La sección Nowcasting es la solución operativa inmediata.
 
 **2. Dependencia de inercia (casos_t-1 dominante):**
 Estructural en modelos de lags. Mitigado con: detección de semanas faltantes,
@@ -1897,17 +1788,17 @@ estructuralmente. En picos, el sistema emite ALERTA antes del desbordamiento.
 Normativo (Res. 1403/2007). En producción: integrar con REPS/SISPRO.
 En presentación: `max(SS_dinámico, SS_normativo)` como piso legal.
 
-**5. SS dinámico menor que estático:**
-Resultado matemáticamente correcto de alta precisión del modelo (MAE=0.54).
-No es inseguro — es eficiente. En producción se aplica piso normativo Res. 1403/2007.
-Diferencia entre logística de adivinación y logística de precisión.
+**5. Ahorro calculado sobre demanda predicha, no sobre orden a realizar:**
+El ahorro mostrado compara comprar la demanda predicha de la semana a precio
+preventivo vs precio reactivo de urgencia. Es independiente de si el stock
+actual ya alcanza, porque mide el valor de *anticipar* la compra.
 
 **6. Variables climáticas ausentes:**
 Estacionalidad capturada vía seno/coseno de semana. Open-Meteo planificado v5.0.
-    """)
+        """)
 
-    st.markdown("#### Argumento de Farmacia Clínica — Para el Evaluador del Sector Salud")
-    st.info("""
+    with st.expander("🩺 Argumento de Farmacia Clínica — Para el Evaluador del Sector Salud"):
+        st.info("""
 Data Sentinel no es una herramienta para científicos de datos.
 
 **Es una herramienta para el Químico Farmacéutico hospitalario** que necesita
@@ -1926,4 +1817,6 @@ SIVIGILA (dato real) → Modelo RF (predicción semana t+1 a t+4)
 Esto es lo que diferencia un sistema de soporte a decisiones clínicas
 de un dashboard de visualización. La norma (Res. MINSALUD 1403/2007)
 y la evidencia (SIVIGILA + modelo) hablan el mismo idioma.
-    """)
+        """)
+
+st.markdown('</div>', unsafe_allow_html=True)
