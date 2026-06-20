@@ -7,5 +7,14 @@ plotly>=5.18.0
 folium>=0.15.0
 streamlit-folium>=0.18.0
 requests>=2.31.0
-anthropic
+streamlit
+pandas
+numpy
+joblib
+requests
+plotly
+folium
+streamlit-folium
+streamlit-option-menu
+google-genai
 streamlit-option-menu
