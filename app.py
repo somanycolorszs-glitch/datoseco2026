@@ -16,10 +16,11 @@ warnings.filterwarnings('ignore')
 
 # ── Dependencias opcionales (agente IA + menú de navegación tipo pilar) ──
 try:
-    import anthropic
-    ANTHROPIC_DISPONIBLE = True
+    from google import genai
+    from google.genai import types as genai_types
+    GEMINI_DISPONIBLE = True
 except ImportError:
-    ANTHROPIC_DISPONIBLE = False
+    GEMINI_DISPONIBLE = False
 
 try:
     from streamlit_option_menu import option_menu
@@ -553,6 +554,10 @@ try:
     VERSION    = paquete['version']
     ENC_LOOKUP = paquete['target_enc_lookup']
     IQR_LOOKUP = paquete['iqr_lookup']
+    # Gap Train-Val R²: si el .pkl trae este campo lo usamos (dato real del
+    # entrenamiento); si no, usamos el último valor documentado como
+    # fallback — pero queda en UN solo lugar, no repetido a mano dos veces.
+    GAP_TRAIN_VAL = paquete.get('gap_train_val_r2', 0.077)
 except FileNotFoundError:
     st.error("⚠️ No se encontró 'modelo_municipal_v4.pkl'.")
     st.stop()
@@ -1017,7 +1022,7 @@ HERRAMIENTAS_AGENTE = [
         "description": "Predicción de casos de dengue para la próxima semana en un "
                         "municipio del Valle del Cauca, junto con urgencia logística "
                         "e insumos requeridos (acetaminofén, lactato de Ringer).",
-        "input_schema": {
+        "parameters": {
             "type": "object",
             "properties": {"municipio": {"type": "string",
                             "description": "Nombre del municipio, ej. CALI, BUGA, TULUA"}},
@@ -1028,19 +1033,19 @@ HERRAMIENTAS_AGENTE = [
         "name": "consultar_resumen_departamental",
         "description": "Resumen del estado logístico (CRÍTICO/ALERTA/NORMAL) de los "
                         "42 municipios del Valle del Cauca para la semana actual.",
-        "input_schema": {"type": "object", "properties": {}},
+        "parameters": {"type": "object", "properties": {}},
     },
     {
         "name": "consultar_metricas_modelo",
         "description": "Métricas oficiales de desempeño del modelo predictivo "
                         "(MAE, RMSE, R²) y ficha técnica del Random Forest.",
-        "input_schema": {"type": "object", "properties": {}},
+        "parameters": {"type": "object", "properties": {}},
     },
     {
         "name": "consultar_historico_municipio",
         "description": "Histórico real de casos de dengue (SIVIGILA 2007–2018) de un "
                         "municipio en sus últimas N semanas reportadas.",
-        "input_schema": {
+        "parameters": {
             "type": "object",
             "properties": {
                 "municipio": {"type": "string"},
@@ -1055,7 +1060,7 @@ HERRAMIENTAS_AGENTE = [
         "description": "Parámetros logísticos de un municipio: distancia desde el "
                         "centro de distribución, lead time, stock actual, punto de "
                         "reorden y stock de seguridad.",
-        "input_schema": {
+        "parameters": {
             "type": "object",
             "properties": {"municipio": {"type": "string"}},
             "required": ["municipio"],
@@ -1098,31 +1103,38 @@ def ejecutar_herramienta(nombre, args):
         return {"error": str(e)}
 
 
-def ejecutar_agente(client, historial_api, max_iter=5):
-    """Loop de tool-use: llama al modelo, ejecuta las herramientas que pida,
-    y repite hasta que responda con texto final (o se agoten los intentos)."""
+def ejecutar_agente(client, historial_contenidos, max_iter=5):
+    """Loop de tool-use con Gemini: llama al modelo, ejecuta las funciones que
+    pida (sobre los datos reales del sistema) y repite hasta que responda con
+    texto final, o se agoten los intentos."""
+    config = genai_types.GenerateContentConfig(
+        system_instruction=SYSTEM_PROMPT_AGENTE,
+        tools=[genai_types.Tool(function_declarations=HERRAMIENTAS_AGENTE)],
+    )
     for _ in range(max_iter):
-        resp = client.messages.create(
-            model="claude-sonnet-4-6",
-            max_tokens=1024,
-            system=SYSTEM_PROMPT_AGENTE,
-            tools=HERRAMIENTAS_AGENTE,
-            messages=historial_api,
+        resp = client.models.generate_content(
+            model="gemini-3.5-flash",
+            contents=historial_contenidos,
+            config=config,
         )
-        bloques_tool = [b for b in resp.content if b.type == "tool_use"]
-        historial_api = historial_api + [{"role": "assistant", "content": resp.content}]
-        if not bloques_tool:
-            texto = "".join(b.text for b in resp.content if b.type == "text").strip()
-            return texto or "(sin respuesta)", historial_api
-        resultados = []
-        for b in bloques_tool:
-            resultado = ejecutar_herramienta(b.name, b.input)
-            resultados.append({
-                "type": "tool_result", "tool_use_id": b.id,
-                "content": json.dumps(resultado, ensure_ascii=False, default=str),
-            })
-        historial_api = historial_api + [{"role": "user", "content": resultados}]
-    return "No pude completar la respuesta tras varias consultas. Intenta reformular la pregunta.", historial_api
+        candidato = resp.candidates[0]
+        historial_contenidos = historial_contenidos + [candidato.content]
+        partes = candidato.content.parts or []
+        llamadas = [p.function_call for p in partes if p.function_call]
+        if not llamadas:
+            texto = "".join(p.text for p in partes if p.text).strip()
+            return texto or "(sin respuesta)", historial_contenidos
+        partes_resultado = []
+        for fc in llamadas:
+            resultado = ejecutar_herramienta(fc.name, dict(fc.args) if fc.args else {})
+            partes_resultado.append(genai_types.Part.from_function_response(
+                name=fc.name,
+                response={"result": json.loads(json.dumps(resultado, ensure_ascii=False, default=str))},
+            ))
+        historial_contenidos = historial_contenidos + [
+            genai_types.Content(role="tool", parts=partes_resultado)
+        ]
+    return "No pude completar la respuesta tras varias consultas. Intenta reformular la pregunta.", historial_contenidos
 
 # ─────────────────────────────────────────────
 # ENCABEZADO
@@ -1140,7 +1152,7 @@ c4.metric("MAE",             f"{METRICAS['mae']} casos/sem")
 c5.metric("RMSE",            f"{METRICAS['rmse']} casos/sem")
 st.caption(
     f"Entrenado: SIVIGILA 2007–2017 · Evaluado: holdout temporal 2018 · "
-    f"Gap Train-Val R²: 0.077 · Sin overfitting · MD5: `{sello_modelo['hash_md5']}`"
+    f"Gap Train-Val R²: {GAP_TRAIN_VAL} · Sin overfitting · MD5: `{sello_modelo['hash_md5']}`"
 )
 st.divider()
 
@@ -1988,12 +2000,12 @@ elif seccion_activa == SECCIONES[6]:
             'Métrica':        ['MAE','RMSE','R²','Gap Train-Val R²','Municipios test'],
             'Valor':          [f"{METRICAS['mae']} casos/sem",
                                f"{METRICAS['rmse']} casos/sem",
-                               f"{METRICAS['r2']}", "0.077",
+                               f"{METRICAS['r2']}", f"{GAP_TRAIN_VAL}",
                                f"{len(MUNICIPIOS)} municipios"],
             'Interpretación': [
                 'Error promedio absoluto en datos no vistos',
                 'Error cuadrático medio (penaliza outliers)',
-                '92.8% de la varianza explicada',
+                f"{METRICAS['r2']*100:.1f}% de la varianza explicada",
                 'Sin overfitting',
                 '100% cobertura departamental',
             ]
@@ -2034,7 +2046,8 @@ elif seccion_activa == SECCIONES[6]:
 
     st.divider()
     with st.expander("⚠️ Limitaciones Documentadas — Respuestas Preparadas para el Jurado"):
-        st.warning("""
+        fac_limit = ERROR_ESTRAT.get('factor_deg', 'N/A')
+        st.warning(f"""
 **1. Data Gap 2018→2026 (COVID-19):**
 Entrenado hasta 2018. Re-entrenamiento continuo vía API SIVIGILA planificado
 desde datos 2023+. La sección Nowcasting es la solución operativa inmediata.
@@ -2043,9 +2056,11 @@ desde datos 2023+. La sección Nowcasting es la solución operativa inmediata.
 Estructural en modelos de lags. Mitigado con: detección de semanas faltantes,
 imputación por mediana móvil, IC ×1.5 en Modo Degradado, y Nowcasting con API.
 
-**3. Degradación en picos (factor 2.23x):**
-Esperado y documentado. Respuesta: SS dinámico Z×σ×√LT absorbe este error
-estructuralmente. En picos, el sistema emite ALERTA antes del desbordamiento.
+**3. Degradación en picos (factor {fac_limit}x):**
+Esperado y documentado — calculado comparando el error del modelo en semanas
+normales vs. semanas de pico epidémico (holdout 2018), no es una versión ni
+un año. Respuesta: SS dinámico Z×σ×√LT absorbe este error estructuralmente.
+En picos, el sistema emite ALERTA antes del desbordamiento.
 
 **4. Stock simulado (no en tiempo real):**
 Normativo (Res. 1403/2007). En producción: integrar con REPS/SISPRO.
@@ -2095,7 +2110,7 @@ elif seccion_activa == SECCIONES[7]:
     with st.expander("⚙️ Arquitectura del agente — para el jurado", expanded=False):
         st.markdown("""
 Esto **no** es un chatbot que alucina números: es un agente con **tool-use real**
-sobre Claude (Anthropic). Cada vez que el usuario pregunta algo, el modelo
+sobre Gemini (Google). Cada vez que el usuario pregunta algo, el modelo
 decide si necesita datos del sistema y llama una o varias de estas herramientas
 *antes* de redactar la respuesta:
 
@@ -2110,13 +2125,13 @@ decide si necesita datos del sistema y llama una o varias de estas herramientas
 ```
 Pregunta del usuario
      ↓
-Claude decide qué herramienta(s) necesita
+Gemini decide qué función(es) necesita (function calling)
      ↓
 Denguard ejecuta la(s) función(es) sobre los datos reales del sistema
      ↓
-El resultado (JSON) vuelve a Claude como "tool_result"
+El resultado (JSON) vuelve a Gemini como function_response
      ↓
-Claude redacta la respuesta final citando las cifras obtenidas
+Gemini redacta la respuesta final citando las cifras obtenidas
 ```
 
 Si una pregunta no tiene una herramienta para resolverla, el agente lo dice
@@ -2125,24 +2140,25 @@ en vez de inventar un número.
 
     api_key = ""
     try:
-        api_key = st.secrets.get("ANTHROPIC_API_KEY", "")
+        api_key = st.secrets.get("GEMINI_API_KEY", "")
     except Exception:
         api_key = ""
     if not api_key:
         api_key = st.text_input(
-            "Anthropic API Key", type="password",
-            help="Se usa solo en esta sesión de navegador, no se guarda ni se envía a ningún otro lado."
+            "Gemini API Key", type="password",
+            help="Se usa solo en esta sesión de navegador, no se guarda ni se envía a ningún otro lado. "
+                 "Consíguela gratis en aistudio.google.com/apikey"
         )
 
-    if not ANTHROPIC_DISPONIBLE:
-        st.error("Falta instalar el SDK de Anthropic: `pip install anthropic`")
+    if not GEMINI_DISPONIBLE:
+        st.error("Falta instalar el SDK de Gemini: `pip install google-genai`")
     elif not api_key:
-        st.info("👆 Ingresa tu API Key de Anthropic para activar el agente.")
+        st.info("👆 Ingresa tu API Key de Gemini para activar el agente.")
     else:
         if "agente_chat" not in st.session_state:
-            st.session_state.agente_chat = []      # historial visible (solo texto)
-        if "agente_api_msgs" not in st.session_state:
-            st.session_state.agente_api_msgs = []   # historial completo (incluye tool calls)
+            st.session_state.agente_chat = []         # historial visible (solo texto)
+        if "agente_contenidos" not in st.session_state:
+            st.session_state.agente_contenidos = []    # historial completo (incluye tool calls)
 
         for m in st.session_state.agente_chat:
             with st.chat_message(m["role"]):
@@ -2154,15 +2170,17 @@ en vez de inventar un número.
         )
         if pregunta:
             st.session_state.agente_chat.append({"role": "user", "content": pregunta})
-            st.session_state.agente_api_msgs.append({"role": "user", "content": pregunta})
+            st.session_state.agente_contenidos.append(
+                genai_types.Content(role="user", parts=[genai_types.Part.from_text(text=pregunta)])
+            )
             with st.chat_message("user"):
                 st.markdown(pregunta)
             with st.chat_message("assistant"):
                 with st.spinner("Consultando herramientas..."):
                     try:
-                        cliente_ia = anthropic.Anthropic(api_key=api_key)
-                        texto, st.session_state.agente_api_msgs = ejecutar_agente(
-                            cliente_ia, st.session_state.agente_api_msgs
+                        cliente_ia = genai.Client(api_key=api_key)
+                        texto, st.session_state.agente_contenidos = ejecutar_agente(
+                            cliente_ia, st.session_state.agente_contenidos
                         )
                     except Exception as e:
                         texto = f"❌ Error consultando al agente: {e}"
@@ -2171,7 +2189,7 @@ en vez de inventar un número.
 
         if st.session_state.agente_chat and st.button("🗑️ Limpiar conversación"):
             st.session_state.agente_chat = []
-            st.session_state.agente_api_msgs = []
+            st.session_state.agente_contenidos = []
             st.rerun()
 
 st.markdown('</div>', unsafe_allow_html=True)
