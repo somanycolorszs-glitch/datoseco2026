@@ -4,6 +4,7 @@ import numpy as np
 import joblib
 import json
 import hashlib
+import unicodedata
 import requests
 import plotly.express as px
 import plotly.graph_objects as go
@@ -33,7 +34,7 @@ except ImportError:
 # ─────────────────────────────────────────────
 st.set_page_config(
     page_title="Denguard — Última Milla",
-    page_icon="🛡️",
+    page_icon="",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -138,8 +139,16 @@ h1 { font-size: 1.9rem !important; font-weight: 800 !important; letter-spacing: 
 h2 { font-size: 1.3rem !important; font-weight: 700 !important; }
 h3 { font-size: 1.05rem !important; font-weight: 600 !important; }
 
-/* ── st.title ── */
-[data-testid="stHeadingWithActionElements"] h1 {
+/* ── Encabezado principal (con ícono SVG, sin emoji) ── */
+.ds-main-title {
+  font-family: 'Syne', sans-serif !important;
+  font-size: 1.9rem !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.03em !important;
+  margin: 0 0 0.3rem 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.55rem !important;
   background: linear-gradient(90deg, var(--accent), var(--accent2));
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
@@ -495,6 +504,14 @@ def md5_archivo(path):
 def timestamp_utc():
     return datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')
 
+def _quitar_acentos(texto):
+    """Normaliza nombres de municipio para cruzar MUNICIPIOS (sin acentos,
+    ej. 'TULUA') con el campo 'municipioprestadordesc' de REPS (puede traer
+    acentos, ej. 'MEDELLÍN'). Evita falsos 'no encontrado' por tildes."""
+    texto = (texto or '').upper().strip()
+    return ''.join(c for c in unicodedata.normalize('NFD', texto)
+                    if unicodedata.category(c) != 'Mn')
+
 def detectar_semanas_faltantes(serie):
     if len(serie) < 4:
         return [], False
@@ -559,13 +576,13 @@ try:
     # fallback — pero queda en UN solo lugar, no repetido a mano dos veces.
     GAP_TRAIN_VAL = paquete.get('gap_train_val_r2', 0.077)
 except FileNotFoundError:
-    st.error("⚠️ No se encontró 'modelo_municipal_v4.pkl'.")
+    st.error("No se encontró 'modelo_municipal_v4.pkl'.")
     st.stop()
 
 try:
     df_hist, sello_datos = cargar_datos()
 except FileNotFoundError:
-    st.error("⚠️ No se encontró 'dengue_valle_semanal.csv'.")
+    st.error("No se encontró 'dengue_valle_semanal.csv'.")
     st.stop()
 
 try:
@@ -575,7 +592,7 @@ try:
     SUPUESTOS       = params_log['supuestos']
     ERROR_ESTRAT    = params_log.get('error_estratificado', {})
 except FileNotFoundError:
-    st.error("⚠️ No se encontró 'logistica_params.json'.")
+    st.error("No se encontró 'logistica_params.json'.")
     st.stop()
 
 df_justificacion = cargar_justificacion()
@@ -595,6 +612,42 @@ COLORES_TOP = [
     '#1D9E75','#D85A30','#185FA5','#3B6D11','#993556'
 ]
 COLOR_URG = {'CRÍTICO': '#E24B4A', 'ALERTA': '#EF9F27', 'NORMAL': '#639922'}
+
+# ── Iconografía (sin emojis) ──────────────────────────────────────────
+# SVG inline en vez de una fuente de íconos externa (ej. Bootstrap Icons
+# vía CDN): el mapa folium se renderiza en un iframe aparte (componente
+# de streamlit-folium), así que una fuente cargada en la página principal
+# NO estaría disponible ahí. El SVG inline es autocontenido y funciona
+# igual dentro y fuera del iframe, sin depender de ninguna red.
+_ICONOS_SVG_PATH = {
+    'exclamation-octagon-fill': (
+        'M4.54.146A.5.5 0 0 1 4.893 0h6.214a.5.5 0 0 1 .353.146l4.394 '
+        '4.394a.5.5 0 0 1 .146.353v6.214a.5.5 0 0 1-.146.353l-4.394 '
+        '4.394a.5.5 0 0 1-.353.146H4.893a.5.5 0 0 1-.353-.146L.146 '
+        '11.46A.5.5 0 0 1 0 11.107V4.893a.5.5 0 0 1 .146-.353zM7.002 11a1 '
+        '1 0 1 0 2 0 1 1 0 0 0-2 0M7.1 4.995a.905.905 0 1 1 1.8 0l-.35 '
+        '3.507a.552.552 0 0 1-1.1 0z'
+    ),
+    'exclamation-triangle-fill': (
+        'M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 '
+        '1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767zM8 5c.535 0 '
+        '.954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 '
+        '0 0 1 8 5m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2'
+    ),
+    'check-circle-fill': (
+        'M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08 '
+        '.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a'
+        '.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z'
+    ),
+}
+
+def icono_svg(nombre, color='currentColor', size=14):
+    """Ícono vectorial inline (sin emoji, sin dependencia de red)."""
+    path = _ICONOS_SVG_PATH.get(nombre, '')
+    return (f'<svg xmlns="http://www.w3.org/2000/svg" width="{size}" '
+            f'height="{size}" viewBox="0 0 16 16" fill="{color}" '
+            f'style="vertical-align:-2px;display:inline-block">'
+            f'<path d="{path}"/></svg>')
 
 # ─────────────────────────────────────────────
 # FUNCIONES CORE
@@ -658,11 +711,11 @@ def evaluar_cadena(municipio, pred_casos, stock_aceta, stock_ringer):
     d_cob = round(stock_aceta / dd_a, 1) if dd_a > 0 else 999
 
     if sp_a < ss_a or sp_r < ss_r:
-        urg, desp, emoji = 'CRÍTICO', 1, '🔴'
+        urg, desp, icono = 'CRÍTICO', 1, 'exclamation-octagon-fill'
     elif stock_aceta < rop_a or stock_ringer < rop_r:
-        urg, desp, emoji = 'ALERTA', max(1, int(np.ceil(lt_d))), '🟠'
+        urg, desp, icono = 'ALERTA', max(1, int(np.ceil(lt_d))), 'exclamation-triangle-fill'
     else:
-        urg, desp, emoji = 'NORMAL', max(1, int(np.ceil(lt_d * 2))), '🟢'
+        urg, desp, icono = 'NORMAL', max(1, int(np.ceil(lt_d * 2))), 'check-circle-fill'
 
     ord_a  = max(0, int(req_a * 4 - max(0, sp_a) + ss_a))
     ord_r  = max(0, int(req_r * 4 - max(0, sp_r) + ss_r))
@@ -684,7 +737,7 @@ def evaluar_cadena(municipio, pred_casos, stock_aceta, stock_ringer):
     c_reac = req_a * COSTOS['aceta_urgencia'] + req_r * COSTOS['ringer_urgencia']
 
     return {
-        'municipio': municipio, 'urgencia': urg, 'emoji': emoji,
+        'municipio': municipio, 'urgencia': urg, 'icono': icono,
         'pred_casos': pred_casos, 'req_aceta': int(req_a), 'req_ringer': int(req_r),
         'stock_aceta': stock_aceta, 'stock_ringer': stock_ringer,
         'stock_post_aceta': round(sp_a), 'stock_post_ringer': round(sp_r),
@@ -755,6 +808,67 @@ def consultar_sivigila_reciente(limite=3000):
             ultimo_error = str(e)
             continue
     return None, ultimo_error or "Error desconocido tras 3 intentos", None
+
+# ─────────────────────────────────────────────
+# REPS — Registro Especial de Prestadores y Sedes de Salud (MinSalud)
+# ─────────────────────────────────────────────
+# Segundo dataset real de datos.gov.co (resource c36g-9fc2). Sustituye el
+# punto de recepción genérico inventado ("SECCIONED Cali") por hospitales
+# públicos (ESE) reales, con nombre y dirección verificables, por municipio.
+# OJO — esto NO trae niveles de stock/inventario: esa información (cuántas
+# tabletas/bolsas hay hoy en cada sede) no se publica como dato abierto en
+# Colombia por razones operativas, así que `stock_aceta_tab` y
+# `stock_ringer_bolsas` siguen siendo simulados a propósito (Res. 1403/2007),
+# y así se documenta explícitamente en toda la app.
+@st.cache_data(ttl=86400, show_spinner=False)
+def cargar_reps_valle():
+    BASE = "https://www.datos.gov.co/resource/c36g-9fc2.json"
+    try:
+        r = requests.get(BASE, params={
+            "$where": "departamentoprestadordesc='Valle del Cauca' AND ese='SI'",
+            "$select": "codigoprestador,nombreprestador,nombresede,"
+                       "municipioprestadordesc,direccionprestador,"
+                       "claseprestador,fecha_corte_reps",
+            "$limit": 3000,
+        }, timeout=60)
+        if r.status_code != 200:
+            return None, f"HTTP {r.status_code}", None
+        df = pd.DataFrame(r.json())
+        if df.empty:
+            return None, "Sin datos para Valle del Cauca", None
+        df['municipio_norm'] = df['municipioprestadordesc'].apply(_quitar_acentos)
+        sello = {
+            'timestamp':      timestamp_utc(),
+            'fuente':         'API datos.gov.co/resource/c36g-9fc2 (REPS · MinSalud)',
+            'registros':      len(df),
+            'fecha_corte':    df['fecha_corte_reps'].iloc[0] if len(df) else 'N/A',
+            'hash_response':  hashlib.md5(r.content).hexdigest()[:12],
+        }
+        return df, None, sello
+    except requests.exceptions.Timeout:
+        return None, "Timeout consultando REPS (>60s)", None
+    except Exception as e:
+        return None, str(e), None
+
+
+def obtener_punto_recepcion(df_reps, municipio):
+    """Hospital público (ESE) real registrado en REPS para un municipio.
+    Prioriza sedes cuyo nombre contiene 'HOSPITAL' (el receptor lógico de
+    un despacho de medicamentos); si no hay, usa la primera ESE registrada."""
+    if df_reps is None or df_reps.empty:
+        return None
+    mun_norm = _quitar_acentos(municipio)
+    candidatos = df_reps[df_reps['municipio_norm'] == mun_norm]
+    if candidatos.empty:
+        return None
+    hospitales = candidatos[candidatos['nombresede'].str.contains(
+        'HOSPITAL', case=False, na=False)]
+    elegido = hospitales.iloc[0] if len(hospitales) else candidatos.iloc[0]
+    return {
+        'nombre_sede': elegido['nombresede'],
+        'direccion': elegido['direccionprestador'],
+        'total_ese_municipio': len(candidatos),
+    }
 
 # ─────────────────────────────────────────────
 # VALIDACIÓN RETROSPECTIVA (cacheada — no depende de la UI)
@@ -878,7 +992,7 @@ def construir_mapa(semana):
             fill=True, fill_color=color, fill_opacity=0.75,
             popup=folium.Popup(
                 f"<div style='font-family:sans-serif;width:210px'>"
-                f"<b style='font-size:13px'>{row['emoji']} {mun}</b>"
+                f"<b style='font-size:13px'>{icono_svg(row['icono'], color)} {mun}</b>"
                 f"<hr style='margin:3px 0'>"
                 f"<b>Urgencia:</b> {row['urgencia']}<br>"
                 f"<b>Predicción:</b> {row['pred_casos']} casos/sem<br>"
@@ -1139,7 +1253,23 @@ def ejecutar_agente(client, historial_contenidos, max_iter=5):
 # ─────────────────────────────────────────────
 # ENCABEZADO
 # ─────────────────────────────────────────────
-st.title("🛡️ Denguard: Logística Farmacéutica de Última Milla")
+_LOGO_SVG = (
+    '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" '
+    'viewBox="0 0 16 16" style="vertical-align:-6px;flex-shrink:0">'
+    '<path d="M8 1 14 3.2v4.6c0 4-2.6 6.7-6 8.2-3.4-1.5-6-4.2-6-8.2V3.2z" '
+    'fill="url(#dsGrad)"/>'
+    '<path d="M5.4 8.1 7.2 9.9 10.6 6" stroke="#05090f" stroke-width="1.4" '
+    'stroke-linecap="round" stroke-linejoin="round" fill="none"/>'
+    '<defs><linearGradient id="dsGrad" x1="0" y1="0" x2="16" y2="16">'
+    '<stop offset="0" stop-color="#00ffe0"/>'
+    '<stop offset="1" stop-color="#0077ff"/>'
+    '</linearGradient></defs></svg>'
+)
+st.markdown(
+    f'<h1 class="ds-main-title">{_LOGO_SVG}'
+    f'Denguard: Logística Farmacéutica de Última Milla</h1>',
+    unsafe_allow_html=True
+)
 st.markdown(
     "**Ecosistema Predictivo Spatial-Aware** — De la predicción epidemiológica "
     "a la orden de despacho · Valle del Cauca · 42 municipios · SIVIGILA 2007–2018"
@@ -1161,19 +1291,19 @@ st.divider()
 # colapsable nativo de Streamlit)
 # ─────────────────────────────────────────────
 SECCIONES = [
-    "📊 Dashboard",
-    "🚚 Cadena de Abastecimiento",
-    "📡 Nowcasting",
-    "📈 Serie Histórica",
-    "🗺️ Mapa",
-    "🔍 Validación Retrospectiva",
-    "🔬 Auditoría ALCOA+",
-    "🤖 Agente IA",
+    "Dashboard",
+    "Cadena de Abastecimiento",
+    "Nowcasting",
+    "Serie Histórica",
+    "Mapa",
+    "Validación Retrospectiva",
+    "Auditoría ALCOA+",
+    "Agente IA",
 ]
 ICONOS_SECCION = ["graph-up-arrow", "truck", "broadcast", "clock-history",
                    "geo-alt", "search", "shield-check", "robot"]
 
-st.sidebar.header("🧭 Navegación")
+st.sidebar.header("Navegación")
 if OPTION_MENU_DISPONIBLE:
     with st.sidebar:
         seccion_activa = option_menu(
@@ -1202,7 +1332,7 @@ else:
     )
 
 st.sidebar.divider()
-st.sidebar.header("📍 Parámetros de Simulación")
+st.sidebar.header("Parámetros de Simulación")
 municipio_sel = st.sidebar.selectbox(
     "Municipio objetivo:", sorted(MUNICIPIOS),
     index=sorted(MUNICIPIOS).index('CALI') if 'CALI' in MUNICIPIOS else 0
@@ -1214,13 +1344,13 @@ serie_imp, idx_imp, modo_degradado = imputar_semanas_faltantes(serie_rec)
 
 if modo_degradado:
     st.sidebar.warning(
-        f"⚠️ **Modo Degradado** — {len(idx_imp)} semana(s) con reporte cero "
+        f"**Modo Degradado** — {len(idx_imp)} semana(s) con reporte cero "
         f"sospechoso detectadas. IC ampliado ×1.5 automáticamente."
     )
 
 ult = lambda i: int(serie_imp.iloc[i]) if len(serie_imp) > abs(i) else 3
 
-with st.sidebar.expander("📈 Inercia Epidemiológica", expanded=False):
+with st.sidebar.expander("Inercia Epidemiológica", expanded=False):
     casos_t1      = st.number_input("Casos semana anterior (t-1)",
                                      min_value=0, value=ult(-1))
     casos_t2      = st.number_input("Casos hace 2 semanas (t-2)",
@@ -1229,7 +1359,7 @@ with st.sidebar.expander("📈 Inercia Epidemiológica", expanded=False):
                                      min_value=0, value=ult(-3))
     semana_actual = st.slider("Semana epidemiológica actual", 1, 52, 20)
 
-with st.sidebar.expander("💊 Stock Actual ⚠️ Simulado", expanded=False):
+with st.sidebar.expander("Stock Actual Simulado", expanded=False):
     inv_base           = INVENTARIO_BASE.get(municipio_sel, {})
     stock_aceta_input  = st.number_input(
         "Acetaminofén disponible (tab)",
@@ -1239,7 +1369,7 @@ with st.sidebar.expander("💊 Stock Actual ⚠️ Simulado", expanded=False):
         "Lactato de Ringer disponible (bolsas)",
         min_value=0, value=inv_base.get('stock_ringer_bolsas', 10), step=5
     )
-    st.caption("⚠️ Stock simulado · Res. MINSALUD 1403/2007 · Edita para escenarios reales.")
+    st.caption("Stock simulado · Res. MINSALUD 1403/2007 · Edita para escenarios reales.")
 
 # ─────────────────────────────────────────────
 # CÁLCULOS CENTRALES
@@ -1274,17 +1404,17 @@ if seccion_activa == SECCIONES[0]:
 
     if modo_degradado:
         st.error(
-            f"⚠️ **MODO DEGRADADO — Gestión de Riesgo Epidemiológico**\n\n"
+            f"**MODO DEGRADADO — Gestión de Riesgo Epidemiológico**\n\n"
             f"Se detectaron **{len(idx_imp)} semana(s)** con reporte cero sospechoso "
             f"en **{municipio_sel}**. Posible falla de reporte SIVIGILA.\n\n"
             f"**Medidas automáticas:** Imputación por mediana móvil ±2 semanas · "
             f"IC ampliado de ±{METRICAS['rmse']:.2f} → **±{rmse_ef:.2f}** casos/sem · "
-            f"Verificar en sección 📡 Nowcasting."
+            f"Verificar en sección Nowcasting."
         )
 
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.info("🦠 Proyección de Pacientes")
+        st.info("Proyección de Pacientes")
         ic_label = (
             f"IC ±RMSE{'×1.5 (Modo Degradado)' if modo_degradado else ''}: "
             f"[{ic_bajo} – {ic_alto}]"
@@ -1293,9 +1423,9 @@ if seccion_activa == SECCIONES[0]:
                   delta=ic_label, delta_color="off")
         st.caption(
             f"MAE base: ±{METRICAS['mae']} · R²={METRICAS['r2']}"
-            + (f" · **⚠️ RMSE efectivo: ±{rmse_ef:.2f}**" if modo_degradado else "")
+            + (f" · **RMSE efectivo: ±{rmse_ef:.2f}**" if modo_degradado else "")
         )
-        with st.expander("ℹ️ IC y Gestión de Riesgo — para el jurado"):
+        with st.expander("IC y Gestión de Riesgo — para el jurado"):
             mae_n = ERROR_ESTRAT.get('mae_normal', 'N/A')
             mae_p = ERROR_ESTRAT.get('mae_pico',   'N/A')
             fac   = ERROR_ESTRAT.get('factor_deg', 'N/A')
@@ -1321,18 +1451,18 @@ En salud pública, un **falso negativo** es más costoso que un falso positivo.
             """)
 
     with col2:
-        st.warning("💊 Insumos Críticos")
+        st.warning("Insumos Críticos")
         if cadena_sel:
             st.metric("Acetaminofén 500mg", f"{cadena_sel['req_aceta']:,} Tab.")
             st.metric("Lactato de Ringer",  f"{cadena_sel['req_ringer']:,} Bol.")
             nivel = {"CRÍTICO": "error", "ALERTA": "warning", "NORMAL": "success"}
             getattr(st, nivel[cadena_sel['urgencia']])(
-                f"{cadena_sel['emoji']} **{cadena_sel['urgencia']}** — "
+                f"**{cadena_sel['urgencia']}** — "
                 f"Despachar en ≤{cadena_sel['despachar_en_dias']} día(s)"
             )
 
     with col3:
-        st.success("💰 Eficiencia Farmacoeconómica")
+        st.success("Eficiencia Farmacoeconómica")
         if cadena_sel:
             st.metric("Ahorro vs compra reactiva",
                       f"${cadena_sel['ahorro']:,.0f} COP",
@@ -1343,7 +1473,7 @@ En salud pública, un **falso negativo** es más costoso que un falso positivo.
                 f"Reactivo: ${cadena_sel['costo_reactivo']:,.0f} · "
                 f"SISMED {COSTOS['fecha_consulta']}"
             )
-            with st.expander("ℹ️ Cómo se calcula el ahorro — para el jurado"):
+            with st.expander("Cómo se calcula el ahorro — para el jurado"):
                 sigma = cadena_sel.get('sigma_error', 'N/A')
                 lt    = cadena_sel.get('lead_time_dias', 0)
                 z     = SUPUESTOS.get('z_score_95', 1.645)
@@ -1421,7 +1551,7 @@ para garantizar cumplimiento legal y seguridad operativa simultáneamente.
         fig_dash.add_vline(x=ultima_fecha, line_dash='dot', line_color='gray', opacity=0.4)
         if diverge:
             fig_dash.add_annotation(x=fechas_h[-1], y=max(preds_h),
-                                    text="⚠️ Posible divergencia", showarrow=True,
+                                    text="Posible divergencia", showarrow=True,
                                     arrowhead=2, font=dict(color='#E24B4A', size=11))
         fig_dash.update_layout(
             height=370, margin=dict(l=0, r=0, t=10, b=0),
@@ -1435,7 +1565,7 @@ para garantizar cumplimiento legal y seguridad operativa simultáneamente.
         st.plotly_chart(fig_dash, use_container_width=True)
 
         if diverge:
-            st.warning("⚠️ Salto >3x entre pasos. Use +1s y +2s con confianza; "
+            st.warning("Salto >3x entre pasos. Use +1s y +2s con confianza; "
                        "+3s y +4s son indicativos.")
 
     with col_g2:
@@ -1466,13 +1596,13 @@ para garantizar cumplimiento legal y seguridad operativa simultáneamente.
 # SECCIÓN 2 — CADENA DE ABASTECIMIENTO
 # ══════════════════════════════════════════════
 elif seccion_activa == SECCIONES[1]:
-    st.markdown("### 🚚 Motor Logístico — De la Predicción a la Orden de Despacho")
+    st.markdown("### Motor Logístico — De la Predicción a la Orden de Despacho")
     st.caption(
         "42 municipios · SS dinámico Z×σ×√LT (95% nivel servicio) · "
         "Chopra & Meindl SCM 2016 · Res. MINSALUD 1403/2007"
     )
 
-    with st.expander("📌 Eficiencia Farmacoeconómica — Logística de Precisión vs Adivinación"):
+    with st.expander("Eficiencia Farmacoeconómica — Logística de Precisión vs Adivinación"):
         st.success(
             "**De la logística de adivinación a la logística de precisión:**\n\n"
             "Los sistemas tradicionales de abastecimiento hospitalario usan "
@@ -1492,9 +1622,9 @@ elif seccion_activa == SECCIONES[1]:
     normales = df_sorted[df_sorted['urgencia'] == 'NORMAL']
 
     cs1, cs2, cs3 = st.columns(3)
-    cs1.error(  f"🔴 CRÍTICO: {len(criticos)} municipios")
-    cs2.warning(f"🟠 ALERTA:  {len(alertas)} municipios")
-    cs3.success(f"🟢 NORMAL:  {len(normales)} municipios")
+    cs1.error(  f"CRÍTICO: {len(criticos)} municipios")
+    cs2.warning(f"ALERTA:  {len(alertas)} municipios")
+    cs3.success(f"NORMAL:  {len(normales)} municipios")
 
     st.divider()
 
@@ -1545,7 +1675,7 @@ elif seccion_activa == SECCIONES[1]:
     ct4.metric("Ahorro total",     f"${df_resumen['ahorro'].sum():,.0f} COP")
 
     st.divider()
-    with st.expander("📊 Stock Actual vs Punto de Reorden Dinámico (42 municipios)"):
+    with st.expander("Stock Actual vs Punto de Reorden Dinámico (42 municipios)"):
         munis_ord  = list(df_sorted['municipio'])
         bar_colors = [COLOR_URG[r] for r in df_sorted['urgencia']]
 
@@ -1582,7 +1712,7 @@ elif seccion_activa == SECCIONES[1]:
         st.subheader(f"Detalle Cadena — {municipio_sel}")
         cd1, cd2, cd3 = st.columns(3)
         with cd1:
-            st.markdown("**📦 Estado de Stock**")
+            st.markdown("**Estado de Stock**")
             sigma_mun = cadena_sel.get('sigma_error', 'N/A')
             st.dataframe(pd.DataFrame({
                 'Insumo':          ['Acetaminofén','Ringer'],
@@ -1599,7 +1729,7 @@ elif seccion_activa == SECCIONES[1]:
             }), hide_index=True, use_container_width=True)
             st.caption(f"σ_error: {sigma_mun} casos/sem · {cadena_sel['metodo_ss']}")
         with cd2:
-            st.markdown("**🛣️ Red Logística**")
+            st.markdown("**Red Logística**")
             st.dataframe(pd.DataFrame({
                 'Parámetro': ['Centro dist.','Dist. aérea','Dist. carretera',
                               'Tortuosidad','Velocidad','Lead time','Cobertura'],
@@ -1614,14 +1744,41 @@ elif seccion_activa == SECCIONES[1]:
                 ]
             }), hide_index=True, use_container_width=True)
         with cd3:
-            st.markdown("**📋 Orden de Despacho**")
+            st.markdown("**Orden de Despacho**")
             st.metric("Aceta. a ordenar", f"{cadena_sel['orden_aceta']:,} tab")
             st.metric("Ringer a ordenar", f"{cadena_sel['orden_ringer']:,} bol")
             st.metric("Despachar en",     f"≤{cadena_sel['despachar_en_dias']} día(s)")
             st.metric("Costo orden",      f"${cadena_sel['costo_preventivo']:,.0f} COP")
             st.metric("Ahorro",           f"${cadena_sel['ahorro']:,.0f} COP")
 
-    with st.expander("📋 Supuestos logísticos — Transparencia total"):
+    with st.expander("Punto de recepción real — REPS (datos.gov.co)", expanded=False):
+        st.caption(
+            "Segundo dataset abierto del proyecto: Registro Especial de "
+            "Prestadores y Sedes de Salud (MinSalud, `c36g-9fc2`). Identifica "
+            "el hospital público (ESE) real que recibiría el despacho — "
+            "reemplaza el supuesto genérico por una sede verificable. "
+            "**No incluye niveles de stock**: esa información no es un dato "
+            "abierto disponible, por eso el inventario sigue simulado."
+        )
+        df_reps, err_reps, sello_reps = cargar_reps_valle()
+        if err_reps:
+            st.warning(f"No se pudo consultar REPS: {err_reps}")
+        elif df_reps is not None:
+            punto = obtener_punto_recepcion(df_reps, municipio_sel)
+            if punto:
+                rp1, rp2 = st.columns(2)
+                rp1.metric("Sede receptora (ESE real)", punto['nombre_sede'])
+                rp2.metric("ESE registradas en el municipio", punto['total_ese_municipio'])
+                st.caption(f"{punto['direccion']}")
+                st.caption(
+                    f"Fuente: {sello_reps['fuente']} · Corte REPS: "
+                    f"{sello_reps['fecha_corte']} · Hash: `{sello_reps['hash_response']}` · "
+                    f"{sello_reps['registros']:,} ESE registradas en Valle del Cauca"
+                )
+            else:
+                st.info(f"No se encontró una ESE registrada para {municipio_sel} en REPS.")
+
+    with st.expander("Supuestos logísticos — Transparencia total"):
         st.warning("Stock inicial simulado (Res. MINSALUD 1403/2007). "
                    "No representa inventario en tiempo real.")
         rows = [
@@ -1649,9 +1806,9 @@ elif seccion_activa == SECCIONES[1]:
 # SECCIÓN 3 — NOWCASTING
 # ══════════════════════════════════════════════
 elif seccion_activa == SECCIONES[2]:
-    st.markdown("### 📡 Nowcasting — Conexión SIVIGILA en Tiempo Real")
+    st.markdown("### Nowcasting — Conexión SIVIGILA en Tiempo Real")
     st.info(
-        "**📌 Data Gap 2018→2026 — Contexto COVID-19:**\n\n"
+        "**Data Gap 2018→2026 — Contexto COVID-19:**\n\n"
         "El modelo fue entrenado con datos SIVIGILA 2007–2018. La pandemia "
         "COVID-19 alteró los ciclos de reporte por tres mecanismos documentados: "
         "(1) **Subregistro** por reorientación diagnóstica; "
@@ -1668,7 +1825,7 @@ elif seccion_activa == SECCIONES[2]:
     with col_nw1:
         municipio_nw  = st.selectbox("Municipio:", sorted(MUNICIPIOS), key='mun_nw',
             index=sorted(MUNICIPIOS).index('CALI') if 'CALI' in MUNICIPIOS else 0)
-        consultar_btn = st.button("🔄 Consultar API SIVIGILA", type="primary")
+        consultar_btn = st.button("Consultar API SIVIGILA", type="primary")
     with col_nw2:
         st.markdown(
             "- Consulta datos.gov.co en tiempo real (cod_eve 210+211)\n"
@@ -1684,7 +1841,7 @@ elif seccion_activa == SECCIONES[2]:
             df_live, error_msg, sello_live = consultar_sivigila_reciente()
 
         if error_msg:
-            st.error(f"❌ Error: {error_msg}")
+            st.error(f"Error: {error_msg}")
             st.info("Consistente con discontinuidades de reporte post-COVID en SIVIGILA. "
                     "Se reintentó automáticamente 3 veces antes de mostrar este error.")
         elif df_live is not None:
@@ -1692,13 +1849,13 @@ elif seccion_activa == SECCIONES[2]:
                 df_live['municipio_ocurrencia'] == municipio_nw
             ].sort_values(['ano','semana'], ascending=False)
 
-            st.success("✅ Dato fresco obtenido directamente de la API SIVIGILA")
+            st.success("Dato fresco obtenido directamente de la API SIVIGILA")
             s1, s2, s3, s4 = st.columns(4)
             s1.metric("Año más reciente",   sello_live['ano_max'])
             s2.metric("Registros (total)",  sello_live['registros'])
             s3.metric("Hash MD5",           sello_live['hash_response'])
             s4.metric("Consultado",         sello_live['timestamp'])
-            st.caption("✅ Original — SIVIGILA directo · ✅ Contemporáneo — tiempo real · "
+            st.caption("Original — SIVIGILA directo · Contemporáneo — tiempo real · "
                        "Cacheado 1h para los 42 municipios")
 
             if len(df_mun_live) >= 3:
@@ -1713,7 +1870,7 @@ elif seccion_activa == SECCIONES[2]:
                 serie_l = pd.Series([t3_l, t2_l, t1_l])
                 _, _, md_l = imputar_semanas_faltantes(serie_l)
                 if md_l:
-                    st.warning("⚠️ Semanas cero sospechosas en datos frescos. "
+                    st.warning("Semanas cero sospechosas en datos frescos. "
                                "Imputación aplicada. Posible discontinuidad post-COVID.")
 
                 pred_live, _ = predecir(municipio_nw, t1_l, t2_l, t3_l, sem_l, md_l)
@@ -1727,12 +1884,12 @@ elif seccion_activa == SECCIONES[2]:
 
                 if abs(pred_live - pred_hist) > 10:
                     st.warning(
-                        f"⚠️ **Divergencia {abs(pred_live-pred_hist)} casos** entre API "
+                        f"**Divergencia {abs(pred_live-pred_hist)} casos** entre API "
                         f"y histórico 2018. Evidencia de data drift post-pandemia. "
                         f"Re-entrenamiento con datos 2023+ recomendado."
                     )
                 else:
-                    st.success("✅ Predicciones consistentes entre fuente histórica y API.")
+                    st.success("Predicciones consistentes entre fuente histórica y API.")
 
                 if len(df_mun_live) >= 6:
                     df_sl = (df_mun_live.groupby(['ano','semana'])['conteo']
@@ -1753,7 +1910,7 @@ elif seccion_activa == SECCIONES[2]:
                     fig_live.update_yaxes(gridcolor='rgba(0,0,0,0.06)')
                     st.plotly_chart(fig_live, use_container_width=True)
 
-                with st.expander("🔎 Datos crudos API"):
+                with st.expander("Datos crudos API"):
                     st.dataframe(df_live[['municipio_ocurrencia','ano','semana',
                                          'conteo','nombre_evento']].head(20),
                                  hide_index=True, use_container_width=True)
@@ -1761,10 +1918,10 @@ elif seccion_activa == SECCIONES[2]:
                 st.warning(f"No hay registros suficientes para {municipio_nw}. "
                            "Posible discontinuidad post-COVID.")
     else:
-        st.info("👆 Selecciona un municipio y presiona **Consultar API SIVIGILA**.")
+        st.info("Selecciona un municipio y presiona **Consultar API SIVIGILA**.")
 
     st.divider()
-    with st.expander("⚙️ Arquitectura de Re-entrenamiento Continuo"):
+    with st.expander("Arquitectura de Re-entrenamiento Continuo"):
         st.markdown("""
 ```
 API SIVIGILA → Extracción semanal automatizable
@@ -1838,15 +1995,15 @@ elif seccion_activa == SECCIONES[4]:
     mapa = construir_mapa(semana_actual)
     st_folium(mapa, width=None, height=550)
     ml1, ml2, ml3 = st.columns(3)
-    ml1.error("🔴 CRÍTICO — Stock post-demanda < SS dinámico")
-    ml2.warning("🟠 ALERTA — Stock actual < ROP dinámico")
-    ml3.success("🟢 NORMAL — Stock suficiente para el período")
+    ml1.error("CRÍTICO — Stock post-demanda < SS dinámico")
+    ml2.warning("ALERTA — Stock actual < ROP dinámico")
+    ml3.success("NORMAL — Stock suficiente para el período")
 
 # ══════════════════════════════════════════════
 # SECCIÓN 6 — VALIDACIÓN RETROSPECTIVA
 # ══════════════════════════════════════════════
 elif seccion_activa == SECCIONES[5]:
-    st.subheader("🔍 Validación Retrospectiva — Brote Cali 2016–2017")
+    st.subheader("Validación Retrospectiva — Brote Cali 2016–2017")
     st.markdown(
         "Demostración de que el sistema **hubiera detectado** el mayor brote "
         "del dataset con anticipación suficiente. Predicciones genuinamente "
@@ -1873,7 +2030,7 @@ elif seccion_activa == SECCIONES[5]:
 
         if sem_antic > 0:
             st.success(
-                f"✅ Sistema generó alerta {sem_antic} semanas antes del pico. "
+                f"Sistema generó alerta {sem_antic} semanas antes del pico. "
                 f"Lead time de {RED_LOGISTICA.get('CALI',{}).get('lead_time_horas',2)} horas "
                 f"— tiempo suficiente para activar la cadena."
             )
@@ -1952,25 +2109,38 @@ elif seccion_activa == SECCIONES[5]:
 # SECCIÓN 7 — AUDITORÍA ALCOA+
 # ══════════════════════════════════════════════
 elif seccion_activa == SECCIONES[6]:
-    st.subheader("🔬 Auditoría Técnica Completa — Compliance ALCOA+")
+    st.subheader("Auditoría Técnica Completa — Compliance ALCOA+")
 
     st.subheader("Sellos de Integridad de Datos")
-    st.dataframe(pd.DataFrame({
+    df_sellos = pd.DataFrame({
         'Artefacto': ['modelo_municipal_v4.pkl','dengue_valle_semanal.csv',
-                      'logistica_params.json','API SIVIGILA (en vivo)'],
+                      'logistica_params.json','API SIVIGILA (en vivo)',
+                      'API REPS (en vivo)'],
         'Hash MD5':  [sello_modelo['hash_md5'], sello_datos['hash_md5'],
-                      sello_log['hash_md5'], 'Calculado en tiempo real (sección Nowcasting)'],
+                      sello_log['hash_md5'], 'Calculado en tiempo real (sección Nowcasting)',
+                      'Calculado en tiempo real (sección Cadena de Abastecimiento)'],
         'Cargado en':[sello_modelo['cargado_en'], sello_datos['cargado_en'],
-                      sello_log['cargado_en'], 'Bajo demanda'],
+                      sello_log['cargado_en'], 'Bajo demanda', 'Bajo demanda (caché 24h)'],
         'Fuente':    [sello_modelo['fuente'], sello_datos['fuente'],
-                      sello_log['fuente'], 'datos.gov.co/resource/4hyg-wa9d · Socrata'],
+                      sello_log['fuente'], 'datos.gov.co/resource/4hyg-wa9d · Socrata',
+                      'datos.gov.co/resource/c36g-9fc2 · MinSalud · Socrata'],
+        'Estado':    ['Atención', 'Verificado', 'Verificado', 'Verificado', 'Verificado'],
         'ALCOA+ Original': [
-            '⚠️ Artefacto local — MLflow/DVC recomendado en producción',
-            '✅ Descargado de datos.gov.co',
-            '✅ Calculado de IGAC + INVIAS + MINSALUD',
-            '✅ Dato original en tiempo real',
+            'Artefacto local — MLflow/DVC recomendado en producción',
+            'Descargado de datos.gov.co',
+            'Calculado de IGAC + INVIAS + MINSALUD',
+            'Dato original en tiempo real',
+            'Dato original en tiempo real — directorio real de ESE, sin niveles de stock',
         ],
-    }), hide_index=True, use_container_width=True)
+    })
+
+    def _color_estado(val):
+        mapa = {'Verificado': 'background-color:#d4edda',
+                'Atención':   'background-color:#fff3cd'}
+        return mapa.get(val, '')
+
+    st.dataframe(df_sellos.style.map(_color_estado, subset=['Estado']),
+                 hide_index=True, use_container_width=True)
 
     st.divider()
     ca1, ca2 = st.columns(2)
@@ -2045,7 +2215,7 @@ elif seccion_activa == SECCIONES[6]:
             )
 
     st.divider()
-    with st.expander("⚠️ Limitaciones Documentadas — Respuestas Preparadas para el Jurado"):
+    with st.expander("Limitaciones Documentadas — Respuestas Preparadas para el Jurado"):
         fac_limit = ERROR_ESTRAT.get('factor_deg', 'N/A')
         st.warning(f"""
 **1. Data Gap 2018→2026 (COVID-19):**
@@ -2062,8 +2232,13 @@ normales vs. semanas de pico epidémico (holdout 2018), no es una versión ni
 un año. Respuesta: SS dinámico Z×σ×√LT absorbe este error estructuralmente.
 En picos, el sistema emite ALERTA antes del desbordamiento.
 
-**4. Stock simulado (no en tiempo real):**
-Normativo (Res. 1403/2007). En producción: integrar con REPS/SISPRO.
+**4. Niveles de stock simulados (no en tiempo real):**
+El **punto de recepción** ya no es un supuesto genérico: se obtiene en vivo
+de REPS (MinSalud, datos.gov.co) — el hospital público (ESE) real por
+municipio. Lo que sigue simulado son las **cantidades** de stock, porque
+el inventario hospitalario en tiempo real no es un dato abierto disponible
+en Colombia (información operativa interna, no publicada por las IPS).
+Normativo (Res. 1403/2007). En producción: integrar con SISMED/SISPRO.
 En presentación: `max(SS_dinámico, SS_normativo)` como piso legal.
 
 **5. Ahorro calculado sobre demanda predicha, no sobre orden a realizar:**
@@ -2075,7 +2250,7 @@ actual ya alcanza, porque mide el valor de *anticipar* la compra.
 Estacionalidad capturada vía seno/coseno de semana. Open-Meteo planificado v5.0.
         """)
 
-    with st.expander("🩺 Argumento de Farmacia Clínica — Para el Evaluador del Sector Salud"):
+    with st.expander("Argumento de Farmacia Clínica — Para el Evaluador del Sector Salud"):
         st.info("""
 Data Sentinel no es una herramienta para científicos de datos.
 
@@ -2101,13 +2276,13 @@ y la evidencia (SIVIGILA + modelo) hablan el mismo idioma.
 # SECCIÓN 8 — AGENTE IA
 # ══════════════════════════════════════════════
 elif seccion_activa == SECCIONES[7]:
-    st.subheader("🤖 Agente IA — Pregúntale a Denguard")
+    st.subheader("Agente IA — Pregúntale a Denguard")
     st.caption(
         "Agente con acceso a herramientas en tiempo real sobre el modelo, el "
         "histórico SIVIGILA y la cadena logística — no improvisa cifras, las consulta."
     )
 
-    with st.expander("⚙️ Arquitectura del agente — para el jurado", expanded=False):
+    with st.expander("Arquitectura del agente — para el jurado", expanded=False):
         st.markdown("""
 Esto **no** es un chatbot que alucina números: es un agente con **tool-use real**
 sobre Gemini (Google). Cada vez que el usuario pregunta algo, el modelo
@@ -2138,22 +2313,22 @@ Si una pregunta no tiene una herramienta para resolverla, el agente lo dice
 en vez de inventar un número.
         """)
 
-    api_key = ""
     try:
-        api_key = st.secrets.get("GEMINI_API_KEY", "")
-    except Exception:
-        api_key = ""
-    if not api_key:
-        api_key = st.text_input(
-            "Gemini API Key", type="password",
-            help="Se usa solo en esta sesión de navegador, no se guarda ni se envía a ningún otro lado. "
-                 "Consíguela gratis en aistudio.google.com/apikey"
-        )
+        api_key = st.secrets["GEMINI_API_KEY"]
+    except (KeyError, FileNotFoundError):
+        api_key = None
 
     if not GEMINI_DISPONIBLE:
         st.error("Falta instalar el SDK de Gemini: `pip install google-genai`")
     elif not api_key:
-        st.info("👆 Ingresa tu API Key de Gemini para activar el agente.")
+        st.error(
+            "No se encontró `GEMINI_API_KEY` en *Secrets*.\n\n"
+            "**En Streamlit Cloud:** ⋮ → Settings → Secrets, agrega:\n"
+            "```toml\nGEMINI_API_KEY = \"tu-key-aquí\"\n```\n"
+            "y reinicia la app (⋮ → Reboot app).\n\n"
+            "**En local:** crea `.streamlit/secrets.toml` con la misma línea.\n\n"
+            "Consigue tu key gratis en aistudio.google.com/apikey"
+        )
     else:
         if "agente_chat" not in st.session_state:
             st.session_state.agente_chat = []         # historial visible (solo texto)
@@ -2183,11 +2358,11 @@ en vez de inventar un número.
                             cliente_ia, st.session_state.agente_contenidos
                         )
                     except Exception as e:
-                        texto = f"❌ Error consultando al agente: {e}"
+                        texto = f"Error consultando al agente: {e}"
                 st.markdown(texto)
             st.session_state.agente_chat.append({"role": "assistant", "content": texto})
 
-        if st.session_state.agente_chat and st.button("🗑️ Limpiar conversación"):
+        if st.session_state.agente_chat and st.button("Limpiar conversación"):
             st.session_state.agente_chat = []
             st.session_state.agente_contenidos = []
             st.rerun()
