@@ -4,7 +4,6 @@ import numpy as np
 import joblib
 import json
 import hashlib
-import unicodedata
 import requests
 import plotly.express as px
 import plotly.graph_objects as go
@@ -44,450 +43,369 @@ st.set_page_config(
 # ─────────────────────────────────────────────
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500&family=Inter:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&family=Nunito+Sans:wght@300;400;600;700&display=swap');
 
+/* ── Variables de color — blanco/azul ── */
 :root {
-  --ink:        #05090f;
-  --ink2:       #0d1622;
-  --surface:    #0f1c2d;
-  --surface2:   #162236;
-  --surface3:   #1c2e46;
-  --accent:     #00ffe0;
-  --accent2:    #0077ff;
-  --danger:     #ff3d5a;
-  --warn:       #ffaa00;
-  --ok:         #00e87a;
-  --text:       #d8e8f5;
-  --muted:      #5a7a99;
-  --border:     rgba(0,255,224,0.08);
-  --border2:    rgba(0,255,224,0.18);
-  --glow:       0 0 24px rgba(0,255,224,0.10);
-  --glow2:      0 0 48px rgba(0,255,224,0.15);
+  --bg:       #ffffff;
+  --bg2:      #f4f7fb;
+  --bg3:      #eaf0fa;
+  --surface:  #ffffff;
+  --surface2: #f0f5fc;
+  --surface3: #e2eaf8;
+  --blue:     #1a56db;
+  --blue2:    #2563eb;
+  --blue-lt:  #3b82f6;
+  --blue-dk:  #1e3a8a;
+  --text:     #1e293b;
+  --muted:    #64748b;
+  --border:   #d1ddf5;
+  --border2:  #bfcfee;
+  --danger:   #dc2626;
+  --warn:     #d97706;
+  --ok:       #16a34a;
+  --shadow:   0 2px 16px rgba(30,86,219,0.09);
+  --shadow2:  0 4px 32px rgba(30,86,219,0.16);
 }
 
-/* ── Reset base Streamlit ── */
+/* ── Reset base ── */
 html, body,
 [data-testid="stAppViewContainer"],
 [data-testid="stMain"],
 .main {
-  background: var(--ink) !important;
+  background: var(--bg) !important;
   color: var(--text) !important;
-  font-family: 'Inter', sans-serif !important;
+  font-family: 'Nunito', 'Nunito Sans', sans-serif !important;
 }
 
-/* ── Fondo con grid animado ── */
+/* ── Fondo con patrón de puntos suave ── */
 [data-testid="stAppViewContainer"]::before {
   content: '';
   position: fixed;
   inset: 0;
-  background-image:
-    linear-gradient(rgba(0,255,224,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,255,224,0.03) 1px, transparent 1px);
-  background-size: 48px 48px;
+  background-image: radial-gradient(circle, #d1ddf5 1px, transparent 1px);
+  background-size: 28px 28px;
   pointer-events: none;
   z-index: 0;
-  animation: gridPulse 8s ease-in-out infinite;
-}
-@keyframes gridPulse {
-  0%,100% { opacity: 0.5; }
-  50%      { opacity: 1;   }
+  opacity: 0.45;
 }
 
 /* ── Sidebar ── */
 [data-testid="stSidebar"] {
-  background: var(--ink2) !important;
+  background: var(--bg2) !important;
   border-right: 1px solid var(--border2) !important;
-  box-shadow: 4px 0 40px rgba(0,0,0,0.6) !important;
-}
-[data-testid="stSidebar"]::after {
-  content: '';
-  position: absolute;
-  top: 0; right: 0;
-  width: 1px; height: 100%;
-  background: linear-gradient(180deg,
-    transparent 0%,
-    var(--accent) 30%,
-    var(--accent2) 70%,
-    transparent 100%);
-  opacity: 0.4;
-  animation: sidebarLine 4s ease-in-out infinite;
-}
-@keyframes sidebarLine {
-  0%,100% { opacity: 0.2; }
-  50%      { opacity: 0.6; }
+  box-shadow: 2px 0 20px rgba(30,86,219,0.07) !important;
 }
 [data-testid="stSidebar"] h1,
 [data-testid="stSidebar"] h2,
 [data-testid="stSidebar"] h3 {
-  font-family: 'Syne', sans-serif !important;
-  font-size: 0.65rem !important;
-  font-weight: 700 !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-size: 0.68rem !important;
+  font-weight: 800 !important;
   text-transform: uppercase !important;
-  letter-spacing: 0.18em !important;
-  color: var(--accent) !important;
-  margin-top: 1.6rem !important;
-  padding-bottom: 0.4rem !important;
-  border-bottom: 1px solid var(--border) !important;
+  letter-spacing: 0.14em !important;
+  color: var(--blue) !important;
+  margin-top: 1.4rem !important;
+  padding-bottom: 0.35rem !important;
+  border-bottom: 2px solid var(--border) !important;
 }
 
-/* ── Encabezados globales ── */
+/* ── Encabezados ── */
 h1, h2, h3 {
-  font-family: 'Syne', sans-serif !important;
+  font-family: 'Nunito', sans-serif !important;
   color: var(--text) !important;
 }
-h1 { font-size: 1.9rem !important; font-weight: 800 !important; letter-spacing: -0.03em !important; }
-h2 { font-size: 1.3rem !important; font-weight: 700 !important; }
+h1 { font-size: 1.85rem !important; font-weight: 800 !important; letter-spacing: -0.02em !important; }
+h2 { font-size: 1.25rem !important; font-weight: 700 !important; }
 h3 { font-size: 1.05rem !important; font-weight: 600 !important; }
 
-/* ── Encabezado principal (con ícono SVG, sin emoji) ── */
+/* ── Encabezado principal custom ── */
 .ds-main-title {
-  font-family: 'Syne', sans-serif !important;
-  font-size: 1.9rem !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-size: 1.85rem !important;
   font-weight: 800 !important;
-  letter-spacing: -0.03em !important;
+  letter-spacing: -0.02em !important;
   margin: 0 0 0.3rem 0 !important;
   display: flex !important;
   align-items: center !important;
   gap: 0.55rem !important;
-  background: linear-gradient(90deg, var(--accent), var(--accent2));
-  -webkit-background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-  animation: titleReveal 1s ease both;
+  color: var(--blue-dk) !important;
+  animation: titleReveal 0.7s ease both;
 }
 @keyframes titleReveal {
-  from { opacity: 0; transform: translateY(-16px); }
+  from { opacity: 0; transform: translateY(-12px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
 /* ── Métricas ── */
 [data-testid="stMetric"] {
   background: var(--surface) !important;
-  border: 1px solid var(--border2) !important;
-  border-radius: 14px !important;
+  border: 1.5px solid var(--border) !important;
+  border-radius: 16px !important;
   padding: 1.1rem 1.3rem !important;
   position: relative !important;
   overflow: hidden !important;
-  transition: transform 0.25s cubic-bezier(.34,1.56,.64,1),
-              box-shadow 0.25s ease,
-              border-color 0.25s ease !important;
+  box-shadow: var(--shadow) !important;
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease !important;
   cursor: default !important;
-}
-[data-testid="stMetric"]::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, rgba(0,255,224,0.04) 0%, transparent 60%);
-  pointer-events: none;
 }
 [data-testid="stMetric"]::after {
   content: '';
   position: absolute;
   top: 0; left: 0;
-  width: 100%; height: 2px;
-  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  width: 100%; height: 3px;
+  background: linear-gradient(90deg, var(--blue), var(--blue-lt));
   transform: scaleX(0);
   transform-origin: left;
-  transition: transform 0.35s ease;
+  transition: transform 0.3s ease;
 }
 [data-testid="stMetric"]:hover {
-  transform: translateY(-4px) !important;
-  box-shadow: var(--glow2) !important;
-  border-color: var(--accent) !important;
+  transform: translateY(-3px) !important;
+  box-shadow: var(--shadow2) !important;
+  border-color: var(--blue-lt) !important;
 }
-[data-testid="stMetric"]:hover::after {
-  transform: scaleX(1);
-}
+[data-testid="stMetric"]:hover::after { transform: scaleX(1); }
 [data-testid="stMetricLabel"] {
-  font-family: 'JetBrains Mono', monospace !important;
-  font-size: 0.6rem !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-size: 0.7rem !important;
+  font-weight: 700 !important;
   text-transform: uppercase !important;
-  letter-spacing: 0.14em !important;
+  letter-spacing: 0.1em !important;
   color: var(--muted) !important;
 }
 [data-testid="stMetricValue"] {
-  font-family: 'Syne', sans-serif !important;
+  font-family: 'Nunito', sans-serif !important;
   font-size: 1.55rem !important;
   font-weight: 800 !important;
-  color: var(--text) !important;
+  color: var(--blue-dk) !important;
   line-height: 1.1 !important;
 }
 [data-testid="stMetricDelta"] {
-  font-family: 'JetBrains Mono', monospace !important;
-  font-size: 0.68rem !important;
+  font-family: 'Nunito Sans', sans-serif !important;
+  font-size: 0.72rem !important;
 }
 
-/* ── Navegación tipo "pilar" — vertical, en el sidebar (colapsable) ── */
-/* Si streamlit-option-menu está instalado se usa ese componente (con
-   íconos); este CSS solo aplica como respaldo si no está disponible,
-   convirtiendo un st.radio en una columna de pastillas verticales. */
+/* ── Navegación pilar en sidebar ── */
 [data-testid="stSidebar"] [data-testid="stRadio"] > label { display: none !important; }
 [data-testid="stSidebar"] [data-testid="stRadio"] > div[role="radiogroup"] {
   display: flex !important;
   flex-direction: column !important;
-  gap: 0.35rem !important;
+  gap: 0.3rem !important;
 }
 [data-testid="stSidebar"] [data-testid="stRadio"] > div[role="radiogroup"] > label {
-  font-family: 'JetBrains Mono', monospace !important;
-  font-size: 0.72rem !important;
-  font-weight: 500 !important;
-  letter-spacing: 0.02em !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-size: 0.82rem !important;
+  font-weight: 600 !important;
   color: var(--muted) !important;
   background: var(--surface) !important;
-  border: 1px solid var(--border2) !important;
-  border-radius: 9px !important;
+  border: 1.5px solid var(--border) !important;
+  border-radius: 10px !important;
   padding: 0.6rem 0.85rem !important;
   margin: 0 !important;
   cursor: pointer !important;
-  transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease, transform 0.15s ease !important;
+  transition: color 0.18s, background 0.18s, border-color 0.18s, transform 0.15s !important;
 }
 [data-testid="stSidebar"] [data-testid="stRadio"] > div[role="radiogroup"] > label:hover {
-  color: var(--accent) !important;
-  border-color: var(--accent) !important;
-  transform: translateX(2px) !important;
+  color: var(--blue) !important;
+  border-color: var(--blue-lt) !important;
+  transform: translateX(3px) !important;
 }
 [data-testid="stSidebar"] [data-testid="stRadio"] > div[role="radiogroup"] > label:has(input:checked) {
-  color: var(--ink) !important;
-  background: var(--accent) !important;
-  border-color: var(--accent) !important;
-  box-shadow: 0 0 16px rgba(0,255,224,0.35) !important;
+  color: #ffffff !important;
+  background: var(--blue) !important;
+  border-color: var(--blue) !important;
+  box-shadow: 0 2px 12px rgba(30,86,219,0.25) !important;
 }
 [data-testid="stSidebar"] [data-testid="stRadio"] [data-testid="stMarkdownContainer"] p {
-  font-size: inherit !important;
-  color: inherit !important;
+  font-size: inherit !important; color: inherit !important;
 }
 [data-testid="stSidebar"] [data-testid="stRadio"] svg { display: none !important; }
-
-/* Contenedor del menú tipo pilar (streamlit-option-menu) */
-[data-testid="stSidebar"] .nav-link { margin-bottom: 4px !important; }
+[data-testid="stSidebar"] .nav-link { margin-bottom: 3px !important; }
 
 /* ── Botones ── */
 [data-testid="stButton"] > button {
   background: transparent !important;
-  color: var(--accent) !important;
-  font-family: 'JetBrains Mono', monospace !important;
-  font-size: 0.72rem !important;
-  font-weight: 500 !important;
-  border: 1px solid var(--accent) !important;
-  border-radius: 8px !important;
-  padding: 0.55rem 1.4rem !important;
-  letter-spacing: 0.08em !important;
-  text-transform: uppercase !important;
-  position: relative !important;
-  overflow: hidden !important;
-  transition: color 0.25s, box-shadow 0.25s, transform 0.2s !important;
-}
-[data-testid="stButton"] > button::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: var(--accent);
-  transform: scaleY(0);
-  transform-origin: bottom;
-  transition: transform 0.25s cubic-bezier(.4,0,.2,1);
-  z-index: -1;
+  color: var(--blue) !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-size: 0.82rem !important;
+  font-weight: 700 !important;
+  border: 1.5px solid var(--blue) !important;
+  border-radius: 10px !important;
+  padding: 0.5rem 1.3rem !important;
+  transition: all 0.2s ease !important;
 }
 [data-testid="stButton"] > button:hover {
-  color: var(--ink) !important;
-  box-shadow: 0 0 20px rgba(0,255,224,0.35) !important;
+  background: var(--blue) !important;
+  color: #fff !important;
+  box-shadow: 0 4px 14px rgba(30,86,219,0.25) !important;
   transform: translateY(-2px) !important;
 }
-[data-testid="stButton"] > button:hover::after { transform: scaleY(1); }
-
-/* Botón primary (type="primary") */
-[data-testid="stButton"] > button[kind="primaryFormSubmit"],
 [data-testid="stButton"] > button[data-testid="baseButton-primary"] {
-  background: var(--accent) !important;
-  color: var(--ink) !important;
+  background: var(--blue) !important;
+  color: #fff !important;
   border: none !important;
-  box-shadow: 0 4px 20px rgba(0,255,224,0.3) !important;
+  box-shadow: var(--shadow) !important;
 }
 [data-testid="stButton"] > button[data-testid="baseButton-primary"]:hover {
-  box-shadow: 0 6px 30px rgba(0,255,224,0.5) !important;
-  transform: translateY(-3px) !important;
+  background: var(--blue-dk) !important;
+  box-shadow: var(--shadow2) !important;
+  transform: translateY(-2px) !important;
 }
 
 /* ── Selectbox / Inputs ── */
 [data-testid="stSelectbox"] > div > div,
 [data-testid="stNumberInput"] > div > div {
-  background: var(--surface2) !important;
-  border: 1px solid var(--border2) !important;
-  border-radius: 8px !important;
+  background: var(--surface) !important;
+  border: 1.5px solid var(--border) !important;
+  border-radius: 10px !important;
   color: var(--text) !important;
   transition: border-color 0.2s, box-shadow 0.2s !important;
+  font-family: 'Nunito Sans', sans-serif !important;
 }
 [data-testid="stSelectbox"] > div > div:focus-within,
 [data-testid="stNumberInput"] > div > div:focus-within {
-  border-color: var(--accent) !important;
-  box-shadow: 0 0 0 3px rgba(0,255,224,0.12) !important;
+  border-color: var(--blue) !important;
+  box-shadow: 0 0 0 3px rgba(30,86,219,0.12) !important;
 }
 [data-testid="stSelectbox"] label,
 [data-testid="stNumberInput"] label,
 [data-testid="stSlider"] label,
 [data-testid="stRadio"] label {
-  font-family: 'JetBrains Mono', monospace !important;
-  font-size: 0.65rem !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
   text-transform: uppercase !important;
-  letter-spacing: 0.12em !important;
+  letter-spacing: 0.09em !important;
   color: var(--muted) !important;
 }
 
 /* ── Slider ── */
-[data-testid="stSlider"] [data-baseweb="slider"] div[role="slider"] {
-  background: var(--accent) !important;
-  box-shadow: 0 0 8px rgba(0,255,224,0.6) !important;
-}
+[data-testid="stSlider"] [data-baseweb="slider"] div[role="slider"],
 [data-testid="stSlider"] [data-baseweb="slider"] div[data-testid="stSliderThumb"] {
-  background: var(--accent) !important;
+  background: var(--blue) !important;
+  box-shadow: 0 0 0 3px rgba(30,86,219,0.2) !important;
 }
 
 /* ── Dataframe ── */
 [data-testid="stDataFrame"] {
-  border: 1px solid var(--border2) !important;
-  border-radius: 12px !important;
+  border: 1.5px solid var(--border) !important;
+  border-radius: 14px !important;
   overflow: hidden !important;
-  box-shadow: var(--glow) !important;
+  box-shadow: var(--shadow) !important;
 }
-[data-testid="stDataFrame"] table {
-  background: var(--surface) !important;
-}
+[data-testid="stDataFrame"] table { background: var(--surface) !important; }
 [data-testid="stDataFrame"] th {
-  background: var(--surface3) !important;
-  font-family: 'JetBrains Mono', monospace !important;
-  font-size: 0.65rem !important;
+  background: var(--bg2) !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-size: 0.68rem !important;
+  font-weight: 800 !important;
   text-transform: uppercase !important;
-  letter-spacing: 0.1em !important;
-  color: var(--accent) !important;
-  border-bottom: 1px solid var(--border2) !important;
+  letter-spacing: 0.09em !important;
+  color: var(--blue-dk) !important;
+  border-bottom: 1.5px solid var(--border) !important;
 }
 [data-testid="stDataFrame"] td {
-  font-family: 'JetBrains Mono', monospace !important;
-  font-size: 0.78rem !important;
+  font-family: 'Nunito Sans', sans-serif !important;
+  font-size: 0.82rem !important;
   color: var(--text) !important;
   border-color: var(--border) !important;
 }
-[data-testid="stDataFrame"] tr:hover td {
-  background: rgba(0,255,224,0.04) !important;
-}
+[data-testid="stDataFrame"] tr:hover td { background: var(--bg3) !important; }
 
 /* ── Expander ── */
 [data-testid="stExpander"] {
   background: var(--surface) !important;
-  border: 1px solid var(--border2) !important;
-  border-radius: 12px !important;
-  transition: border-color 0.25s, box-shadow 0.25s !important;
+  border: 1.5px solid var(--border) !important;
+  border-radius: 14px !important;
+  box-shadow: var(--shadow) !important;
+  transition: border-color 0.2s, box-shadow 0.2s !important;
   overflow: hidden !important;
 }
 [data-testid="stExpander"]:hover {
-  border-color: rgba(0,255,224,0.3) !important;
-  box-shadow: var(--glow) !important;
+  border-color: var(--blue-lt) !important;
+  box-shadow: var(--shadow2) !important;
 }
 [data-testid="stExpander"] summary {
-  font-family: 'JetBrains Mono', monospace !important;
-  font-size: 0.7rem !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-size: 0.82rem !important;
+  font-weight: 600 !important;
   color: var(--muted) !important;
-  letter-spacing: 0.06em !important;
-  padding: 0.9rem 1.1rem !important;
+  padding: 0.85rem 1.1rem !important;
 }
-[data-testid="stExpander"] summary:hover {
-  color: var(--accent) !important;
-}
+[data-testid="stExpander"] summary:hover { color: var(--blue) !important; }
 details[data-testid="stExpander"] > summary::marker,
 details[data-testid="stExpander"] > summary::-webkit-details-marker {
-  color: var(--accent) !important;
+  color: var(--blue) !important;
 }
 
 /* ── Alerts ── */
 [data-testid="stAlert"] {
-  border-radius: 10px !important;
+  border-radius: 12px !important;
   border-left-width: 3px !important;
-  font-size: 0.82rem !important;
-  font-family: 'Inter', sans-serif !important;
-  backdrop-filter: blur(4px) !important;
+  font-size: 0.85rem !important;
+  font-family: 'Nunito Sans', sans-serif !important;
 }
-[data-testid="stAlert"][data-baseweb="notification"][kind="info"],
-div.stInfo {
-  background: rgba(0,119,255,0.08) !important;
-  border-left-color: var(--accent2) !important;
-}
-[data-testid="stAlert"][data-baseweb="notification"][kind="success"],
-div.stSuccess {
-  background: rgba(0,232,122,0.08) !important;
-  border-left-color: var(--ok) !important;
-}
-[data-testid="stAlert"][data-baseweb="notification"][kind="warning"],
-div.stWarning {
-  background: rgba(255,170,0,0.08) !important;
-  border-left-color: var(--warn) !important;
-}
-[data-testid="stAlert"][data-baseweb="notification"][kind="error"],
-div.stError {
-  background: rgba(255,61,90,0.08) !important;
-  border-left-color: var(--danger) !important;
-}
+div.stInfo    { background: rgba(30,86,219,0.06) !important; border-left-color: var(--blue) !important; }
+div.stSuccess { background: rgba(22,163,74,0.07) !important; border-left-color: var(--ok) !important; }
+div.stWarning { background: rgba(217,119,6,0.07) !important; border-left-color: var(--warn) !important; }
+div.stError   { background: rgba(220,38,38,0.06) !important; border-left-color: var(--danger) !important; }
 
 /* ── Caption ── */
 [data-testid="stCaptionContainer"] {
-  font-family: 'JetBrains Mono', monospace !important;
-  font-size: 0.65rem !important;
+  font-family: 'Nunito Sans', sans-serif !important;
+  font-size: 0.72rem !important;
   color: var(--muted) !important;
 }
 
 /* ── Divider ── */
 hr {
   border: none !important;
-  border-top: 1px solid var(--border2) !important;
-  margin: 1.4rem 0 !important;
-  position: relative !important;
+  border-top: 1.5px solid var(--border) !important;
+  margin: 1.2rem 0 !important;
 }
 
 /* ── Mapa iframe ── */
 [data-testid="stIFrame"] {
-  border-radius: 14px !important;
-  border: 1px solid var(--border2) !important;
-  box-shadow: var(--glow) !important;
+  border-radius: 16px !important;
+  border: 1.5px solid var(--border) !important;
+  box-shadow: var(--shadow) !important;
   overflow: hidden !important;
 }
 
 /* ── Multiselect ── */
 [data-testid="stMultiSelect"] [data-baseweb="tag"] {
-  background: rgba(0,255,224,0.12) !important;
-  border: 1px solid var(--accent) !important;
-  color: var(--accent) !important;
-  font-family: 'JetBrains Mono', monospace !important;
-  font-size: 0.7rem !important;
-  border-radius: 6px !important;
+  background: rgba(30,86,219,0.1) !important;
+  border: 1px solid var(--blue-lt) !important;
+  color: var(--blue-dk) !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-size: 0.75rem !important;
+  border-radius: 8px !important;
 }
 
-/* ── Spinner ── */
-[data-testid="stSpinner"] {
-  color: var(--accent) !important;
-}
-
-/* ── Plotly charts fondo oscuro ── */
-.js-plotly-plot .plotly {
-  background: transparent !important;
+/* ── Radio (contenido, no sidebar) ── */
+[data-testid="stRadio"] [data-testid="stMarkdownContainer"] p {
+  font-family: 'Nunito Sans', sans-serif !important;
+  font-size: 0.85rem !important;
+  color: var(--text) !important;
 }
 
 /* ── Scrollbar ── */
-::-webkit-scrollbar { width: 4px; height: 4px; }
-::-webkit-scrollbar-track { background: var(--ink2); }
-::-webkit-scrollbar-thumb {
-  background: var(--surface3);
-  border-radius: 2px;
-}
-::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--bg2); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--blue-lt); }
 
-/* ── Animaciones de entrada ── */
+/* ── Animaciones ── */
 @keyframes fadeUp {
-  from { opacity:0; transform:translateY(16px); }
+  from { opacity:0; transform:translateY(14px); }
   to   { opacity:1; transform:translateY(0); }
 }
-.ds-animate-in { animation: fadeUp 0.5s ease both; }
-[data-testid="column"]:nth-child(1) { animation: fadeUp 0.5s 0.05s ease both; }
-[data-testid="column"]:nth-child(2) { animation: fadeUp 0.5s 0.15s ease both; }
-[data-testid="column"]:nth-child(3) { animation: fadeUp 0.5s 0.25s ease both; }
-[data-testid="column"]:nth-child(4) { animation: fadeUp 0.5s 0.35s ease both; }
-[data-testid="column"]:nth-child(5) { animation: fadeUp 0.5s 0.45s ease both; }
+.ds-animate-in { animation: fadeUp 0.4s ease both; }
+[data-testid="column"]:nth-child(1) { animation: fadeUp 0.4s 0.05s ease both; }
+[data-testid="column"]:nth-child(2) { animation: fadeUp 0.4s 0.12s ease both; }
+[data-testid="column"]:nth-child(3) { animation: fadeUp 0.4s 0.20s ease both; }
+[data-testid="column"]:nth-child(4) { animation: fadeUp 0.4s 0.28s ease both; }
+[data-testid="column"]:nth-child(5) { animation: fadeUp 0.4s 0.36s ease both; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -503,14 +421,6 @@ def md5_archivo(path):
 
 def timestamp_utc():
     return datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')
-
-def _quitar_acentos(texto):
-    """Normaliza nombres de municipio para cruzar MUNICIPIOS (sin acentos,
-    ej. 'TULUA') con el campo 'municipioprestadordesc' de REPS (puede traer
-    acentos, ej. 'MEDELLÍN'). Evita falsos 'no encontrado' por tildes."""
-    texto = (texto or '').upper().strip()
-    return ''.join(c for c in unicodedata.normalize('NFD', texto)
-                    if unicodedata.category(c) != 'Mn')
 
 def detectar_semanas_faltantes(serie):
     if len(serie) < 4:
@@ -608,10 +518,10 @@ COSTOS = {
     'ringer_urgencia': 8_000,
 }
 COLORES_TOP = [
-    '#E24B4A','#378ADD','#639922','#BA7517','#533AB7',
-    '#1D9E75','#D85A30','#185FA5','#3B6D11','#993556'
+    '#1A56DB','#DC2626','#16A34A','#D97706','#7C3AED',
+    '#0891B2','#EA580C','#0D9488','#4F46E5','#DB2777'
 ]
-COLOR_URG = {'CRÍTICO': '#E24B4A', 'ALERTA': '#EF9F27', 'NORMAL': '#639922'}
+COLOR_URG = {'CRÍTICO': '#DC2626', 'ALERTA': '#D97706', 'NORMAL': '#16A34A'}
 
 # ── Iconografía (sin emojis) ──────────────────────────────────────────
 # SVG inline en vez de una fuente de íconos externa (ej. Bootstrap Icons
@@ -810,65 +720,6 @@ def consultar_sivigila_reciente(limite=3000):
     return None, ultimo_error or "Error desconocido tras 3 intentos", None
 
 # ─────────────────────────────────────────────
-# REPS — Registro Especial de Prestadores y Sedes de Salud (MinSalud)
-# ─────────────────────────────────────────────
-# Segundo dataset real de datos.gov.co (resource c36g-9fc2). Sustituye el
-# punto de recepción genérico inventado ("SECCIONED Cali") por hospitales
-# públicos (ESE) reales, con nombre y dirección verificables, por municipio.
-# OJO — esto NO trae niveles de stock/inventario: esa información (cuántas
-# tabletas/bolsas hay hoy en cada sede) no se publica como dato abierto en
-# Colombia por razones operativas, así que `stock_aceta_tab` y
-# `stock_ringer_bolsas` siguen siendo simulados a propósito (Res. 1403/2007),
-# y así se documenta explícitamente en toda la app.
-@st.cache_data(ttl=86400, show_spinner=False)
-def cargar_reps_valle():
-    BASE = "https://www.datos.gov.co/resource/c36g-9fc2.json"
-    try:
-        r = requests.get(BASE, params={
-            "$where": "departamentoprestadordesc='Valle del Cauca' AND ese='SI'",
-            "$select": "codigoprestador,nombreprestador,nombresede,"
-                       "municipioprestadordesc,direccionprestador,"
-                       "claseprestador,fecha_corte_reps",
-            "$limit": 3000,
-        }, timeout=60)
-        if r.status_code != 200:
-            return None, f"HTTP {r.status_code}", None
-        df = pd.DataFrame(r.json())
-        if df.empty:
-            return None, "Sin datos para Valle del Cauca", None
-        df['municipio_norm'] = df['municipioprestadordesc'].apply(_quitar_acentos)
-        sello = {
-            'timestamp':      timestamp_utc(),
-            'fuente':         'API datos.gov.co/resource/c36g-9fc2 (REPS · MinSalud)',
-            'registros':      len(df),
-            'fecha_corte':    df['fecha_corte_reps'].iloc[0] if len(df) else 'N/A',
-            'hash_response':  hashlib.md5(r.content).hexdigest()[:12],
-        }
-        return df, None, sello
-    except requests.exceptions.Timeout:
-        return None, "Timeout consultando REPS (>60s)", None
-    except Exception as e:
-        return None, str(e), None
-
-
-def obtener_punto_recepcion(df_reps, municipio):
-    """Hospital público (ESE) real registrado en REPS para un municipio.
-    Prioriza sedes cuyo nombre contiene 'HOSPITAL' (el receptor lógico de
-    un despacho de medicamentos); si no hay, usa la primera ESE registrada."""
-    if df_reps is None or df_reps.empty:
-        return None
-    mun_norm = _quitar_acentos(municipio)
-    candidatos = df_reps[df_reps['municipio_norm'] == mun_norm]
-    if candidatos.empty:
-        return None
-    hospitales = candidatos[candidatos['nombresede'].str.contains(
-        'HOSPITAL', case=False, na=False)]
-    elegido = hospitales.iloc[0] if len(hospitales) else candidatos.iloc[0]
-    return {
-        'nombre_sede': elegido['nombresede'],
-        'direccion': elegido['direccionprestador'],
-        'total_ese_municipio': len(candidatos),
-    }
 
 # ─────────────────────────────────────────────
 # VALIDACIÓN RETROSPECTIVA (cacheada — no depende de la UI)
@@ -1074,7 +925,7 @@ def tool_resumen_departamental():
         "ahorro_total_estimado_cop": int(df_r['ahorro'].sum()),
         "municipio_mayor_riesgo": (
             df_r.sort_values('pred_casos', ascending=False).iloc[0]['municipio']
-            if len(df_r) else None
+            if len(df_r) > 0 else "Sin datos"
         ),
     }
 
@@ -1095,7 +946,10 @@ def tool_historico_municipio(municipio, semanas=12):
     if not mun:
         return {"error": f"Municipio '{municipio}' no reconocido.",
                 "municipios_disponibles": sorted(MUNICIPIOS)}
-    semanas = max(1, min(int(semanas or 12), 104))
+    try:
+        semanas = max(1, min(int(semanas or 12), 104))
+    except (ValueError, TypeError):
+        semanas = 12
     h = df_hist[df_hist['municipio_ocurrencia'] == mun].sort_values('fecha').tail(semanas)
     return {
         "municipio": mun,
@@ -1258,11 +1112,11 @@ _LOGO_SVG = (
     'viewBox="0 0 16 16" style="vertical-align:-6px;flex-shrink:0">'
     '<path d="M8 1 14 3.2v4.6c0 4-2.6 6.7-6 8.2-3.4-1.5-6-4.2-6-8.2V3.2z" '
     'fill="url(#dsGrad)"/>'
-    '<path d="M5.4 8.1 7.2 9.9 10.6 6" stroke="#05090f" stroke-width="1.4" '
+    '<path d="M5.4 8.1 7.2 9.9 10.6 6" stroke="#ffffff" stroke-width="1.4" '
     'stroke-linecap="round" stroke-linejoin="round" fill="none"/>'
     '<defs><linearGradient id="dsGrad" x1="0" y1="0" x2="16" y2="16">'
-    '<stop offset="0" stop-color="#00ffe0"/>'
-    '<stop offset="1" stop-color="#0077ff"/>'
+    '<stop offset="0" stop-color="#1a56db"/>'
+    '<stop offset="1" stop-color="#3b82f6"/>'
     '</linearGradient></defs></svg>'
 )
 st.markdown(
@@ -1291,6 +1145,7 @@ st.divider()
 # colapsable nativo de Streamlit)
 # ─────────────────────────────────────────────
 SECCIONES = [
+    "Vista General",
     "Dashboard",
     "Cadena de Abastecimiento",
     "Nowcasting",
@@ -1300,8 +1155,8 @@ SECCIONES = [
     "Auditoría ALCOA+",
     "Agente IA",
 ]
-ICONOS_SECCION = ["graph-up-arrow", "truck", "broadcast", "clock-history",
-                   "geo-alt", "search", "shield-check", "robot"]
+ICONOS_SECCION = ["house-fill", "graph-up-arrow", "truck", "broadcast",
+                   "clock-history", "geo-alt", "search", "shield-check", "robot"]
 
 st.sidebar.header("Navegación")
 if OPTION_MENU_DISPONIBLE:
@@ -1399,7 +1254,112 @@ st.markdown('<div class="ds-animate-in">', unsafe_allow_html=True)
 # ══════════════════════════════════════════════
 # SECCIÓN 1 — DASHBOARD PREDICTIVO
 # ══════════════════════════════════════════════
+# ══════════════════════════════════════════════
+# SECCIÓN 0 — VISTA GENERAL (lenguaje simple, para cualquier persona)
+# ══════════════════════════════════════════════
 if seccion_activa == SECCIONES[0]:
+    st.markdown(f"### Resumen para {municipio_sel}")
+    st.markdown(
+        "Esta pantalla te da lo más importante en un vistazo. "
+        "No necesitas saber de salud ni de logística para entenderla."
+    )
+    st.divider()
+
+    # ── Bloque principal: semáforo visual ────────────────────────────────
+    cadena_simple = evaluar_cadena(
+        municipio_sel, pred_sel, stock_aceta_input, stock_ringer_input
+    )
+    urg = cadena_simple['urgencia'] if cadena_simple else 'NORMAL'
+    COLOR_BG  = {'CRÍTICO': '#FFF0F0', 'ALERTA': '#FFFBF0', 'NORMAL': '#F0FFF5'}
+    COLOR_BRD = {'CRÍTICO': '#E24B4A', 'ALERTA': '#EF9F27', 'NORMAL': '#2E9E5B'}
+    LABEL_URG = {
+        'CRÍTICO': 'Se necesitan medicamentos urgentemente',
+        'ALERTA':  'Hay que pedir medicamentos pronto',
+        'NORMAL':  'Todo está bajo control por ahora',
+    }
+    DESC_URG = {
+        'CRÍTICO': (
+            f"El stock actual no alcanza para cubrir los casos previstos esta semana. "
+            f"Se debe despachar en las próximas **{cadena_simple['despachar_en_dias']} horas** "
+            f"para evitar desabasto."
+        ),
+        'ALERTA': (
+            f"El stock bajará del nivel mínimo recomendado si no se actúa esta semana. "
+            f"Se debe hacer el pedido en máximo **{cadena_simple['despachar_en_dias']} día(s)**."
+        ),
+        'NORMAL': (
+            f"El municipio tiene medicamentos suficientes para atender los casos previstos "
+            f"durante los próximos **{cadena_simple['dias_cobertura']} días**."
+        ),
+    }
+
+    st.markdown(
+        f'<div style="background:{COLOR_BG[urg]};border:2px solid {COLOR_BRD[urg]};'
+        f'border-radius:16px;padding:1.5rem 2rem;margin-bottom:1.2rem">'
+        f'<div style="font-size:1.05rem;font-weight:700;color:{COLOR_BRD[urg]};'
+        f'margin-bottom:0.4rem">{LABEL_URG[urg]}</div>'
+        f'<div style="font-size:0.92rem;color:#334">{DESC_URG[urg]}</div>'
+        f'</div>',
+        unsafe_allow_html=True
+    )
+
+    # ── 4 métricas clave en lenguaje simple ──────────────────────────────
+    g1, g2, g3, g4 = st.columns(4)
+    g1.metric(
+        "Casos previstos la próxima semana",
+        f"{pred_sel}",
+        help="Número de personas que probablemente necesitarán atención médica por dengue."
+    )
+    g2.metric(
+        "Pastillas de acetaminofén necesarias",
+        f"{cadena_simple['req_aceta']:,}" if cadena_simple else "—",
+        help="Cantidad de tabletas de acetaminofén 500mg para tratar los casos previstos."
+    )
+    g3.metric(
+        "Bolsas de suero necesarias",
+        f"{cadena_simple['req_ringer']:,}" if cadena_simple else "—",
+        help="Bolsas de Lactato de Ringer para los casos graves que requieren hospitalización."
+    )
+    g4.metric(
+        "Ahorro al planificar con anticipación",
+        f"${cadena_simple['ahorro']:,.0f} COP" if cadena_simple else "—",
+        help="Dinero que se ahorra comprando a precio normal (planificado) en vez de a precio de emergencia."
+    )
+
+    st.divider()
+
+    # ── Explicación sencilla del sistema ─────────────────────────────────
+    with st.expander("Cómo funciona este sistema", expanded=False):
+        st.markdown(f"""
+Este sistema predice cuántos casos de dengue habrá en **{municipio_sel}** la
+próxima semana, y calcula automáticamente cuántos medicamentos se necesitan
+y si el stock actual alcanza.
+
+**En 3 pasos:**
+
+1. **Predice** — usa los casos reportados de las últimas semanas y el
+   historial de 11 años (SIVIGILA 2007–2018) para estimar cuántos
+   pacientes habrá la próxima semana: **{pred_sel} casos**.
+
+2. **Evalúa** — compara esa predicción con el stock actual de medicamentos
+   en el municipio y determina si hay suficiente, si hay que pedir pronto,
+   o si es urgente.
+
+3. **Actúa** — genera automáticamente la cantidad exacta a pedir y el
+   tiempo máximo para hacer el pedido, para que los medicamentos lleguen
+   a tiempo.
+
+**Por qué importa:** un sistema reactivo (comprar cuando ya falta) paga
+precios de emergencia y pone en riesgo a los pacientes. Este sistema
+planifica con anticipación y ahorra dinero público.
+        """)
+
+    st.markdown("Para ver el análisis técnico completo, usa el menú de la izquierda.")
+
+# ══════════════════════════════════════════════
+# SECCIÓN 1 — DASHBOARD PREDICTIVO (antes sección 0)
+# ══════════════════════════════════════════════
+elif seccion_activa == SECCIONES[1]:
     st.markdown(f"### Reporte Predictivo — {municipio_sel}")
 
     if modo_degradado:
@@ -1533,7 +1493,7 @@ para garantizar cumplimiento legal y seguridad operativa simultáneamente.
 
         fig_dash.add_trace(go.Scatter(
             x=fechas_h + fechas_h[::-1], y=ic_a_h + ic_b_h[::-1],
-            fill='toself', fillcolor='rgba(226,75,74,0.15)',
+            fill='toself', fillcolor='rgba(220,38,38,0.12)',
             line=dict(color='rgba(255,255,255,0)'),
             showlegend=True,
             name=f'IC ±RMSE{"×1.5" if modo_degradado else ""}',
@@ -1542,8 +1502,8 @@ para garantizar cumplimiento legal y seguridad operativa simultáneamente.
         fig_dash.add_trace(go.Scatter(
             x=fechas_h, y=preds_h, mode='lines+markers',
             name='Predicción 4 semanas',
-            line=dict(color='#E24B4A', width=2, dash='dash'),
-            marker=dict(size=9, color='#E24B4A'),
+            line=dict(color='#DC2626', width=2, dash='dash'),
+            marker=dict(size=9, color='#DC2626'),
             hovertemplate='<b>%{x|%d %b %Y}</b><br>Pred: %{y}<br>'
                           'IC: [%{customdata[0]} – %{customdata[1]}]<extra></extra>',
             customdata=list(zip(ic_b_h, ic_a_h))
@@ -1558,10 +1518,10 @@ para garantizar cumplimiento legal y seguridad operativa simultáneamente.
             legend=dict(orientation='h', y=-0.18),
             xaxis_title='', yaxis_title='Casos / semana',
             hovermode='x unified',
-            plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='#ffffff', paper_bgcolor='#ffffff',
         )
         fig_dash.update_xaxes(showgrid=False)
-        fig_dash.update_yaxes(gridcolor='rgba(0,0,0,0.06)')
+        fig_dash.update_yaxes(gridcolor='#e2eaf8')
         st.plotly_chart(fig_dash, use_container_width=True)
 
         if diverge:
@@ -1577,17 +1537,17 @@ para garantizar cumplimiento legal y seguridad operativa simultáneamente.
         fig_h = go.Figure()
         fig_h.add_trace(go.Bar(
             x=horizonte_df['paso'], y=horizonte_df['pred'],
-            marker_color=['#E24B4A','#EF9F27','#BA7517','#993556'],
+            marker_color=['#1A56DB','#2563EB','#3B82F6','#6096FB'],
             error_y=dict(type='data', array=horizonte_df['ic'].tolist(),
                          visible=True, color='#666'),
             hovertemplate='%{x}: %{y} casos ± %{error_y.array}<extra></extra>'
         ))
         fig_h.update_layout(
             height=200, margin=dict(l=0, r=0, t=10, b=0), showlegend=False,
-            plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='#ffffff', paper_bgcolor='#ffffff',
             yaxis_title='Casos'
         )
-        fig_h.update_yaxes(gridcolor='rgba(0,0,0,0.06)')
+        fig_h.update_yaxes(gridcolor='#e2eaf8')
         st.plotly_chart(fig_h, use_container_width=True)
         st.caption("IC = MAE×(1+35%/paso). "
                    + ("**×1.5 Modo Degradado.**" if modo_degradado else ""))
@@ -1595,7 +1555,7 @@ para garantizar cumplimiento legal y seguridad operativa simultáneamente.
 # ══════════════════════════════════════════════
 # SECCIÓN 2 — CADENA DE ABASTECIMIENTO
 # ══════════════════════════════════════════════
-elif seccion_activa == SECCIONES[1]:
+elif seccion_activa == SECCIONES[2]:
     st.markdown("### Motor Logístico — De la Predicción a la Orden de Despacho")
     st.caption(
         "42 municipios · SS dinámico Z×σ×√LT (95% nivel servicio) · "
@@ -1642,10 +1602,10 @@ elif seccion_activa == SECCIONES[1]:
     )
     fig_bub.update_layout(
         height=380, margin=dict(l=0, r=0, t=40, b=0),
-        plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='#ffffff', paper_bgcolor='#ffffff',
     )
-    fig_bub.update_xaxes(gridcolor='rgba(0,0,0,0.06)')
-    fig_bub.update_yaxes(gridcolor='rgba(0,0,0,0.06)')
+    fig_bub.update_xaxes(gridcolor='#e2eaf8')
+    fig_bub.update_yaxes(gridcolor='#e2eaf8')
     st.plotly_chart(fig_bub, use_container_width=True)
 
     st.subheader("Órdenes de Despacho — Prioridad Automática")
@@ -1701,10 +1661,10 @@ elif seccion_activa == SECCIONES[1]:
 
         fig_stock.update_layout(
             height=400, margin=dict(l=0, r=0, t=40, b=80),
-            plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='#ffffff', paper_bgcolor='#ffffff',
         )
         fig_stock.update_xaxes(tickangle=45, tickfont=dict(size=8))
-        fig_stock.update_yaxes(gridcolor='rgba(0,0,0,0.06)')
+        fig_stock.update_yaxes(gridcolor='#e2eaf8')
         st.plotly_chart(fig_stock, use_container_width=True)
 
     st.divider()
@@ -1751,32 +1711,6 @@ elif seccion_activa == SECCIONES[1]:
             st.metric("Costo orden",      f"${cadena_sel['costo_preventivo']:,.0f} COP")
             st.metric("Ahorro",           f"${cadena_sel['ahorro']:,.0f} COP")
 
-    with st.expander("Punto de recepción real — REPS (datos.gov.co)", expanded=False):
-        st.caption(
-            "Segundo dataset abierto del proyecto: Registro Especial de "
-            "Prestadores y Sedes de Salud (MinSalud, `c36g-9fc2`). Identifica "
-            "el hospital público (ESE) real que recibiría el despacho — "
-            "reemplaza el supuesto genérico por una sede verificable. "
-            "**No incluye niveles de stock**: esa información no es un dato "
-            "abierto disponible, por eso el inventario sigue simulado."
-        )
-        df_reps, err_reps, sello_reps = cargar_reps_valle()
-        if err_reps:
-            st.warning(f"No se pudo consultar REPS: {err_reps}")
-        elif df_reps is not None:
-            punto = obtener_punto_recepcion(df_reps, municipio_sel)
-            if punto:
-                rp1, rp2 = st.columns(2)
-                rp1.metric("Sede receptora (ESE real)", punto['nombre_sede'])
-                rp2.metric("ESE registradas en el municipio", punto['total_ese_municipio'])
-                st.caption(f"{punto['direccion']}")
-                st.caption(
-                    f"Fuente: {sello_reps['fuente']} · Corte REPS: "
-                    f"{sello_reps['fecha_corte']} · Hash: `{sello_reps['hash_response']}` · "
-                    f"{sello_reps['registros']:,} ESE registradas en Valle del Cauca"
-                )
-            else:
-                st.info(f"No se encontró una ESE registrada para {municipio_sel} en REPS.")
 
     with st.expander("Supuestos logísticos — Transparencia total"):
         st.warning("Stock inicial simulado (Res. MINSALUD 1403/2007). "
@@ -1805,7 +1739,7 @@ elif seccion_activa == SECCIONES[1]:
 # ══════════════════════════════════════════════
 # SECCIÓN 3 — NOWCASTING
 # ══════════════════════════════════════════════
-elif seccion_activa == SECCIONES[2]:
+elif seccion_activa == SECCIONES[3]:
     st.markdown("### Nowcasting — Conexión SIVIGILA en Tiempo Real")
     st.info(
         "**Data Gap 2018→2026 — Contexto COVID-19:**\n\n"
@@ -1864,8 +1798,8 @@ elif seccion_activa == SECCIONES[2]:
                 t1_l  = int(conteos.iloc[0]['conteo']) if len(conteos) > 0 else 0
                 t2_l  = int(conteos.iloc[1]['conteo']) if len(conteos) > 1 else 0
                 t3_l  = int(conteos.iloc[2]['conteo']) if len(conteos) > 2 else 0
-                sem_l = int(conteos.iloc[0]['semana'])
-                ano_l = int(conteos.iloc[0]['ano'])
+                sem_l = int(conteos.iloc[0]['semana']) if len(conteos) > 0 else semana_actual
+                ano_l = int(conteos.iloc[0]['ano'])    if len(conteos) > 0 else 0
 
                 serie_l = pd.Series([t3_l, t2_l, t1_l])
                 _, _, md_l = imputar_semanas_faltantes(serie_l)
@@ -1904,10 +1838,10 @@ elif seccion_activa == SECCIONES[2]:
                     )
                     fig_live.update_layout(
                         height=300, margin=dict(l=0, r=0, t=40, b=0),
-                        plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)',
+                        plot_bgcolor='#ffffff', paper_bgcolor='#ffffff',
                     )
                     fig_live.update_xaxes(tickangle=45, tickfont=dict(size=8))
-                    fig_live.update_yaxes(gridcolor='rgba(0,0,0,0.06)')
+                    fig_live.update_yaxes(gridcolor='#e2eaf8')
                     st.plotly_chart(fig_live, use_container_width=True)
 
                 with st.expander("Datos crudos API"):
@@ -1943,7 +1877,7 @@ Re-entrenamiento inicia desde datos 2023+ para capturar nueva dinámica vectoria
 # ══════════════════════════════════════════════
 # SECCIÓN 4 — SERIE HISTÓRICA
 # ══════════════════════════════════════════════
-elif seccion_activa == SECCIONES[3]:
+elif seccion_activa == SECCIONES[4]:
     st.subheader("Serie Temporal Completa — SIVIGILA 2007–2018 · 42 Municipios")
 
     col_f1, col_f2 = st.columns([1, 3])
@@ -1969,10 +1903,10 @@ elif seccion_activa == SECCIONES[3]:
         fig_hist.update_traces(line_width=1.5)
         fig_hist.update_layout(
             height=420, margin=dict(l=0, r=0, t=40, b=0),
-            plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='#ffffff', paper_bgcolor='#ffffff',
             hovermode='x unified',
         )
-        fig_hist.update_yaxes(gridcolor='rgba(0,0,0,0.06)')
+        fig_hist.update_yaxes(gridcolor='#e2eaf8')
         fig_hist.update_xaxes(showgrid=False)
         st.plotly_chart(fig_hist, use_container_width=True)
 
@@ -1987,7 +1921,7 @@ elif seccion_activa == SECCIONES[3]:
 # ══════════════════════════════════════════════
 # SECCIÓN 5 — MAPA DEPARTAMENTAL
 # ══════════════════════════════════════════════
-elif seccion_activa == SECCIONES[4]:
+elif seccion_activa == SECCIONES[5]:
     st.subheader("Mapa de Riesgo Departamental — 42 Municipios Valle del Cauca")
     st.caption("Color = urgencia logística · Tamaño = casos predichos · "
                "Líneas = rutas desde SECCIONED Cali")
@@ -2002,7 +1936,7 @@ elif seccion_activa == SECCIONES[4]:
 # ══════════════════════════════════════════════
 # SECCIÓN 6 — VALIDACIÓN RETROSPECTIVA
 # ══════════════════════════════════════════════
-elif seccion_activa == SECCIONES[5]:
+elif seccion_activa == SECCIONES[6]:
     st.subheader("Validación Retrospectiva — Brote Cali 2016–2017")
     st.markdown(
         "Demostración de que el sistema **hubiera detectado** el mayor brote "
@@ -2049,7 +1983,7 @@ elif seccion_activa == SECCIONES[5]:
         ), row=1, col=1)
         fig_retro.add_trace(go.Scatter(
             x=df_r16['fecha'], y=df_r16['pred_casos'],
-            name='Predicción', line=dict(color='#E24B4A', width=2, dash='dash'),
+            name='Predicción', line=dict(color='#DC2626', width=2, dash='dash'),
             hovertemplate='%{x|%d %b %Y}<br>Pred: %{y}<extra></extra>'
         ), row=1, col=1)
         fig_retro.add_vline(x=pico_fec, line_dash='dot',
@@ -2086,10 +2020,10 @@ elif seccion_activa == SECCIONES[5]:
 
         fig_retro.update_layout(
             height=700, hovermode='x unified',
-            plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='#ffffff', paper_bgcolor='#ffffff',
             margin=dict(l=0, r=0, t=40, b=0),
         )
-        fig_retro.update_yaxes(gridcolor='rgba(0,0,0,0.06)')
+        fig_retro.update_yaxes(gridcolor='#e2eaf8')
         fig_retro.update_xaxes(showgrid=False)
         st.plotly_chart(fig_retro, use_container_width=True)
 
@@ -2108,29 +2042,28 @@ elif seccion_activa == SECCIONES[5]:
 # ══════════════════════════════════════════════
 # SECCIÓN 7 — AUDITORÍA ALCOA+
 # ══════════════════════════════════════════════
-elif seccion_activa == SECCIONES[6]:
+elif seccion_activa == SECCIONES[7]:
     st.subheader("Auditoría Técnica Completa — Compliance ALCOA+")
 
     st.subheader("Sellos de Integridad de Datos")
     df_sellos = pd.DataFrame({
         'Artefacto': ['modelo_municipal_v4.pkl','dengue_valle_semanal.csv',
                       'logistica_params.json','API SIVIGILA (en vivo)',
-                      'API REPS (en vivo)'],
+],
         'Hash MD5':  [sello_modelo['hash_md5'], sello_datos['hash_md5'],
                       sello_log['hash_md5'], 'Calculado en tiempo real (sección Nowcasting)',
-                      'Calculado en tiempo real (sección Cadena de Abastecimiento)'],
+],
         'Cargado en':[sello_modelo['cargado_en'], sello_datos['cargado_en'],
                       sello_log['cargado_en'], 'Bajo demanda', 'Bajo demanda (caché 24h)'],
         'Fuente':    [sello_modelo['fuente'], sello_datos['fuente'],
                       sello_log['fuente'], 'datos.gov.co/resource/4hyg-wa9d · Socrata',
-                      'datos.gov.co/resource/c36g-9fc2 · MinSalud · Socrata'],
+],
         'Estado':    ['Atención', 'Verificado', 'Verificado', 'Verificado', 'Verificado'],
         'ALCOA+ Original': [
             'Artefacto local — MLflow/DVC recomendado en producción',
             'Descargado de datos.gov.co',
             'Calculado de IGAC + INVIAS + MINSALUD',
             'Dato original en tiempo real',
-            'Dato original en tiempo real — directorio real de ESE, sin niveles de stock',
         ],
     })
 
@@ -2232,12 +2165,8 @@ normales vs. semanas de pico epidémico (holdout 2018), no es una versión ni
 un año. Respuesta: SS dinámico Z×σ×√LT absorbe este error estructuralmente.
 En picos, el sistema emite ALERTA antes del desbordamiento.
 
-**4. Niveles de stock simulados (no en tiempo real):**
-El **punto de recepción** ya no es un supuesto genérico: se obtiene en vivo
-de REPS (MinSalud, datos.gov.co) — el hospital público (ESE) real por
-municipio. Lo que sigue simulado son las **cantidades** de stock, porque
-el inventario hospitalario en tiempo real no es un dato abierto disponible
-en Colombia (información operativa interna, no publicada por las IPS).
+**4. Stock simulado (no en tiempo real):**
+El inventario hospitalario en tiempo real no es dato abierto en Colombia.
 Normativo (Res. 1403/2007). En producción: integrar con SISMED/SISPRO.
 En presentación: `max(SS_dinámico, SS_normativo)` como piso legal.
 
@@ -2275,7 +2204,7 @@ y la evidencia (SIVIGILA + modelo) hablan el mismo idioma.
 # ══════════════════════════════════════════════
 # SECCIÓN 8 — AGENTE IA
 # ══════════════════════════════════════════════
-elif seccion_activa == SECCIONES[7]:
+elif seccion_activa == SECCIONES[8]:
     st.subheader("Agente IA — Pregúntale a Denguard")
     st.caption(
         "Agente con acceso a herramientas en tiempo real sobre el modelo, el "
