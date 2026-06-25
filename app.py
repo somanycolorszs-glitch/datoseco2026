@@ -45,28 +45,72 @@ st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&family=Nunito+Sans:wght@300;400;600;700&display=swap');
 
-/* ── Variables de color — blanco/azul ── */
+/* ══════════════════════════════════════
+   TEMA CLARO (defecto)
+   ══════════════════════════════════════ */
 :root {
-  --bg:       #ffffff;
-  --bg2:      #f4f7fb;
-  --bg3:      #eaf0fa;
-  --surface:  #ffffff;
-  --surface2: #f0f5fc;
-  --surface3: #e2eaf8;
-  --blue:     #1a56db;
-  --blue2:    #2563eb;
-  --blue-lt:  #3b82f6;
-  --blue-dk:  #1e3a8a;
-  --text:     #1e293b;
-  --muted:    #64748b;
-  --border:   #d1ddf5;
-  --border2:  #bfcfee;
-  --danger:   #dc2626;
-  --warn:     #d97706;
-  --ok:       #16a34a;
-  --shadow:   0 2px 16px rgba(30,86,219,0.09);
-  --shadow2:  0 4px 32px rgba(30,86,219,0.16);
+  --bg:         #ffffff;
+  --bg2:        #f4f7fb;
+  --bg3:        #eaf0fa;
+  --surface:    #ffffff;
+  --surface2:   #f0f5fc;
+  --surface3:   #e2eaf8;
+  --blue:       #1a56db;
+  --blue2:      #2563eb;
+  --blue-lt:    #3b82f6;
+  --blue-dk:    #1e3a8a;
+  --text:       #1e293b;
+  --text2:      #334155;
+  --muted:      #64748b;
+  --border:     #d1ddf5;
+  --border2:    #bfcfee;
+  --danger:     #dc2626;
+  --warn:       #d97706;
+  --ok:         #16a34a;
+  --shadow:     0 2px 16px rgba(30,86,219,0.09);
+  --shadow2:    0 4px 32px rgba(30,86,219,0.16);
+  --dot-color:  #d1ddf5;
+  --plot-bg:    #ffffff;
+  --grid-color: #e2eaf8;
 }
+
+/* ══════════════════════════════════════
+   TEMA OSCURO — se activa automáticamente
+   cuando el sistema operativo está en
+   modo oscuro (prefers-color-scheme)
+   ══════════════════════════════════════ */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:         #0f172a;
+    --bg2:        #1e293b;
+    --bg3:        #1a2744;
+    --surface:    #1e293b;
+    --surface2:   #243352;
+    --surface3:   #2d3f66;
+    --blue:       #60a5fa;
+    --blue2:      #3b82f6;
+    --blue-lt:    #93c5fd;
+    --blue-dk:    #bfdbfe;
+    --text:       #e2e8f0;
+    --text2:      #cbd5e1;
+    --muted:      #94a3b8;
+    --border:     #2d3f66;
+    --border2:    #3b4f7a;
+    --danger:     #f87171;
+    --warn:       #fbbf24;
+    --ok:         #4ade80;
+    --shadow:     0 2px 16px rgba(0,0,0,0.35);
+    --shadow2:    0 4px 32px rgba(0,0,0,0.5);
+    --dot-color:  #2d3f66;
+    --plot-bg:    #1e293b;
+    --grid-color: #2d3f66;
+  }
+}
+
+/* ══════════════════════════════════════
+   ESTILOS BASE (usan las variables,
+   funcionan en ambos temas)
+   ══════════════════════════════════════ */
 
 /* ── Reset base ── */
 html, body,
@@ -78,23 +122,23 @@ html, body,
   font-family: 'Nunito', 'Nunito Sans', sans-serif !important;
 }
 
-/* ── Fondo con patrón de puntos suave ── */
+/* ── Fondo con patrón de puntos ── */
 [data-testid="stAppViewContainer"]::before {
   content: '';
   position: fixed;
   inset: 0;
-  background-image: radial-gradient(circle, #d1ddf5 1px, transparent 1px);
+  background-image: radial-gradient(circle, var(--dot-color) 1px, transparent 1px);
   background-size: 28px 28px;
   pointer-events: none;
   z-index: 0;
-  opacity: 0.45;
+  opacity: 0.5;
 }
 
 /* ── Sidebar ── */
 [data-testid="stSidebar"] {
   background: var(--bg2) !important;
   border-right: 1px solid var(--border2) !important;
-  box-shadow: 2px 0 20px rgba(30,86,219,0.07) !important;
+  box-shadow: 2px 0 20px var(--shadow) !important;
 }
 [data-testid="stSidebar"] h1,
 [data-testid="stSidebar"] h2,
@@ -110,7 +154,7 @@ html, body,
   border-bottom: 2px solid var(--border) !important;
 }
 
-/* ── Encabezados ── */
+/* ── Encabezados globales ── */
 h1, h2, h3 {
   font-family: 'Nunito', sans-serif !important;
   color: var(--text) !important;
@@ -183,6 +227,7 @@ h3 { font-size: 1.05rem !important; font-weight: 600 !important; }
 [data-testid="stMetricDelta"] {
   font-family: 'Nunito Sans', sans-serif !important;
   font-size: 0.72rem !important;
+  color: var(--text2) !important;
 }
 
 /* ── Navegación pilar en sidebar ── */
@@ -214,10 +259,11 @@ h3 { font-size: 1.05rem !important; font-weight: 600 !important; }
   color: #ffffff !important;
   background: var(--blue) !important;
   border-color: var(--blue) !important;
-  box-shadow: 0 2px 12px rgba(30,86,219,0.25) !important;
+  box-shadow: 0 2px 12px rgba(30,86,219,0.3) !important;
 }
 [data-testid="stSidebar"] [data-testid="stRadio"] [data-testid="stMarkdownContainer"] p {
-  font-size: inherit !important; color: inherit !important;
+  font-size: inherit !important;
+  color: inherit !important;
 }
 [data-testid="stSidebar"] [data-testid="stRadio"] svg { display: none !important; }
 [data-testid="stSidebar"] .nav-link { margin-bottom: 3px !important; }
@@ -237,7 +283,7 @@ h3 { font-size: 1.05rem !important; font-weight: 600 !important; }
 [data-testid="stButton"] > button:hover {
   background: var(--blue) !important;
   color: #fff !important;
-  box-shadow: 0 4px 14px rgba(30,86,219,0.25) !important;
+  box-shadow: var(--shadow2) !important;
   transform: translateY(-2px) !important;
 }
 [data-testid="stButton"] > button[data-testid="baseButton-primary"] {
@@ -247,7 +293,7 @@ h3 { font-size: 1.05rem !important; font-weight: 600 !important; }
   box-shadow: var(--shadow) !important;
 }
 [data-testid="stButton"] > button[data-testid="baseButton-primary"]:hover {
-  background: var(--blue-dk) !important;
+  background: var(--blue2) !important;
   box-shadow: var(--shadow2) !important;
   transform: translateY(-2px) !important;
 }
@@ -255,17 +301,17 @@ h3 { font-size: 1.05rem !important; font-weight: 600 !important; }
 /* ── Selectbox / Inputs ── */
 [data-testid="stSelectbox"] > div > div,
 [data-testid="stNumberInput"] > div > div {
-  background: var(--surface) !important;
+  background: var(--surface2) !important;
   border: 1.5px solid var(--border) !important;
   border-radius: 10px !important;
   color: var(--text) !important;
-  transition: border-color 0.2s, box-shadow 0.2s !important;
   font-family: 'Nunito Sans', sans-serif !important;
+  transition: border-color 0.2s, box-shadow 0.2s !important;
 }
 [data-testid="stSelectbox"] > div > div:focus-within,
 [data-testid="stNumberInput"] > div > div:focus-within {
   border-color: var(--blue) !important;
-  box-shadow: 0 0 0 3px rgba(30,86,219,0.12) !important;
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.2) !important;
 }
 [data-testid="stSelectbox"] label,
 [data-testid="stNumberInput"] label,
@@ -283,7 +329,7 @@ h3 { font-size: 1.05rem !important; font-weight: 600 !important; }
 [data-testid="stSlider"] [data-baseweb="slider"] div[role="slider"],
 [data-testid="stSlider"] [data-baseweb="slider"] div[data-testid="stSliderThumb"] {
   background: var(--blue) !important;
-  box-shadow: 0 0 0 3px rgba(30,86,219,0.2) !important;
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.25) !important;
 }
 
 /* ── Dataframe ── */
@@ -309,6 +355,7 @@ h3 { font-size: 1.05rem !important; font-weight: 600 !important; }
   font-size: 0.82rem !important;
   color: var(--text) !important;
   border-color: var(--border) !important;
+  background: var(--surface) !important;
 }
 [data-testid="stDataFrame"] tr:hover td { background: var(--bg3) !important; }
 
@@ -318,8 +365,8 @@ h3 { font-size: 1.05rem !important; font-weight: 600 !important; }
   border: 1.5px solid var(--border) !important;
   border-radius: 14px !important;
   box-shadow: var(--shadow) !important;
-  transition: border-color 0.2s, box-shadow 0.2s !important;
   overflow: hidden !important;
+  transition: border-color 0.2s, box-shadow 0.2s !important;
 }
 [data-testid="stExpander"]:hover {
   border-color: var(--blue-lt) !important;
@@ -338,17 +385,29 @@ details[data-testid="stExpander"] > summary::-webkit-details-marker {
   color: var(--blue) !important;
 }
 
+/* ── Contenido de expander (fondo correcto en dark) ── */
+[data-testid="stExpander"] > div[data-testid="stExpanderDetails"] {
+  background: var(--surface) !important;
+  color: var(--text) !important;
+}
+
 /* ── Alerts ── */
 [data-testid="stAlert"] {
   border-radius: 12px !important;
   border-left-width: 3px !important;
   font-size: 0.85rem !important;
   font-family: 'Nunito Sans', sans-serif !important;
+  background: var(--surface2) !important;
+  color: var(--text) !important;
 }
-div.stInfo    { background: rgba(30,86,219,0.06) !important; border-left-color: var(--blue) !important; }
-div.stSuccess { background: rgba(22,163,74,0.07) !important; border-left-color: var(--ok) !important; }
-div.stWarning { background: rgba(217,119,6,0.07) !important; border-left-color: var(--warn) !important; }
-div.stError   { background: rgba(220,38,38,0.06) !important; border-left-color: var(--danger) !important; }
+div.stInfo    { background: color-mix(in srgb, var(--blue)   10%, var(--surface)) !important;
+                border-left-color: var(--blue) !important; }
+div.stSuccess { background: color-mix(in srgb, var(--ok)     10%, var(--surface)) !important;
+                border-left-color: var(--ok) !important; }
+div.stWarning { background: color-mix(in srgb, var(--warn)   10%, var(--surface)) !important;
+                border-left-color: var(--warn) !important; }
+div.stError   { background: color-mix(in srgb, var(--danger) 10%, var(--surface)) !important;
+                border-left-color: var(--danger) !important; }
 
 /* ── Caption ── */
 [data-testid="stCaptionContainer"] {
@@ -374,7 +433,7 @@ hr {
 
 /* ── Multiselect ── */
 [data-testid="stMultiSelect"] [data-baseweb="tag"] {
-  background: rgba(30,86,219,0.1) !important;
+  background: color-mix(in srgb, var(--blue) 15%, var(--surface)) !important;
   border: 1px solid var(--blue-lt) !important;
   color: var(--blue-dk) !important;
   font-family: 'Nunito', sans-serif !important;
@@ -382,11 +441,42 @@ hr {
   border-radius: 8px !important;
 }
 
-/* ── Radio (contenido, no sidebar) ── */
+/* ── Radio (no sidebar) ── */
 [data-testid="stRadio"] [data-testid="stMarkdownContainer"] p {
   font-family: 'Nunito Sans', sans-serif !important;
   font-size: 0.85rem !important;
   color: var(--text) !important;
+}
+
+/* ── Chat messages (sección agente IA) ── */
+[data-testid="stChatMessage"] {
+  background: var(--surface2) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 12px !important;
+  color: var(--text) !important;
+}
+[data-testid="stChatInputTextArea"] {
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  border-color: var(--border) !important;
+  font-family: 'Nunito Sans', sans-serif !important;
+}
+
+/* ── Texto general dentro de la app ── */
+p, li, span, label {
+  color: var(--text) !important;
+}
+a { color: var(--blue) !important; }
+code {
+  background: var(--surface3) !important;
+  color: var(--blue-dk) !important;
+  border-radius: 4px !important;
+  padding: 0.1em 0.35em !important;
+}
+pre, .stCodeBlock {
+  background: var(--bg2) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 10px !important;
 }
 
 /* ── Scrollbar ── */
@@ -418,6 +508,20 @@ def md5_archivo(path):
             return hashlib.md5(f.read()).hexdigest()[:12]
     except Exception:
         return 'N/A'
+
+def _colores_tema():
+    """Devuelve colores de fondo y grilla compatibles con el tema activo
+    (claro u oscuro) tal como lo reporta Streamlit. Se llama una sola vez
+    por rerun, sin coste significativo."""
+    try:
+        tema = st.get_option('theme.base') or 'light'
+    except Exception:
+        tema = 'light'
+    if tema == 'dark':
+        return {'plot': '#1e293b', 'paper': '#1e293b', 'grid': '#2d3f66',
+                'font': '#e2e8f0'}
+    return {'plot': '#ffffff', 'paper': '#ffffff', 'grid': '#e2eaf8',
+            'font': '#1e293b'}
 
 def timestamp_utc():
     return datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')
