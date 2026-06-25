@@ -510,18 +510,72 @@ def md5_archivo(path):
         return 'N/A'
 
 def _colores_tema():
-    """Devuelve colores de fondo y grilla compatibles con el tema activo
-    (claro u oscuro) tal como lo reporta Streamlit. Se llama una sola vez
-    por rerun, sin coste significativo."""
+    """Detecta si el sistema/navegador está en modo oscuro o claro.
+    Streamlit expone `st.get_option('theme.base')` cuando el usuario
+    configuró un tema explícito en .streamlit/config.toml; si no hay
+    configuración explícita (modo 'auto', lo más común), intenta leer
+    el color de fondo real que Streamlit inyecta en la sesión.
+    Si todo falla, usa 'light' como fallback seguro."""
     try:
-        tema = st.get_option('theme.base') or 'light'
+        base = st.get_option('theme.base')
+        if base in ('dark', 'light'):
+            tema = base
+        else:
+            # Modo auto: inferir desde el color de fondo configurado
+            bg = st.get_option('theme.backgroundColor') or '#ffffff'
+            # Un fondo oscuro tiene luminancia baja (R+G+B < 382)
+            bg = bg.lstrip('#')
+            if len(bg) == 6:
+                r, g, b = int(bg[0:2],16), int(bg[2:4],16), int(bg[4:6],16)
+                tema = 'dark' if (r + g + b) < 382 else 'light'
+            else:
+                tema = 'light'
     except Exception:
         tema = 'light'
     if tema == 'dark':
-        return {'plot': '#1e293b', 'paper': '#1e293b', 'grid': '#2d3f66',
-                'font': '#e2e8f0'}
-    return {'plot': '#ffffff', 'paper': '#ffffff', 'grid': '#e2eaf8',
-            'font': '#1e293b'}
+        return {'plot':  '#1e293b', 'paper': '#1e293b',
+                'grid':  '#2d3f66', 'font':  '#e2e8f0',
+                'axis':  '#94a3b8', 'zero':  '#3b4f7a'}
+    return {'plot':  '#ffffff', 'paper': '#ffffff',
+            'grid':  '#e2eaf8', 'font':  '#1e293b',
+            'axis':  '#64748b', 'zero':  '#bfcfee'}
+
+@st.cache_data(show_spinner=False, ttl=60)
+def _tema_cacheado():
+    """Versión cacheada (60s) para no recalcular en cada widget."""
+    return _colores_tema()
+
+def _plotly_layout(fig, height=370, **extra):
+    """Aplica el tema activo (claro/oscuro) a cualquier figura Plotly.
+    Estandariza márgenes, fuentes, hover y ejes para toda la app."""
+    t = _colores_tema()
+    base = dict(
+        height=height,
+        margin=dict(l=0, r=0, t=10, b=0),
+        plot_bgcolor=t['plot'],
+        paper_bgcolor=t['paper'],
+        font=dict(family='Nunito, Nunito Sans, sans-serif',
+                  color=t['font'], size=12),
+        legend=dict(font=dict(color=t['font']),
+                    bgcolor='rgba(0,0,0,0)'),
+        hovermode='x unified',
+        hoverlabel=dict(
+            bgcolor=t['paper'],
+            font_color=t['font'],
+            bordercolor=t['grid'],
+        ),
+        xaxis=dict(showgrid=False,
+                   linecolor=t['grid'],
+                   tickfont=dict(color=t['axis']),
+                   title_font=dict(color=t['axis'])),
+        yaxis=dict(gridcolor=t['grid'],
+                   linecolor=t['grid'],
+                   tickfont=dict(color=t['axis']),
+                   title_font=dict(color=t['axis'])),
+    )
+    base.update(extra)
+    fig.update_layout(**base)
+    return fig
 
 def timestamp_utc():
     return datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')
@@ -1176,16 +1230,53 @@ def ejecutar_herramienta(nombre, args):
 
 
 def ejecutar_agente(client, historial_contenidos, max_iter=5):
-    """Loop de tool-use con Gemini: llama al modelo, ejecuta las funciones que
-    pida (sobre los datos reales del sistema) y repite hasta que responda con
-    texto final, o se agoten los intentos."""
+    """Loop de tool-use con Gemini. Intenta los modelos en orden de prioridad:
+    1. gemini-3.5-flash  — el más capaz, puede estar bajo alta demanda (503)
+    2. gemini-2.5-flash  — estable GA, excelente para tool-use
+    3. gemini-2.5-flash-lite — fallback mínimo si todo lo demás falla
+    Si un modelo devuelve 503 o 429 pasa al siguiente automáticamente."""
+    MODELOS_FALLBACK = [
+        "gemini-3.5-flash",
+        "gemini-2.5-flash",
+        "gemini-2.5-flash-lite",
+    ]
     config = genai_types.GenerateContentConfig(
         system_instruction=SYSTEM_PROMPT_AGENTE,
         tools=[genai_types.Tool(function_declarations=HERRAMIENTAS_AGENTE)],
     )
+
+    # Elegir el modelo disponible en este momento
+    modelo_activo = None
+    for candidato_modelo in MODELOS_FALLBACK:
+        try:
+            # Ping rápido para verificar disponibilidad antes del loop completo
+            client.models.generate_content(
+                model=candidato_modelo,
+                contents=[genai_types.Content(
+                    role="user",
+                    parts=[genai_types.Part.from_text(text="ok")]
+                )],
+                config=genai_types.GenerateContentConfig(max_output_tokens=5),
+            )
+            modelo_activo = candidato_modelo
+            break
+        except Exception as e:
+            msg = str(e).lower()
+            if any(c in msg for c in ('503', '429', 'unavailable', 'quota')):
+                continue   # modelo ocupado/con cuota — probar el siguiente
+            # Otro error (auth, network) — no tiene sentido seguir intentando
+            raise
+
+    if modelo_activo is None:
+        return (
+            "Todos los modelos de Gemini están bajo alta demanda ahora mismo. "
+            "Espera un minuto e intenta de nuevo.",
+            historial_contenidos
+        )
+
     for _ in range(max_iter):
         resp = client.models.generate_content(
-            model="gemini-3.5-flash",
+            model=modelo_activo,
             contents=historial_contenidos,
             config=config,
         )
@@ -1195,18 +1286,22 @@ def ejecutar_agente(client, historial_contenidos, max_iter=5):
         llamadas = [p.function_call for p in partes if p.function_call]
         if not llamadas:
             texto = "".join(p.text for p in partes if p.text).strip()
-            return texto or "(sin respuesta)", historial_contenidos
+            sufijo = (f"\n\n---\n*Modelo: {modelo_activo}*"
+                      if modelo_activo != MODELOS_FALLBACK[0] else "")
+            return (texto or "(sin respuesta)") + sufijo, historial_contenidos
         partes_resultado = []
         for fc in llamadas:
             resultado = ejecutar_herramienta(fc.name, dict(fc.args) if fc.args else {})
             partes_resultado.append(genai_types.Part.from_function_response(
                 name=fc.name,
-                response={"result": json.loads(json.dumps(resultado, ensure_ascii=False, default=str))},
+                response={"result": json.loads(
+                    json.dumps(resultado, ensure_ascii=False, default=str))},
             ))
         historial_contenidos = historial_contenidos + [
             genai_types.Content(role="tool", parts=partes_resultado)
         ]
-    return "No pude completar la respuesta tras varias consultas. Intenta reformular la pregunta.", historial_contenidos
+    return ("No pude completar la respuesta tras varias consultas. "
+            "Intenta reformular la pregunta."), historial_contenidos
 
 # ─────────────────────────────────────────────
 # ENCABEZADO
@@ -1272,7 +1367,7 @@ if OPTION_MENU_DISPONIBLE:
             default_index=0,
             styles={
                 "container": {"padding": "0!important", "background-color": "transparent"},
-                "icon": {"color": "#00ffe0", "font-size": "13px"},
+                "icon": {"color": "#60a5fa", "font-size": "13px"},
                 "nav-link": {
                     "font-family": "JetBrains Mono, monospace", "font-size": "12.5px",
                     "color": "#5a7a99", "background-color": "#0f1c2d",
@@ -1280,7 +1375,7 @@ if OPTION_MENU_DISPONIBLE:
                     "margin": "0 0 4px 0", "padding": "10px 12px",
                 },
                 "nav-link-selected": {
-                    "background-color": "#00ffe0", "color": "#05090f",
+                    "background-color": "#1a56db", "color": "#ffffff",
                     "font-weight": "600",
                 },
             },
@@ -1478,7 +1573,7 @@ elif seccion_activa == SECCIONES[1]:
 
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.info("Proyección de Pacientes")
+        st.markdown('<p style="font-family:Nunito,sans-serif;font-weight:700;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--blue);margin:0 0 0.6rem 0">Proyección de Pacientes</p>', unsafe_allow_html=True)
         ic_label = (
             f"IC ±RMSE{'×1.5 (Modo Degradado)' if modo_degradado else ''}: "
             f"[{ic_bajo} – {ic_alto}]"
@@ -1515,7 +1610,7 @@ En salud pública, un **falso negativo** es más costoso que un falso positivo.
             """)
 
     with col2:
-        st.warning("Insumos Críticos")
+        st.markdown('<p style="font-family:Nunito,sans-serif;font-weight:700;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--warn);margin:0 0 0.6rem 0">Insumos Críticos</p>', unsafe_allow_html=True)
         if cadena_sel:
             st.metric("Acetaminofén 500mg", f"{cadena_sel['req_aceta']:,} Tab.")
             st.metric("Lactato de Ringer",  f"{cadena_sel['req_ringer']:,} Bol.")
@@ -1526,7 +1621,7 @@ En salud pública, un **falso negativo** es más costoso que un falso positivo.
             )
 
     with col3:
-        st.success("Eficiencia Farmacoeconómica")
+        st.markdown('<p style="font-family:Nunito,sans-serif;font-weight:700;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--ok);margin:0 0 0.6rem 0">Eficiencia Farmacoeconómica</p>', unsafe_allow_html=True)
         if cadena_sel:
             st.metric("Ahorro vs compra reactiva",
                       f"${cadena_sel['ahorro']:,.0f} COP",
@@ -1617,15 +1712,12 @@ para garantizar cumplimiento legal y seguridad operativa simultáneamente.
             fig_dash.add_annotation(x=fechas_h[-1], y=max(preds_h),
                                     text="Posible divergencia", showarrow=True,
                                     arrowhead=2, font=dict(color='#E24B4A', size=11))
-        fig_dash.update_layout(
-            height=370, margin=dict(l=0, r=0, t=10, b=0),
-            legend=dict(orientation='h', y=-0.18),
-            xaxis_title='', yaxis_title='Casos / semana',
-            hovermode='x unified',
-            plot_bgcolor='#ffffff', paper_bgcolor='#ffffff',
-        )
+        _plotly_layout(fig_dash, height=370,
+            legend=dict(orientation='h', y=-0.18,
+                        font=dict(color=_colores_tema()['font'])),
+            xaxis_title='', yaxis_title='Casos / semana')
         fig_dash.update_xaxes(showgrid=False)
-        fig_dash.update_yaxes(gridcolor='#e2eaf8')
+        fig_dash.update_yaxes(gridcolor=_colores_tema()['grid'])
         st.plotly_chart(fig_dash, use_container_width=True)
 
         if diverge:
@@ -1646,12 +1738,9 @@ para garantizar cumplimiento legal y seguridad operativa simultáneamente.
                          visible=True, color='#666'),
             hovertemplate='%{x}: %{y} casos ± %{error_y.array}<extra></extra>'
         ))
-        fig_h.update_layout(
-            height=200, margin=dict(l=0, r=0, t=10, b=0), showlegend=False,
-            plot_bgcolor='#ffffff', paper_bgcolor='#ffffff',
-            yaxis_title='Casos'
-        )
-        fig_h.update_yaxes(gridcolor='#e2eaf8')
+        _plotly_layout(fig_h, height=200, showlegend=False,
+            yaxis_title='Casos')
+        fig_h.update_yaxes(gridcolor=_colores_tema()['grid'])
         st.plotly_chart(fig_h, use_container_width=True)
         st.caption("IC = MAE×(1+35%/paso). "
                    + ("**×1.5 Modo Degradado.**" if modo_degradado else ""))
@@ -1704,12 +1793,10 @@ elif seccion_activa == SECCIONES[2]:
                 'pred_casos': 'Casos predichos', 'costo_preventivo': 'Costo COP'},
         title='Tamaño de burbuja = costo de la orden de despacho',
     )
-    fig_bub.update_layout(
-        height=380, margin=dict(l=0, r=0, t=40, b=0),
-        plot_bgcolor='#ffffff', paper_bgcolor='#ffffff',
-    )
-    fig_bub.update_xaxes(gridcolor='#e2eaf8')
-    fig_bub.update_yaxes(gridcolor='#e2eaf8')
+    _plotly_layout(fig_bub, height=380,
+        margin=dict(l=0, r=0, t=40, b=0))
+    fig_bub.update_xaxes(gridcolor=_colores_tema()['grid'])
+    fig_bub.update_yaxes(gridcolor=_colores_tema()['grid'])
     st.plotly_chart(fig_bub, use_container_width=True)
 
     st.subheader("Órdenes de Despacho — Prioridad Automática")
@@ -1763,12 +1850,11 @@ elif seccion_activa == SECCIONES[2]:
                 hovertemplate='%{x}<br>ROP: %{y:,}<extra></extra>'
             ), row=1, col=col_idx)
 
-        fig_stock.update_layout(
-            height=400, margin=dict(l=0, r=0, t=40, b=80),
-            plot_bgcolor='#ffffff', paper_bgcolor='#ffffff',
-        )
-        fig_stock.update_xaxes(tickangle=45, tickfont=dict(size=8))
-        fig_stock.update_yaxes(gridcolor='#e2eaf8')
+        _plotly_layout(fig_stock, height=400,
+            margin=dict(l=0, r=0, t=40, b=80))
+        fig_stock.update_xaxes(tickangle=45,
+            tickfont=dict(size=8, color=_colores_tema()['axis']))
+        fig_stock.update_yaxes(gridcolor=_colores_tema()['grid'])
         st.plotly_chart(fig_stock, use_container_width=True)
 
     st.divider()
@@ -1940,12 +2026,11 @@ elif seccion_activa == SECCIONES[3]:
                         labels={'conteo': 'Casos', 'periodo': 'Año-Semana'},
                         color_discrete_sequence=['#378ADD'],
                     )
-                    fig_live.update_layout(
-                        height=300, margin=dict(l=0, r=0, t=40, b=0),
-                        plot_bgcolor='#ffffff', paper_bgcolor='#ffffff',
-                    )
-                    fig_live.update_xaxes(tickangle=45, tickfont=dict(size=8))
-                    fig_live.update_yaxes(gridcolor='#e2eaf8')
+                    _plotly_layout(fig_live, height=300,
+                        margin=dict(l=0, r=0, t=40, b=0))
+                    fig_live.update_xaxes(tickangle=45,
+                        tickfont=dict(size=8, color=_colores_tema()['axis']))
+                    fig_live.update_yaxes(gridcolor=_colores_tema()['grid'])
                     st.plotly_chart(fig_live, use_container_width=True)
 
                 with st.expander("Datos crudos API"):
@@ -2005,12 +2090,9 @@ elif seccion_activa == SECCIONES[4]:
             title='Dengue — Valle del Cauca · Semanas epidemiológicas',
         )
         fig_hist.update_traces(line_width=1.5)
-        fig_hist.update_layout(
-            height=420, margin=dict(l=0, r=0, t=40, b=0),
-            plot_bgcolor='#ffffff', paper_bgcolor='#ffffff',
-            hovermode='x unified',
-        )
-        fig_hist.update_yaxes(gridcolor='#e2eaf8')
+        _plotly_layout(fig_hist, height=420,
+            margin=dict(l=0, r=0, t=40, b=0))
+        fig_hist.update_yaxes(gridcolor=_colores_tema()['grid'])
         fig_hist.update_xaxes(showgrid=False)
         st.plotly_chart(fig_hist, use_container_width=True)
 
@@ -2122,12 +2204,14 @@ elif seccion_activa == SECCIONES[6]:
                 line_width=2.5, opacity=0.9
             )
 
+        _t = _colores_tema()
         fig_retro.update_layout(
             height=700, hovermode='x unified',
-            plot_bgcolor='#ffffff', paper_bgcolor='#ffffff',
+            plot_bgcolor=_t['plot'], paper_bgcolor=_t['paper'],
             margin=dict(l=0, r=0, t=40, b=0),
+            font=dict(family='Nunito, sans-serif', color=_t['font']),
         )
-        fig_retro.update_yaxes(gridcolor='#e2eaf8')
+        fig_retro.update_yaxes(gridcolor=_t['grid'])
         fig_retro.update_xaxes(showgrid=False)
         st.plotly_chart(fig_retro, use_container_width=True)
 
