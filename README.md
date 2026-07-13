@@ -7,6 +7,7 @@
 
 <p align="center">
   <a href="https://observatory.streamlit.app/"><img src="https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=Streamlit&logoColor=white" alt="Desplegado en Streamlit"></a>
+  <a href="https://colab.research.google.com/drive/1_ZHAxARnehdR7ifGCaTe-qMTHEg7ptrQ?usp=sharing"><img src="https://img.shields.io/badge/Google%20Colab-Training%20Notebook-F9AB00?style=for-the-badge&logo=googlecolab&logoColor=white" alt="Google Colab"></a>
   <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/"><img src="https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg?style=for-the-badge" alt="Licencia: CC BY-NC-SA 4.0"></a>
   <img src="https://img.shields.io/badge/Audit-ALCOA%2B-blue?style=for-the-badge" alt="Estandár ALCOA+">
 </p>
@@ -15,7 +16,7 @@
 
 ## 📌 1. Visión General y Arquitectura del Sistema
 
-Denguard es una plataforma de software de grado de producción diseñada para resolver una de las fallas más críticas en la salud pública colombiana: el desabasto cíclico y reactivo de medicamentos e insumos esenciales durante los brotes de dengue. En lugar de operar bajo un esquema de reabastecimiento puramente empírico o reactivo (reaccionar cuando las urgencias hospitalarias ya están saturadas), Denguard fusiona la inteligencia epidemiológica cuantitativa con la ingeniería de la cadena de suministro de última milla, automatizando la toma de decisiones críticas para los 42 municipios del Valle del Cauca.
+Denguard is una plataforma de software de grado de producción diseñada para resolver una de las fallas más críticas en la salud pública colombiana: el desabasto cíclico y reactivo de medicamentos e insumos esenciales durante los brotes de dengue. En lugar de operar bajo un esquema de reabastecimiento puramente empírico o reactivo (reaccionar cuando las urgencias hospitalarias ya están saturadas), Denguard fusiona la inteligencia epidemiológica cuantitativa con la ingeniería de la cadena de suministro de última milla, automatizando la toma de decisiones críticas para los 42 municipios del Valle del Cauca.
 
 El sistema se fundamenta en un principio rector: el dato epidemiológico público debe transformarse inmediatamente en una orden de despacho farmacéutico parametrizada hacia cada punto de atención desde el centro de distribución centralizado SECCIONED.
 
@@ -35,7 +36,7 @@ El Patrón de Falla Estructural se compone de:
 ## 🛠️ 3. Componentes Arquitectónicos de la Solución
 
 ### 3.1. Capa de Predicción Epidemiológica (Machine Learning)
-El núcleo predictivo de Denguard está compuesto por un modelo matemático basado en el algoritmo Random Forest Regressor, entrenado exhaustivamente sobre un dataset robusto de 11 años de registros históricos de SIVIGILA (2007–2018) provenientes del portal oficial de datos abiertos del Estado colombiano (datos.gov.co).
+El núcleo predictivo de Denguard está compuesto por un modelo matemático basado en el algoritmo Random Forest Regressor, entrenado y documentado exhaustivamente en el [Pipeline de Google Colab](https://colab.research.google.com/drive/1_ZHAxARnehdR7ifGCaTe-qMTHEg7ptrQ?usp=sharing). El entrenamiento se ejecutó sobre un dataset robusto de 11 años de registros históricos de SIVIGILA (2007–2018) provenientes del portal oficial de datos abiertos del Estado colombiano (datos.gov.co).
 
 * Métricas de Rendimiento: El modelo alcanza un coeficiente de determinación R² = 0.928 en un esquema de holdout temporal estricto (datos de testeo correspondientes al año 2018 completo), con un Error Absoluto Medio (MAE) de 0.54 casos por semana por municipio.
 * Ingeniería de Características (8 Features Fundamentales):
@@ -66,7 +67,7 @@ El sistema calcula dinámicamente las siguientes variables clave para cada uno d
 3. Cantidad Óptima de Pedido (Órdenes de Despacho):
    El motor contrasta el inventario disponible proyectado contra el ROP y calcula las unidades exactas de Acetaminofén 500mg (tabletas) y Lactato de Ringer (bolsas de 500ml) requeridas para restablecer la resiliencia clínica local.
 
-4. Clasificación de Prioridad Logística:
+4. Classification de Prioridad Logística:
    El motor automatiza el triaje logístico departamental en tres niveles de criticidad:
    * CRÍTICO: Inventario actual por debajo del stock de seguridad básico bajo el contexto de brote inminente. Requiere despacho prioritario escoltado o express en menos de 24 horas.
    * ALERTA: Inventario en zona de reorden. Despacho programado estándar dentro de la ventana de lead time (48-72 horas).
@@ -122,7 +123,7 @@ Este capital de alta eficiencia fiscal puede ser reinyectado directamente por la
 
 ---
 
-## 🚀 7. Escalabilidad Técnico y Pipeline de Re-Entrenamiento
+## 🚀 7. Escalabilidad Técnica y Pipeline de Re-Entrenamiento
 
 La arquitectura de Denguard fue concebida bajo patrones de diseño desacoplados, lo que permite tres vectores de escalabilidad limpia:
 
