@@ -2242,11 +2242,11 @@ elif seccion_activa == SECCIONES[7]:
                       sello_log['hash_md5'], 'Calculado en tiempo real (sección Nowcasting)',
 ],
         'Cargado en':[sello_modelo['cargado_en'], sello_datos['cargado_en'],
-                      sello_log['cargado_en'], 'Bajo demanda', 'Bajo demanda (caché 24h)'],
+                      sello_log['cargado_en'], 'Bajo demanda'],
         'Fuente':    [sello_modelo['fuente'], sello_datos['fuente'],
                       sello_log['fuente'], 'datos.gov.co/resource/4hyg-wa9d · Socrata',
 ],
-        'Estado':    ['Atención', 'Verificado', 'Verificado', 'Verificado', 'Verificado'],
+        'Estado':    ['Atención', 'Verificado', 'Verificado', 'Verificado'],
         'ALCOA+ Original': [
             'Artefacto local — MLflow/DVC recomendado en producción',
             'Descargado de datos.gov.co',
