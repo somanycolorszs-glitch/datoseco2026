@@ -142,7 +142,7 @@ El ecosistema Denguard segmenta su visualización y analítica según el perfil 
 * Agente conversacional IA: Interfaz de chat integrada en la esquina operativa para agilizar consultas críticas mediante procesamiento de lenguaje natural en tiempo real.
 
 ---
-
+LINK DEL APLICATIVO : https://observatory.streamlit.app/
 ## 📂 9. Estructura del Repositorio
 
 ```text
