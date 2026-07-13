@@ -7,7 +7,7 @@
 
 <p align="center">
   <a href="https://observatory.streamlit.app/"><img src="https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=Streamlit&logoColor=white" alt="Desplegado en Streamlit"></a>
-  <img src="https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge" alt="Licencia: MIT">
+  <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/"><img src="https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg?style=for-the-badge" alt="Licencia: CC BY-NC-SA 4.0"></a>
   <img src="https://img.shields.io/badge/Audit-ALCOA%2B-blue?style=for-the-badge" alt="Estandár ALCOA+">
 </p>
 
