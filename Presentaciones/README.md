@@ -11,7 +11,7 @@
   <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/"><img src="https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg?style=for-the-badge" alt="Licencia: CC BY-NC-SA 4.0"></a>
   <img src="https://img.shields.io/badge/Audit-ALCOA%2B-blue?style=for-the-badge" alt="Estándar ALCOA+">
 </p>
-
+LINK APP: https://observatory.streamlit.app/
 ---
 
 ## 📌 1. Visión General y Arquitectura del Sistema
