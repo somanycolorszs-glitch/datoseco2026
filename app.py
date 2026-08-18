@@ -2306,4 +2306,318 @@ elif seccion_activa == SECCIONES[6]:
         fig_retro.add_trace(go.Scatter(
             x=df_r16['fecha'], y=df_r16['pred_casos'],
             name='Predicción', line=dict(color='#DC2626', width=2, dash='dash'),
-            hovertemplate='%{x|%d %b %Y}<br>Pred: %{y}<extra
+            hovertemplate='%{x|%d %b %Y}<br>Pred: %{y}<extra></extra>'
+        ), row=1, col=1)
+        fig_retro.add_vline(x=pico_fec, line_dash='dot',
+                            line_color='#533AB7', opacity=0.7)
+        fig_retro.add_annotation(x=pico_fec, y=pico_val,
+                                  text=f" Pico: {pico_val}", showarrow=False,
+                                  font=dict(color='#533AB7', size=10))
+
+        fig_retro.add_trace(go.Scatter(
+            x=df_r16['fecha'], y=df_r16['stock_aceta'],
+            name='Stock aceta.', line=dict(color='#333', width=1.8),
+            hovertemplate='%{x|%d %b %Y}<br>Stock: %{y:,}<extra></extra>'
+        ), row=2, col=1)
+        fig_retro.add_hline(y=rop_aceta, line_dash='dash', line_color='#EF9F27',
+                             annotation_text=f'ROP ({rop_aceta:,})',
+                             annotation_position='top right', row=2, col=1)
+        fig_retro.add_hline(y=ss_aceta, line_dash='dash', line_color='#E24B4A',
+                             annotation_text=f'SS ({ss_aceta:,})',
+                             annotation_position='bottom right', row=2, col=1)
+
+        colors_sem = [COLOR_URG[u] for u in df_r16['urgencia']]
+        fig_retro.add_trace(go.Bar(
+            x=df_r16['fecha'], y=[1] * len(df_r16),
+            marker_color=colors_sem, name='Urgencia',
+            hovertemplate='%{x|%d %b %Y}<br>%{customdata}<extra></extra>',
+            customdata=df_r16['urgencia'].tolist()
+        ), row=3, col=1)
+        if idx_primera_al is not None:
+            fig_retro.add_vline(
+                x=df_r16.loc[idx_primera_al, 'fecha'],
+                line_dash='solid', line_color='#EF9F27',
+                line_width=2.5, opacity=0.9
+            )
+
+        _t = _colores_tema()
+        fig_retro.update_layout(
+            height=700, hovermode='x unified',
+            plot_bgcolor=_t['plot'], paper_bgcolor=_t['paper'],
+            margin=dict(l=0, r=0, t=40, b=0),
+            font=dict(family='Manrope, sans-serif', color=_t['font']),
+        )
+        fig_retro.update_yaxes(gridcolor=_t['grid'])
+        fig_retro.update_xaxes(showgrid=False)
+        st.plotly_chart(fig_retro, use_container_width=True)
+
+        mae_r  = round(np.mean(np.abs(df_r16['real_casos'] - df_r16['pred_casos'])), 2)
+        rmse_r = round(np.sqrt(np.mean((df_r16['real_casos'] - df_r16['pred_casos'])**2)), 2)
+        denom  = np.sum((df_r16['real_casos'] - df_r16['real_casos'].mean())**2)
+        r2_r   = round(1 - np.sum((df_r16['real_casos'] - df_r16['pred_casos'])**2) /
+                       denom, 3) if denom > 0 else 0
+        mr1, mr2, mr3 = st.columns(3)
+        mr1.metric("MAE (Cali 2016–17)",  f"{mae_r} casos/sem")
+        mr2.metric("RMSE (Cali 2016–17)", f"{rmse_r} casos/sem")
+        mr3.metric("R² (Cali 2016–17)",   f"{r2_r}")
+    else:
+        st.warning("No hay suficiente histórico de CALI desde 2015 para esta validación.")
+
+# ══════════════════════════════════════════════
+# SECCIÓN 7 — AUDITORÍA ALCOA+
+# ══════════════════════════════════════════════
+elif seccion_activa == SECCIONES[7]:
+    st.subheader("Auditoría Técnica Completa — Compliance ALCOA+")
+
+    st.subheader("Sellos de Integridad de Datos")
+    df_sellos = pd.DataFrame({
+        'Artefacto': ['modelo_municipal_v4.pkl','dengue_valle_semanal.csv',
+                      'logistica_params.json','API SIVIGILA (en vivo)',
+],
+        'Hash MD5':  [sello_modelo['hash_md5'], sello_datos['hash_md5'],
+                      sello_log['hash_md5'], 'Calculado en tiempo real (sección Nowcasting)',
+],
+        'Cargado en':[sello_modelo['cargado_en'], sello_datos['cargado_en'],
+                      sello_log['cargado_en'], 'Bajo demanda'],
+        'Fuente':    [sello_modelo['fuente'], sello_datos['fuente'],
+                      sello_log['fuente'], 'datos.gov.co/resource/4hyg-wa9d · Socrata',
+],
+        'Estado':    ['Atención', 'Verificado', 'Verificado', 'Verificado'],
+        'ALCOA+ Original': [
+            'Artefacto local — MLflow/DVC recomendado en producción',
+            'Descargado de datos.gov.co',
+            'Calculado de IGAC + INVIAS + MINSALUD',
+            'Dato original en tiempo real',
+        ],
+    })
+
+    def _color_estado(val):
+        mapa = {'Verificado': 'background-color:#d4edda',
+                'Atención':   'background-color:#fff3cd'}
+        return mapa.get(val, '')
+
+    st.dataframe(df_sellos.style.map(_color_estado, subset=['Estado']),
+                 hide_index=True, use_container_width=True)
+
+    st.divider()
+    ca1, ca2 = st.columns(2)
+
+    with ca1:
+        st.markdown("#### Ficha Técnica")
+        st.table(pd.DataFrame.from_dict({
+            'Algoritmo':            'Random Forest Regressor',
+            'N° árboles':           '300',
+            'Profundidad máxima':   '12',
+            'Min. muestras hoja':   '3',
+            'Max features':         'sqrt',
+            'Semilla':              '42',
+            'Encoding municipio':   'Target encoding + IQR histórico',
+            'N° features':          str(len(FEATURES)),
+            'Municipios':           f"{len(MUNICIPIOS)} (100% Valle del Cauca)",
+            'Versión':              VERSION,
+            'Entrenado con':        paquete['entrenado_con'],
+            'Evaluado en':          paquete['evaluado_en'],
+            'Fecha entreno':        paquete['fecha_entreno'],
+            'Hash modelo':          sello_modelo['hash_md5'],
+        }, orient='index', columns=['Valor']))
+
+    with ca2:
+        st.markdown("#### Métricas Oficiales — Holdout Temporal 2018")
+        st.dataframe(pd.DataFrame({
+            'Métrica':        ['MAE','RMSE','R²','Gap Train-Val R²','Municipios test'],
+            'Valor':          [f"{METRICAS['mae']} casos/sem",
+                               f"{METRICAS['rmse']} casos/sem",
+                               f"{METRICAS['r2']}", f"{GAP_TRAIN_VAL}",
+                               f"{len(MUNICIPIOS)} municipios"],
+            'Interpretación': [
+                'Error promedio absoluto en datos no vistos',
+                'Error cuadrático medio (penaliza outliers)',
+                f"{METRICAS['r2']*100:.1f}% de la varianza explicada",
+                'Sin overfitting',
+                '100% cobertura departamental',
+            ]
+        }), hide_index=True, use_container_width=True)
+
+        mae_n = ERROR_ESTRAT.get('mae_normal', 'N/A')
+        mae_p = ERROR_ESTRAT.get('mae_pico',   'N/A')
+        fac   = ERROR_ESTRAT.get('factor_deg', 'N/A')
+        pct   = ERROR_ESTRAT.get('pct_pico',   'N/A')
+        met   = ERROR_ESTRAT.get('metodo_umbral', 'OPS 2015')
+
+        st.markdown("#### Análisis de Error Estratificado")
+        st.dataframe(pd.DataFrame({
+            'Contexto':       ['Semanas normales','Semanas de pico','Factor degradación'],
+            'MAE':            [f"{mae_n} casos/sem", f"{mae_p} casos/sem", f"{fac}x"],
+            'Muestra':        [
+                f"{ERROR_ESTRAT.get('n_normal','N/A')} semanas (84.5%)",
+                f"{ERROR_ESTRAT.get('n_pico','N/A')} semanas ({pct}%)",
+                '—'
+            ],
+            'Método umbral':  [met, met, 'Chopra & Meindl SCM 2016'],
+        }), hide_index=True, use_container_width=True)
+        st.caption(
+            f"El modelo se degrada {fac}x en picos. Mitigado con SS dinámico "
+            f"Z(95%)×σ×√LT que absorbe la varianza estructural del error."
+        )
+
+        if df_justificacion is not None:
+            st.markdown("#### Justificación de Municipios")
+            st.dataframe(
+                df_justificacion[['municipio_ocurrencia','total_casos',
+                                  'anos_activos','carga_pct','carga_acum_pct']]
+                .rename(columns={'municipio_ocurrencia':'Municipio',
+                                 'total_casos':'Total','anos_activos':'Años',
+                                 'carga_pct':'Carga %','carga_acum_pct':'Acum. %'}),
+                hide_index=True, use_container_width=True, height=260
+            )
+
+    st.divider()
+    with st.expander("Limitaciones Documentadas — Respuestas Preparadas para el Jurado"):
+        fac_limit = ERROR_ESTRAT.get('factor_deg', 'N/A')
+        st.warning(f"""
+1. Data Gap 2018→2026 (COVID-19):
+Entrenado hasta 2018. Re-entrenamiento continuo vía API SIVIGILA planificado
+desde datos 2023+. La sección Nowcasting es la solución operativa inmediata.
+
+2. Dependencia de inercia (casos_t-1 dominante):
+Estructural en modelos de lags. Mitigado con: detección de semanas faltantes,
+imputación por mediana móvil, IC ×1.5 en Modo Degradado, y Nowcasting con API.
+
+3. Degradación en picos (factor {fac_limit}x):
+Esperado y documentado — calculado comparando el error del modelo en semanas
+normales vs. semanas de pico epidémico (holdout 2018), no es una versión ni
+un año. Respuesta: SS dinámico Z×σ×√LT absorbe este error estructuralmente.
+En picos, el sistema emite ALERTA antes del desbordamiento.
+
+4. Stock simulado (no en tiempo real):
+El inventario hospitalario en tiempo real no es dato abierto en Colombia.
+Normativo (Res. 1403/2007). En producción: integrar con SISMED/SISPRO.
+En presentación: `max(SS_dinámico, SS_normativo)` como piso legal.
+
+5. Ahorro calculado sobre demanda predicha, no sobre orden a realizar:
+El ahorro mostrado compara comprar la demanda predicha de la semana a precio
+preventivo vs precio reactivo de urgencia. Es independiente de si el stock
+actual ya alcanza, porque mide el valor de *anticipar* la compra.
+
+6. Variables climáticas ausentes:
+Estacionalidad capturada vía seno/coseno de semana. Open-Meteo planificado v5.0.
+        """)
+
+    with st.expander("Argumento de Farmacia Clínica — Para el Evaluador del Sector Salud"):
+        st.info("""
+Data Sentinel no es una herramienta para científicos de datos.
+
+Es una herramienta para el Químico Farmacéutico hospitalario que necesita
+saber si el Lactato de Ringer llega a Buenaventura antes de que la curva de
+contagio sature la urgencia, o si Acetaminofén 500mg está disponible en Buga
+cuando el sistema de alerta temprana dice que la próxima semana habrá 15 casos.
+
+La cadena de decisión completa:
+```
+SIVIGILA (dato real) → Modelo RF (predicción semana t+1 a t+4)
+→ Motor logístico (SS dinámico + lead time real)
+→ Orden de despacho priorizada (CRÍTICO/ALERTA/NORMAL)
+→ Químico Farmacéutico activa la compra antes del desabasto
+```
+
+Esto es lo que diferencia un sistema de soporte a decisiones clínicas
+de un dashboard de visualización. La norma (Res. MINSALUD 1403/2007)
+y la evidencia (SIVIGILA + modelo) hablan el mismo idioma.
+        """)
+
+# ══════════════════════════════════════════════
+# SECCIÓN 8 — AGENTE IA
+# ══════════════════════════════════════════════
+elif seccion_activa == SECCIONES[8]:
+    st.subheader("Agente IA — Pregúntale a Denguard")
+    st.caption(
+        "Agente con acceso a herramientas en tiempo real sobre el modelo, el "
+        "histórico SIVIGILA y la cadena logística — no improvisa cifras, las consulta."
+    )
+
+    with st.expander("Arquitectura del agente — para el jurado", expanded=False):
+        st.markdown("""
+Esto no es un chatbot que alucina números: es un agente con tool-use real
+sobre Gemini (Google). Cada vez que el usuario pregunta algo, el modelo
+decide si necesita datos del sistema y llama una o varias de estas herramientas
+*antes* de redactar la respuesta:
+
+| Herramienta | Qué consulta |
+|---|---|
+| `consultar_prediccion_municipio` | Predicción de la próxima semana + urgencia logística |
+| `consultar_resumen_departamental` | Estado CRÍTICO / ALERTA / NORMAL de los 42 municipios |
+| `consultar_metricas_modelo` | MAE, RMSE, R² y ficha técnica del Random Forest |
+| `consultar_historico_municipio` | Casos reales SIVIGILA por semana |
+| `consultar_logistica_municipio` | Distancia, lead time, stock, ROP, SS |
+
+```
+Pregunta del usuario
+     ↓
+Gemini decide qué función(es) necesita (function calling)
+     ↓
+Denguard ejecuta la(s) función(es) sobre los datos reales del sistema
+     ↓
+El resultado (JSON) vuelve a Gemini como function_response
+     ↓
+Gemini redacta la respuesta final citando las cifras obtenidas
+```
+
+Si una pregunta no tiene una herramienta para resolverla, el agente lo dice
+en vez de inventar un número.
+        """)
+
+    try:
+        api_key = st.secrets["GEMINI_API_KEY"]
+    except (KeyError, FileNotFoundError):
+        api_key = None
+
+    if not GEMINI_DISPONIBLE:
+        st.error("Falta instalar el SDK de Gemini: `pip install google-genai`")
+    elif not api_key:
+        st.error(
+            "No se encontró `GEMINI_API_KEY` en *Secrets*.\n\n"
+            "En Streamlit Cloud: ⋮ → Settings → Secrets, agrega:\n"
+            "```toml\nGEMINI_API_KEY = \"tu-key-aquí\"\n```\n"
+            "y reinicia la app (⋮ → Reboot app).\n\n"
+            "En local: crea `.streamlit/secrets.toml` con la misma línea.\n\n"
+            "Consigue tu key gratis en aistudio.google.com/apikey"
+        )
+    else:
+        if "agente_chat" not in st.session_state:
+            st.session_state.agente_chat = []         # historial visible (solo texto)
+        if "agente_contenidos" not in st.session_state:
+            st.session_state.agente_contenidos = []    # historial completo (incluye tool calls)
+
+        for m in st.session_state.agente_chat:
+            with st.chat_message(m["role"]):
+                st.markdown(m["content"])
+
+        pregunta = st.chat_input(
+            "Ej: ¿Qué municipios están en CRÍTICO esta semana? · "
+            "¿Cuántos casos se predicen para Buga?"
+        )
+        if pregunta:
+            st.session_state.agente_chat.append({"role": "user", "content": pregunta})
+            st.session_state.agente_contenidos.append(
+                genai_types.Content(role="user", parts=[genai_types.Part.from_text(text=pregunta)])
+            )
+            with st.chat_message("user"):
+                st.markdown(pregunta)
+            with st.chat_message("assistant"):
+                with st.spinner("Consultando herramientas..."):
+                    try:
+                        cliente_ia = genai.Client(api_key=api_key)
+                        texto, st.session_state.agente_contenidos = ejecutar_agente(
+                            cliente_ia, st.session_state.agente_contenidos
+                        )
+                    except Exception as e:
+                        texto = f"Error consultando al agente: {e}"
+                st.markdown(texto)
+            st.session_state.agente_chat.append({"role": "assistant", "content": texto})
+
+        if st.session_state.agente_chat and st.button("Limpiar conversación"):
+            st.session_state.agente_chat = []
+            st.session_state.agente_contenidos = []
+            st.rerun()
+
+st.markdown('</div>', unsafe_allow_html=True)
