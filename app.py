@@ -43,194 +43,280 @@ st.set_page_config(
 # ─────────────────────────────────────────────
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&family=Nunito+Sans:wght@300;400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
 /* ══════════════════════════════════════
-   TEMA CLARO (defecto)
+   TEMA CLARO (por defecto)
    ══════════════════════════════════════ */
 :root {
-  --bg:         #ffffff;
-  --bg2:        #f4f7fb;
-  --bg3:        #eaf0fa;
-  --surface:    #ffffff;
-  --surface2:   #f0f5fc;
-  --surface3:   #e2eaf8;
-  --blue:       #1a56db;
-  --blue2:      #2563eb;
-  --blue-lt:    #3b82f6;
-  --blue-dk:    #1e3a8a;
-  --text:       #1e293b;
-  --text2:      #334155;
-  --muted:      #64748b;
-  --border:     #d1ddf5;
-  --border2:    #bfcfee;
-  --danger:     #dc2626;
-  --warn:       #d97706;
-  --ok:         #16a34a;
-  --shadow:     0 2px 16px rgba(30,86,219,0.09);
-  --shadow2:    0 4px 32px rgba(30,86,219,0.16);
-  --dot-color:  #d1ddf5;
-  --plot-bg:    #ffffff;
-  --grid-color: #e2eaf8;
+  --bg:          #f7f9fc;
+  --bg2:         #eef2f9;
+  --bg3:         #e4ecf7;
+  --surface:     #ffffff;
+  --surface2:    #f6f9fd;
+  --surface3:    #eaf1fb;
+  --glass:       rgba(255,255,255,0.72);
+  --primary:     #2454c7;
+  --primary2:    #3d6de0;
+  --primary-lt:  #6f9bff;
+  --primary-dk:  #14306e;
+  --accent:      #0891b2;
+  --accent-lt:   #22b8d4;
+  --text:        #101828;
+  --text2:       #33415c;
+  --muted:       #667085;
+  --border:      #dbe3f2;
+  --border2:     #c6d4ec;
+  --danger:      #dc2626;
+  --warn:        #d97706;
+  --ok:          #15803d;
+  --shadow:      0 2px 14px rgba(20,48,110,0.07);
+  --shadow2:     0 10px 40px rgba(20,48,110,0.14);
+  --glow:        0 0 0 3px rgba(36,84,199,0.14);
+  --dot-color:   #dbe3f2;
+  --grad-brand:  linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+  --radius-sm:   8px;
+  --radius:      12px;
+  --radius-lg:   18px;
 }
 
 /* ══════════════════════════════════════
-   TEMA OSCURO — se activa automáticamente
-   cuando el sistema operativo está en
-   modo oscuro (prefers-color-scheme)
+   TEMA OSCURO — automático según el
+   sistema operativo (prefers-color-scheme)
    ══════════════════════════════════════ */
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg:         #0f172a;
-    --bg2:        #1e293b;
-    --bg3:        #1a2744;
-    --surface:    #1e293b;
-    --surface2:   #243352;
-    --surface3:   #2d3f66;
-    --blue:       #60a5fa;
-    --blue2:      #3b82f6;
-    --blue-lt:    #93c5fd;
-    --blue-dk:    #bfdbfe;
-    --text:       #e2e8f0;
-    --text2:      #cbd5e1;
-    --muted:      #94a3b8;
-    --border:     #2d3f66;
-    --border2:    #3b4f7a;
-    --danger:     #f87171;
-    --warn:       #fbbf24;
-    --ok:         #4ade80;
-    --shadow:     0 2px 16px rgba(0,0,0,0.35);
-    --shadow2:    0 4px 32px rgba(0,0,0,0.5);
-    --dot-color:  #2d3f66;
-    --plot-bg:    #1e293b;
-    --grid-color: #2d3f66;
+    --bg:          #090d16;
+    --bg2:         #0f1524;
+    --bg3:         #141b2e;
+    --surface:     #121a2b;
+    --surface2:    #161f34;
+    --surface3:    #1c2740;
+    --glass:       rgba(18,26,43,0.72);
+    --primary:     #6690f2;
+    --primary2:    #85a6ff;
+    --primary-lt:  #a7c1ff;
+    --primary-dk:  #d6e3ff;
+    --accent:      #2dd4ee;
+    --accent-lt:   #67e2f5;
+    --text:        #e8edf7;
+    --text2:       #c1cbdf;
+    --muted:       #8994ac;
+    --border:      #22304e;
+    --border2:     #2c3d63;
+    --danger:      #f87171;
+    --warn:        #fbbf24;
+    --ok:          #4ade80;
+    --shadow:      0 2px 18px rgba(0,0,0,0.4);
+    --shadow2:     0 14px 48px rgba(0,0,0,0.55);
+    --glow:        0 0 0 3px rgba(102,144,242,0.22);
+    --dot-color:   #1c2740;
   }
 }
 
 /* ══════════════════════════════════════
-   ESTILOS BASE (usan las variables,
-   funcionan en ambos temas)
+   BASE
    ══════════════════════════════════════ */
+* { scroll-behavior: smooth; }
 
-/* ── Reset base ── */
 html, body,
 [data-testid="stAppViewContainer"],
 [data-testid="stMain"],
 .main {
   background: var(--bg) !important;
   color: var(--text) !important;
-  font-family: 'Nunito', 'Nunito Sans', sans-serif !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* ── Fondo con patrón de puntos ── */
+/* Fondo ambiental: malla de puntos + halos de luz muy sutiles, estáticos
+   para no distraer en un panel clínico, pero con profundidad premium */
 [data-testid="stAppViewContainer"]::before {
   content: '';
   position: fixed;
   inset: 0;
-  background-image: radial-gradient(circle, var(--dot-color) 1px, transparent 1px);
-  background-size: 28px 28px;
+  background-image:
+    radial-gradient(circle, var(--dot-color) 1px, transparent 1px),
+    radial-gradient(ellipse 60% 45% at 85% -10%, rgba(36,84,199,0.10), transparent 60%),
+    radial-gradient(ellipse 50% 40% at -10% 110%, rgba(8,145,178,0.08), transparent 60%);
+  background-size: 26px 26px, auto, auto;
   pointer-events: none;
   z-index: 0;
-  opacity: 0.5;
+  opacity: 0.9;
 }
 
-/* ── Sidebar ── */
+/* Barra de progreso superior (color de acento de Streamlit) */
+[data-testid="stStatusWidget"] { color: var(--primary) !important; }
+div[data-testid="stDecoration"] { background: var(--grad-brand) !important; }
+
+/* ── Sidebar en vidrio esmerilado (glassmorphism) ── */
 [data-testid="stSidebar"] {
-  background: var(--bg2) !important;
-  border-right: 1px solid var(--border2) !important;
-  box-shadow: 2px 0 20px var(--shadow) !important;
+  background: var(--glass) !important;
+  backdrop-filter: blur(18px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(140%) !important;
+  border-right: 1px solid var(--border) !important;
+  box-shadow: 4px 0 28px rgba(10,20,45,0.06) !important;
 }
 [data-testid="stSidebar"] h1,
 [data-testid="stSidebar"] h2,
 [data-testid="stSidebar"] h3 {
-  font-family: 'Nunito', sans-serif !important;
-  font-size: 0.68rem !important;
+  font-family: 'Manrope', sans-serif !important;
+  font-size: 0.66rem !important;
   font-weight: 800 !important;
   text-transform: uppercase !important;
-  letter-spacing: 0.14em !important;
-  color: var(--blue) !important;
+  letter-spacing: 0.13em !important;
+  color: var(--primary) !important;
   margin-top: 1.4rem !important;
-  padding-bottom: 0.35rem !important;
-  border-bottom: 2px solid var(--border) !important;
+  padding-bottom: 0.4rem !important;
+  border-bottom: 1.5px solid var(--border) !important;
+  position: relative;
+}
+[data-testid="stSidebar"] h1::after,
+[data-testid="stSidebar"] h2::after,
+[data-testid="stSidebar"] h3::after {
+  content: '';
+  position: absolute;
+  left: 0; bottom: -1.5px;
+  width: 28px; height: 1.5px;
+  background: var(--grad-brand);
 }
 
 /* ── Encabezados globales ── */
 h1, h2, h3 {
-  font-family: 'Nunito', sans-serif !important;
+  font-family: 'Manrope', sans-serif !important;
   color: var(--text) !important;
 }
-h1 { font-size: 1.85rem !important; font-weight: 800 !important; letter-spacing: -0.02em !important; }
-h2 { font-size: 1.25rem !important; font-weight: 700 !important; }
-h3 { font-size: 1.05rem !important; font-weight: 600 !important; }
+h1 { font-size: 1.85rem !important; font-weight: 800 !important; letter-spacing: -0.025em !important; }
+h2 { font-size: 1.22rem !important; font-weight: 700 !important; letter-spacing: -0.015em !important; }
+h3 { font-size: 1.02rem !important; font-weight: 700 !important; }
 
-/* ── Encabezado principal custom ── */
+/* ── Encabezado principal con marca ── */
 .ds-main-title {
-  font-family: 'Nunito', sans-serif !important;
-  font-size: 1.85rem !important;
+  font-family: 'Manrope', sans-serif !important;
+  font-size: 1.9rem !important;
   font-weight: 800 !important;
-  letter-spacing: -0.02em !important;
+  letter-spacing: -0.025em !important;
   margin: 0 0 0.3rem 0 !important;
   display: flex !important;
   align-items: center !important;
-  gap: 0.55rem !important;
-  color: var(--blue-dk) !important;
-  animation: titleReveal 0.7s ease both;
+  gap: 0.6rem !important;
+  background: linear-gradient(120deg, var(--primary-dk), var(--primary) 55%, var(--accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent !important;
+  animation: titleReveal 0.7s cubic-bezier(.22,1,.36,1) both;
 }
 @keyframes titleReveal {
-  from { opacity: 0; transform: translateY(-12px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateY(-12px); filter: blur(4px); }
+  to   { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+/* ── Tooltip ligero, sólo CSS — usar con
+     <span class="ds-tip" data-tip="texto">contenido</span> ── */
+.ds-tip { position: relative; cursor: help; border-bottom: 1px dotted var(--border2); }
+.ds-tip::after {
+  content: attr(data-tip);
+  position: absolute;
+  left: 50%; bottom: calc(100% + 8px);
+  transform: translateX(-50%) translateY(4px);
+  background: var(--text);
+  color: var(--bg);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 500;
+  line-height: 1.35;
+  white-space: normal;
+  width: max-content;
+  max-width: 220px;
+  padding: 0.45rem 0.65rem;
+  border-radius: 8px;
+  box-shadow: var(--shadow2);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  z-index: 40;
+}
+.ds-tip:hover::after,
+.ds-tip:focus-visible::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ── Etiqueta de sub-sección (reemplaza el uso de negritas sueltas) ── */
+.ds-colhead {
+  display: inline-block;
+  font-family: 'Manrope', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--primary);
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 1.5px solid var(--border);
 }
 
 /* ── Métricas ── */
 [data-testid="stMetric"] {
   background: var(--surface) !important;
-  border: 1.5px solid var(--border) !important;
-  border-radius: 16px !important;
-  padding: 1.1rem 1.3rem !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-lg) !important;
+  padding: 1.15rem 1.35rem !important;
   position: relative !important;
   overflow: hidden !important;
   box-shadow: var(--shadow) !important;
-  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease !important;
+  transition: transform 0.25s cubic-bezier(.22,1,.36,1), box-shadow 0.25s ease, border-color 0.25s ease !important;
   cursor: default !important;
+}
+[data-testid="stMetric"]::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(120px 60px at 0% 0%, rgba(36,84,199,0.07), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
 }
 [data-testid="stMetric"]::after {
   content: '';
   position: absolute;
   top: 0; left: 0;
   width: 100%; height: 3px;
-  background: linear-gradient(90deg, var(--blue), var(--blue-lt));
+  background: var(--grad-brand);
   transform: scaleX(0);
   transform-origin: left;
-  transition: transform 0.3s ease;
+  transition: transform 0.35s cubic-bezier(.22,1,.36,1);
 }
 [data-testid="stMetric"]:hover {
-  transform: translateY(-3px) !important;
+  transform: translateY(-4px) !important;
   box-shadow: var(--shadow2) !important;
-  border-color: var(--blue-lt) !important;
+  border-color: var(--primary-lt) !important;
 }
 [data-testid="stMetric"]:hover::after { transform: scaleX(1); }
+[data-testid="stMetric"]:hover::before { opacity: 1; }
 [data-testid="stMetricLabel"] {
-  font-family: 'Nunito', sans-serif !important;
-  font-size: 0.7rem !important;
+  font-family: 'Manrope', sans-serif !important;
+  font-size: 0.68rem !important;
   font-weight: 700 !important;
   text-transform: uppercase !important;
-  letter-spacing: 0.1em !important;
+  letter-spacing: 0.09em !important;
   color: var(--muted) !important;
 }
 [data-testid="stMetricValue"] {
-  font-family: 'Nunito', sans-serif !important;
-  font-size: 1.55rem !important;
+  font-family: 'Manrope', sans-serif !important;
+  font-size: 1.6rem !important;
   font-weight: 800 !important;
-  color: var(--blue-dk) !important;
-  line-height: 1.1 !important;
+  color: var(--text) !important;
+  line-height: 1.15 !important;
 }
 [data-testid="stMetricDelta"] {
-  font-family: 'Nunito Sans', sans-serif !important;
-  font-size: 0.72rem !important;
+  font-family: 'Inter', sans-serif !important;
+  font-size: 0.74rem !important;
+  font-weight: 500 !important;
   color: var(--text2) !important;
 }
 
-/* ── Navegación pilar en sidebar ── */
+/* ── Navegación tipo pilar en sidebar (fallback st.radio) ── */
 [data-testid="stSidebar"] [data-testid="stRadio"] > label { display: none !important; }
 [data-testid="stSidebar"] [data-testid="stRadio"] > div[role="radiogroup"] {
   display: flex !important;
@@ -238,120 +324,128 @@ h3 { font-size: 1.05rem !important; font-weight: 600 !important; }
   gap: 0.3rem !important;
 }
 [data-testid="stSidebar"] [data-testid="stRadio"] > div[role="radiogroup"] > label {
-  font-family: 'Nunito', sans-serif !important;
+  font-family: 'Manrope', sans-serif !important;
   font-size: 0.82rem !important;
   font-weight: 600 !important;
-  color: var(--muted) !important;
+  color: var(--text2) !important;
   background: var(--surface) !important;
-  border: 1.5px solid var(--border) !important;
+  border: 1px solid var(--border) !important;
   border-radius: 10px !important;
-  padding: 0.6rem 0.85rem !important;
+  padding: 0.62rem 0.9rem !important;
   margin: 0 !important;
   cursor: pointer !important;
-  transition: color 0.18s, background 0.18s, border-color 0.18s, transform 0.15s !important;
+  transition: color 0.18s ease, background 0.18s ease, border-color 0.18s ease, transform 0.18s ease !important;
 }
 [data-testid="stSidebar"] [data-testid="stRadio"] > div[role="radiogroup"] > label:hover {
-  color: var(--blue) !important;
-  border-color: var(--blue-lt) !important;
-  transform: translateX(3px) !important;
+  color: var(--primary) !important;
+  border-color: var(--primary-lt) !important;
+  transform: translateX(4px) !important;
 }
 [data-testid="stSidebar"] [data-testid="stRadio"] > div[role="radiogroup"] > label:has(input:checked) {
   color: #ffffff !important;
-  background: var(--blue) !important;
-  border-color: var(--blue) !important;
-  box-shadow: 0 2px 12px rgba(30,86,219,0.3) !important;
+  background: var(--grad-brand) !important;
+  border-color: transparent !important;
+  box-shadow: 0 4px 16px rgba(36,84,199,0.32) !important;
 }
 [data-testid="stSidebar"] [data-testid="stRadio"] [data-testid="stMarkdownContainer"] p {
   font-size: inherit !important;
   color: inherit !important;
 }
 [data-testid="stSidebar"] [data-testid="stRadio"] svg { display: none !important; }
-[data-testid="stSidebar"] .nav-link { margin-bottom: 3px !important; }
+[data-testid="stSidebar"] .nav-link { margin-bottom: 4px !important; transition: transform 0.18s ease !important; }
+[data-testid="stSidebar"] .nav-link:hover { transform: translateX(4px) !important; }
 
 /* ── Botones ── */
 [data-testid="stButton"] > button {
   background: transparent !important;
-  color: var(--blue) !important;
-  font-family: 'Nunito', sans-serif !important;
+  color: var(--primary) !important;
+  font-family: 'Manrope', sans-serif !important;
   font-size: 0.82rem !important;
   font-weight: 700 !important;
-  border: 1.5px solid var(--blue) !important;
+  border: 1.5px solid var(--primary) !important;
   border-radius: 10px !important;
   padding: 0.5rem 1.3rem !important;
-  transition: all 0.2s ease !important;
+  transition: all 0.22s cubic-bezier(.22,1,.36,1) !important;
+  position: relative !important;
+  overflow: hidden !important;
 }
 [data-testid="stButton"] > button:hover {
-  background: var(--blue) !important;
+  background: var(--primary) !important;
   color: #fff !important;
   box-shadow: var(--shadow2) !important;
   transform: translateY(-2px) !important;
 }
+[data-testid="stButton"] > button:active { transform: translateY(0) !important; }
+[data-testid="stButton"] > button:focus-visible {
+  outline: none !important;
+  box-shadow: var(--glow) !important;
+}
 [data-testid="stButton"] > button[data-testid="baseButton-primary"] {
-  background: var(--blue) !important;
+  background: var(--grad-brand) !important;
   color: #fff !important;
   border: none !important;
   box-shadow: var(--shadow) !important;
 }
 [data-testid="stButton"] > button[data-testid="baseButton-primary"]:hover {
-  background: var(--blue2) !important;
-  box-shadow: var(--shadow2) !important;
+  box-shadow: 0 10px 30px rgba(36,84,199,0.35) !important;
   transform: translateY(-2px) !important;
+  filter: brightness(1.06) !important;
 }
 
-/* ── Selectbox / Inputs ── */
+/* ── Selectbox / Inputs numéricos ── */
 [data-testid="stSelectbox"] > div > div,
 [data-testid="stNumberInput"] > div > div {
   background: var(--surface2) !important;
   border: 1.5px solid var(--border) !important;
   border-radius: 10px !important;
   color: var(--text) !important;
-  font-family: 'Nunito Sans', sans-serif !important;
-  transition: border-color 0.2s, box-shadow 0.2s !important;
+  font-family: 'Inter', sans-serif !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
 }
 [data-testid="stSelectbox"] > div > div:focus-within,
 [data-testid="stNumberInput"] > div > div:focus-within {
-  border-color: var(--blue) !important;
-  box-shadow: 0 0 0 3px rgba(59,130,246,0.2) !important;
+  border-color: var(--primary) !important;
+  box-shadow: var(--glow) !important;
 }
 [data-testid="stSelectbox"] label,
 [data-testid="stNumberInput"] label,
 [data-testid="stSlider"] label,
 [data-testid="stRadio"] label {
-  font-family: 'Nunito', sans-serif !important;
-  font-size: 0.72rem !important;
+  font-family: 'Manrope', sans-serif !important;
+  font-size: 0.7rem !important;
   font-weight: 700 !important;
   text-transform: uppercase !important;
-  letter-spacing: 0.09em !important;
+  letter-spacing: 0.08em !important;
   color: var(--muted) !important;
 }
 
 /* ── Slider ── */
 [data-testid="stSlider"] [data-baseweb="slider"] div[role="slider"],
 [data-testid="stSlider"] [data-baseweb="slider"] div[data-testid="stSliderThumb"] {
-  background: var(--blue) !important;
-  box-shadow: 0 0 0 3px rgba(59,130,246,0.25) !important;
+  background: var(--primary) !important;
+  box-shadow: var(--glow) !important;
 }
 
 /* ── Dataframe ── */
 [data-testid="stDataFrame"] {
-  border: 1.5px solid var(--border) !important;
-  border-radius: 14px !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius) !important;
   overflow: hidden !important;
   box-shadow: var(--shadow) !important;
 }
 [data-testid="stDataFrame"] table { background: var(--surface) !important; }
 [data-testid="stDataFrame"] th {
   background: var(--bg2) !important;
-  font-family: 'Nunito', sans-serif !important;
-  font-size: 0.68rem !important;
+  font-family: 'Manrope', sans-serif !important;
+  font-size: 0.66rem !important;
   font-weight: 800 !important;
   text-transform: uppercase !important;
-  letter-spacing: 0.09em !important;
-  color: var(--blue-dk) !important;
+  letter-spacing: 0.08em !important;
+  color: var(--primary-dk) !important;
   border-bottom: 1.5px solid var(--border) !important;
 }
 [data-testid="stDataFrame"] td {
-  font-family: 'Nunito Sans', sans-serif !important;
+  font-family: 'Inter', sans-serif !important;
   font-size: 0.82rem !important;
   color: var(--text) !important;
   border-color: var(--border) !important;
@@ -359,59 +453,72 @@ h3 { font-size: 1.05rem !important; font-weight: 600 !important; }
 }
 [data-testid="stDataFrame"] tr:hover td { background: var(--bg3) !important; }
 
+/* ── Gráficas Plotly: marco premium ── */
+[data-testid="stPlotlyChart"] {
+  border-radius: var(--radius-lg) !important;
+  border: 1px solid var(--border) !important;
+  background: var(--surface) !important;
+  box-shadow: var(--shadow) !important;
+  padding: 0.4rem !important;
+  transition: box-shadow 0.25s ease, border-color 0.25s ease !important;
+}
+[data-testid="stPlotlyChart"]:hover {
+  box-shadow: var(--shadow2) !important;
+  border-color: var(--border2) !important;
+}
+
 /* ── Expander ── */
 [data-testid="stExpander"] {
   background: var(--surface) !important;
-  border: 1.5px solid var(--border) !important;
-  border-radius: 14px !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius) !important;
   box-shadow: var(--shadow) !important;
   overflow: hidden !important;
-  transition: border-color 0.2s, box-shadow 0.2s !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
 }
 [data-testid="stExpander"]:hover {
-  border-color: var(--blue-lt) !important;
+  border-color: var(--primary-lt) !important;
   box-shadow: var(--shadow2) !important;
 }
 [data-testid="stExpander"] summary {
-  font-family: 'Nunito', sans-serif !important;
+  font-family: 'Manrope', sans-serif !important;
   font-size: 0.82rem !important;
-  font-weight: 600 !important;
-  color: var(--muted) !important;
+  font-weight: 700 !important;
+  color: var(--text2) !important;
   padding: 0.85rem 1.1rem !important;
 }
-[data-testid="stExpander"] summary:hover { color: var(--blue) !important; }
+[data-testid="stExpander"] summary:hover { color: var(--primary) !important; }
 details[data-testid="stExpander"] > summary::marker,
 details[data-testid="stExpander"] > summary::-webkit-details-marker {
-  color: var(--blue) !important;
+  color: var(--primary) !important;
 }
-
-/* ── Contenido de expander (fondo correcto en dark) ── */
 [data-testid="stExpander"] > div[data-testid="stExpanderDetails"] {
   background: var(--surface) !important;
   color: var(--text) !important;
 }
 
-/* ── Alerts ── */
+/* ── Alertas ── */
 [data-testid="stAlert"] {
-  border-radius: 12px !important;
+  border-radius: var(--radius) !important;
   border-left-width: 3px !important;
   font-size: 0.85rem !important;
-  font-family: 'Nunito Sans', sans-serif !important;
+  font-family: 'Inter', sans-serif !important;
   background: var(--surface2) !important;
   color: var(--text) !important;
+  box-shadow: var(--shadow) !important;
 }
-div.stInfo    { background: color-mix(in srgb, var(--blue)   10%, var(--surface)) !important;
-                border-left-color: var(--blue) !important; }
-div.stSuccess { background: color-mix(in srgb, var(--ok)     10%, var(--surface)) !important;
+div.stInfo    { background: color-mix(in srgb, var(--primary) 10%, var(--surface)) !important;
+                border-left-color: var(--primary) !important; }
+div.stSuccess { background: color-mix(in srgb, var(--ok)      10%, var(--surface)) !important;
                 border-left-color: var(--ok) !important; }
-div.stWarning { background: color-mix(in srgb, var(--warn)   10%, var(--surface)) !important;
+div.stWarning { background: color-mix(in srgb, var(--warn)    10%, var(--surface)) !important;
                 border-left-color: var(--warn) !important; }
-div.stError   { background: color-mix(in srgb, var(--danger) 10%, var(--surface)) !important;
+div.stError   { background: color-mix(in srgb, var(--danger)  10%, var(--surface)) !important;
                 border-left-color: var(--danger) !important; }
 
 /* ── Caption ── */
 [data-testid="stCaptionContainer"] {
-  font-family: 'Nunito Sans', sans-serif !important;
+  font-family: 'Inter', sans-serif !important;
   font-size: 0.72rem !important;
   color: var(--muted) !important;
 }
@@ -419,83 +526,109 @@ div.stError   { background: color-mix(in srgb, var(--danger) 10%, var(--surface)
 /* ── Divider ── */
 hr {
   border: none !important;
-  border-top: 1.5px solid var(--border) !important;
+  border-top: 1px solid var(--border) !important;
   margin: 1.2rem 0 !important;
 }
 
 /* ── Mapa iframe ── */
 [data-testid="stIFrame"] {
-  border-radius: 16px !important;
-  border: 1.5px solid var(--border) !important;
+  border-radius: var(--radius-lg) !important;
+  border: 1px solid var(--border) !important;
   box-shadow: var(--shadow) !important;
   overflow: hidden !important;
 }
 
 /* ── Multiselect ── */
 [data-testid="stMultiSelect"] [data-baseweb="tag"] {
-  background: color-mix(in srgb, var(--blue) 15%, var(--surface)) !important;
-  border: 1px solid var(--blue-lt) !important;
-  color: var(--blue-dk) !important;
-  font-family: 'Nunito', sans-serif !important;
+  background: color-mix(in srgb, var(--primary) 15%, var(--surface)) !important;
+  border: 1px solid var(--primary-lt) !important;
+  color: var(--primary-dk) !important;
+  font-family: 'Manrope', sans-serif !important;
   font-size: 0.75rem !important;
   border-radius: 8px !important;
 }
 
-/* ── Radio (no sidebar) ── */
+/* ── Radio (fuera del sidebar) ── */
 [data-testid="stRadio"] [data-testid="stMarkdownContainer"] p {
-  font-family: 'Nunito Sans', sans-serif !important;
+  font-family: 'Inter', sans-serif !important;
   font-size: 0.85rem !important;
   color: var(--text) !important;
 }
 
-/* ── Chat messages (sección agente IA) ── */
+/* ── Mensajes de chat (sección agente IA) ── */
 [data-testid="stChatMessage"] {
   background: var(--surface2) !important;
   border: 1px solid var(--border) !important;
-  border-radius: 12px !important;
+  border-radius: var(--radius) !important;
   color: var(--text) !important;
+  box-shadow: var(--shadow) !important;
+  transition: box-shadow 0.2s ease !important;
 }
+[data-testid="stChatMessage"]:hover { box-shadow: var(--shadow2) !important; }
 [data-testid="stChatInputTextArea"] {
   background: var(--surface) !important;
   color: var(--text) !important;
   border-color: var(--border) !important;
-  font-family: 'Nunito Sans', sans-serif !important;
+  font-family: 'Inter', sans-serif !important;
+  border-radius: 10px !important;
+}
+[data-testid="stChatInputTextArea"]:focus {
+  border-color: var(--primary) !important;
+  box-shadow: var(--glow) !important;
 }
 
-/* ── Texto general dentro de la app ── */
-p, li, span, label {
-  color: var(--text) !important;
-}
-a { color: var(--blue) !important; }
+/* ── Texto general ── */
+p, li, span, label { color: var(--text) !important; }
+a { color: var(--primary) !important; text-decoration-color: var(--primary-lt) !important; }
+a:hover { color: var(--accent) !important; }
+strong, b { color: var(--text) !important; font-weight: 700 !important; }
 code {
   background: var(--surface3) !important;
-  color: var(--blue-dk) !important;
+  color: var(--primary-dk) !important;
   border-radius: 4px !important;
-  padding: 0.1em 0.35em !important;
+  padding: 0.12em 0.4em !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 0.85em !important;
 }
 pre, .stCodeBlock {
   background: var(--bg2) !important;
   border: 1px solid var(--border) !important;
-  border-radius: 10px !important;
+  border-radius: var(--radius) !important;
 }
+table { font-family: 'Inter', sans-serif !important; }
+
+/* ── Barra de progreso / spinner ── */
+[data-testid="stSpinner"] > div { border-top-color: var(--primary) !important; }
+.stProgress > div > div > div { background: var(--grad-brand) !important; }
 
 /* ── Scrollbar ── */
-::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: var(--bg2); }
-::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--blue-lt); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--primary-lt); }
 
-/* ── Animaciones ── */
-@keyframes fadeUp {
-  from { opacity:0; transform:translateY(14px); }
-  to   { opacity:1; transform:translateY(0); }
+/* ── Enfoque accesible consistente ── */
+button:focus-visible, [role="radiogroup"] label:focus-within,
+input:focus-visible, select:focus-visible {
+  outline: none !important;
+  box-shadow: var(--glow) !important;
 }
-.ds-animate-in { animation: fadeUp 0.4s ease both; }
-[data-testid="column"]:nth-child(1) { animation: fadeUp 0.4s 0.05s ease both; }
-[data-testid="column"]:nth-child(2) { animation: fadeUp 0.4s 0.12s ease both; }
-[data-testid="column"]:nth-child(3) { animation: fadeUp 0.4s 0.20s ease both; }
-[data-testid="column"]:nth-child(4) { animation: fadeUp 0.4s 0.28s ease both; }
-[data-testid="column"]:nth-child(5) { animation: fadeUp 0.4s 0.36s ease both; }
+
+/* ── Animaciones de entrada ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.ds-animate-in { animation: fadeUp 0.45s cubic-bezier(.22,1,.36,1) both; }
+[data-testid="column"]:nth-child(1) { animation: fadeUp 0.42s 0.04s cubic-bezier(.22,1,.36,1) both; }
+[data-testid="column"]:nth-child(2) { animation: fadeUp 0.42s 0.10s cubic-bezier(.22,1,.36,1) both; }
+[data-testid="column"]:nth-child(3) { animation: fadeUp 0.42s 0.16s cubic-bezier(.22,1,.36,1) both; }
+[data-testid="column"]:nth-child(4) { animation: fadeUp 0.42s 0.22s cubic-bezier(.22,1,.36,1) both; }
+[data-testid="column"]:nth-child(5) { animation: fadeUp 0.42s 0.28s cubic-bezier(.22,1,.36,1) both; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -533,12 +666,12 @@ def _colores_tema():
     except Exception:
         tema = 'light'
     if tema == 'dark':
-        return {'plot':  '#1e293b', 'paper': '#1e293b',
-                'grid':  '#2d3f66', 'font':  '#e2e8f0',
-                'axis':  '#94a3b8', 'zero':  '#3b4f7a'}
+        return {'plot':  '#121a2b', 'paper': '#121a2b',
+                'grid':  '#22304e', 'font':  '#e8edf7',
+                'axis':  '#8994ac', 'zero':  '#2c3d63'}
     return {'plot':  '#ffffff', 'paper': '#ffffff',
-            'grid':  '#e2eaf8', 'font':  '#1e293b',
-            'axis':  '#64748b', 'zero':  '#bfcfee'}
+            'grid':  '#dbe3f2', 'font':  '#101828',
+            'axis':  '#667085', 'zero':  '#c6d4ec'}
 
 @st.cache_data(show_spinner=False, ttl=60)
 def _tema_cacheado():
@@ -554,7 +687,7 @@ def _plotly_layout(fig, height=370, **extra):
         margin=dict(l=0, r=0, t=10, b=0),
         plot_bgcolor=t['plot'],
         paper_bgcolor=t['paper'],
-        font=dict(family='Nunito, Nunito Sans, sans-serif',
+        font=dict(family='Manrope, Inter, sans-serif',
                   color=t['font'], size=12),
         legend=dict(font=dict(color=t['font']),
                     bgcolor='rgba(0,0,0,0)'),
@@ -1314,8 +1447,8 @@ _LOGO_SVG = (
     '<path d="M5.4 8.1 7.2 9.9 10.6 6" stroke="#ffffff" stroke-width="1.4" '
     'stroke-linecap="round" stroke-linejoin="round" fill="none"/>'
     '<defs><linearGradient id="dsGrad" x1="0" y1="0" x2="16" y2="16">'
-    '<stop offset="0" stop-color="#1a56db"/>'
-    '<stop offset="1" stop-color="#3b82f6"/>'
+    '<stop offset="0" stop-color="#2454c7"/>'
+    '<stop offset="1" stop-color="#0891b2"/>'
     '</linearGradient></defs></svg>'
 )
 st.markdown(
@@ -1324,7 +1457,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 st.markdown(
-    "**Ecosistema Predictivo Spatial-Aware** — De la predicción epidemiológica "
+    "Ecosistema Predictivo Spatial-Aware — De la predicción epidemiológica "
     "a la orden de despacho · Valle del Cauca · 42 municipios · SIVIGILA 2007–2018"
 )
 c1, c2, c3, c4, c5 = st.columns(5)
@@ -1367,16 +1500,19 @@ if OPTION_MENU_DISPONIBLE:
             default_index=0,
             styles={
                 "container": {"padding": "0!important", "background-color": "transparent"},
-                "icon": {"color": "#60a5fa", "font-size": "13px"},
+                "icon": {"color": "var(--primary)", "font-size": "13px"},
                 "nav-link": {
-                    "font-family": "JetBrains Mono, monospace", "font-size": "12.5px",
-                    "color": "#5a7a99", "background-color": "#0f1c2d",
-                    "border": "1px solid rgba(0,255,224,0.18)", "border-radius": "9px",
+                    "font-family": "Manrope, sans-serif", "font-size": "13px",
+                    "font-weight": "600",
+                    "color": "var(--text2)", "background-color": "var(--surface)",
+                    "border": "1px solid var(--border)", "border-radius": "10px",
                     "margin": "0 0 4px 0", "padding": "10px 12px",
+                    "transition": "transform 0.18s ease",
                 },
                 "nav-link-selected": {
-                    "background-color": "#1a56db", "color": "#ffffff",
-                    "font-weight": "600",
+                    "background-image": "linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%)",
+                    "color": "#ffffff", "font-weight": "700",
+                    "box-shadow": "0 4px 16px rgba(36,84,199,0.32)",
                 },
             },
         )
@@ -1398,7 +1534,7 @@ serie_imp, idx_imp, modo_degradado = imputar_semanas_faltantes(serie_rec)
 
 if modo_degradado:
     st.sidebar.warning(
-        f"**Modo Degradado** — {len(idx_imp)} semana(s) con reporte cero "
+        f"Modo Degradado — {len(idx_imp)} semana(s) con reporte cero "
         f"sospechoso detectadas. IC ampliado ×1.5 automáticamente."
     )
 
@@ -1479,16 +1615,16 @@ if seccion_activa == SECCIONES[0]:
     DESC_URG = {
         'CRÍTICO': (
             f"El stock actual no alcanza para cubrir los casos previstos esta semana. "
-            f"Se debe despachar en las próximas **{cadena_simple['despachar_en_dias']} horas** "
+            f"Se debe despachar en las próximas {cadena_simple['despachar_en_dias']} horas "
             f"para evitar desabasto."
         ),
         'ALERTA': (
             f"El stock bajará del nivel mínimo recomendado si no se actúa esta semana. "
-            f"Se debe hacer el pedido en máximo **{cadena_simple['despachar_en_dias']} día(s)**."
+            f"Se debe hacer el pedido en máximo {cadena_simple['despachar_en_dias']} día(s)."
         ),
         'NORMAL': (
             f"El municipio tiene medicamentos suficientes para atender los casos previstos "
-            f"durante los próximos **{cadena_simple['dias_cobertura']} días**."
+            f"durante los próximos {cadena_simple['dias_cobertura']} días."
         ),
     }
 
@@ -1530,25 +1666,25 @@ if seccion_activa == SECCIONES[0]:
     # ── Explicación sencilla del sistema ─────────────────────────────────
     with st.expander("Cómo funciona este sistema", expanded=False):
         st.markdown(f"""
-Este sistema predice cuántos casos de dengue habrá en **{municipio_sel}** la
+Este sistema predice cuántos casos de dengue habrá en {municipio_sel} la
 próxima semana, y calcula automáticamente cuántos medicamentos se necesitan
 y si el stock actual alcanza.
 
-**En 3 pasos:**
+En 3 pasos:
 
-1. **Predice** — usa los casos reportados de las últimas semanas y el
+1. Predice — usa los casos reportados de las últimas semanas y el
    historial de 11 años (SIVIGILA 2007–2018) para estimar cuántos
-   pacientes habrá la próxima semana: **{pred_sel} casos**.
+   pacientes habrá la próxima semana: {pred_sel} casos.
 
-2. **Evalúa** — compara esa predicción con el stock actual de medicamentos
+2. Evalúa — compara esa predicción con el stock actual de medicamentos
    en el municipio y determina si hay suficiente, si hay que pedir pronto,
    o si es urgente.
 
-3. **Actúa** — genera automáticamente la cantidad exacta a pedir y el
+3. Actúa — genera automáticamente la cantidad exacta a pedir y el
    tiempo máximo para hacer el pedido, para que los medicamentos lleguen
    a tiempo.
 
-**Por qué importa:** un sistema reactivo (comprar cuando ya falta) paga
+Por qué importa: un sistema reactivo (comprar cuando ya falta) paga
 precios de emergencia y pone en riesgo a los pacientes. Este sistema
 planifica con anticipación y ahorra dinero público.
         """)
@@ -1563,11 +1699,11 @@ elif seccion_activa == SECCIONES[1]:
 
     if modo_degradado:
         st.error(
-            f"**MODO DEGRADADO — Gestión de Riesgo Epidemiológico**\n\n"
-            f"Se detectaron **{len(idx_imp)} semana(s)** con reporte cero sospechoso "
-            f"en **{municipio_sel}**. Posible falla de reporte SIVIGILA.\n\n"
-            f"**Medidas automáticas:** Imputación por mediana móvil ±2 semanas · "
-            f"IC ampliado de ±{METRICAS['rmse']:.2f} → **±{rmse_ef:.2f}** casos/sem · "
+            f"MODO DEGRADADO — Gestión de Riesgo Epidemiológico\n\n"
+            f"Se detectaron {len(idx_imp)} semana(s) con reporte cero sospechoso "
+            f"en {municipio_sel}. Posible falla de reporte SIVIGILA.\n\n"
+            f"Medidas automáticas: Imputación por mediana móvil ±2 semanas · "
+            f"IC ampliado de ±{METRICAS['rmse']:.2f} → ±{rmse_ef:.2f} casos/sem · "
             f"Verificar en sección Nowcasting."
         )
 
@@ -1582,7 +1718,7 @@ elif seccion_activa == SECCIONES[1]:
                   delta=ic_label, delta_color="off")
         st.caption(
             f"MAE base: ±{METRICAS['mae']} · R²={METRICAS['r2']}"
-            + (f" · **RMSE efectivo: ±{rmse_ef:.2f}**" if modo_degradado else "")
+            + (f" · RMSE efectivo: ±{rmse_ef:.2f}" if modo_degradado else "")
         )
         with st.expander("IC y Gestión de Riesgo — para el jurado"):
             mae_n = ERROR_ESTRAT.get('mae_normal', 'N/A')
@@ -1590,23 +1726,23 @@ elif seccion_activa == SECCIONES[1]:
             fac   = ERROR_ESTRAT.get('factor_deg', 'N/A')
             met   = ERROR_ESTRAT.get('metodo_umbral', 'OPS 2015')
             st.markdown(f"""
-**Intervalo de Confianza (IC):**
-RMSE del modelo: **±{METRICAS['rmse']} casos/sem** (holdout 2018).
+Intervalo de Confianza (IC):
+RMSE del modelo: ±{METRICAS['rmse']} casos/sem (holdout 2018).
 En Modo Degradado se amplía ×1.5 como medida conservadora.
 
 | Estado | RMSE efectivo | IC | Decisión |
 |---|---|---|---|
 | Normal | ±{METRICAS['rmse']} | [{max(0,pred_sel-int(METRICAS['rmse']))} – {pred_sel+int(METRICAS['rmse'])}] | Stock base |
-| Modo Degradado | **±{rmse_ef:.2f}** | **[{ic_bajo} – {ic_alto}]** | Stock conservador |
+| Modo Degradado | ±{rmse_ef:.2f} | [{ic_bajo} – {ic_alto}] | Stock conservador |
 
-**Análisis de error estratificado:**
-- MAE semanas normales: **{mae_n} casos**
-- MAE semanas de pico (≥ p75 municipal, {met}): **{mae_p} casos**
-- Factor de degradación en picos: **{fac}x**
+Análisis de error estratificado:
+- MAE semanas normales: {mae_n} casos
+- MAE semanas de pico (≥ p75 municipal, {met}): {mae_p} casos
+- Factor de degradación en picos: {fac}x
 
-El modelo se degrada **{fac}x** en picos. Respuesta operativa:
+El modelo se degrada {fac}x en picos. Respuesta operativa:
 SS dinámico `Z(95%)×σ×√LT` absorbe esta varianza estructuralmente.
-En salud pública, un **falso negativo** es más costoso que un falso positivo.
+En salud pública, un falso negativo es más costoso que un falso positivo.
             """)
 
     with col2:
@@ -1616,7 +1752,7 @@ En salud pública, un **falso negativo** es más costoso que un falso positivo.
             st.metric("Lactato de Ringer",  f"{cadena_sel['req_ringer']:,} Bol.")
             nivel = {"CRÍTICO": "error", "ALERTA": "warning", "NORMAL": "success"}
             getattr(st, nivel[cadena_sel['urgencia']])(
-                f"**{cadena_sel['urgencia']}** — "
+                f"{cadena_sel['urgencia']} — "
                 f"Despachar en ≤{cadena_sel['despachar_en_dias']} día(s)"
             )
 
@@ -1637,24 +1773,24 @@ En salud pública, un **falso negativo** es más costoso que un falso positivo.
                 lt    = cadena_sel.get('lead_time_dias', 0)
                 z     = SUPUESTOS.get('z_score_95', 1.645)
                 st.markdown(f"""
-**Eficiencia Farmacoeconómica — Logística de Precisión:**
+Eficiencia Farmacoeconómica — Logística de Precisión:
 
-El ahorro compara el costo de cubrir la **demanda predicha de esta semana**
+El ahorro compara el costo de cubrir la demanda predicha de esta semana
 ({cadena_sel['req_aceta']:,} tab. de acetaminofén + {cadena_sel['req_ringer']:,}
 bolsas de Ringer) comprada de dos formas distintas:
 
-- **Preventiva** (precio normal SISMED, planificada con anticipación gracias
-  a la predicción): **${cadena_sel['costo_preventivo']:,.0f} COP**
-- **Reactiva** (precio de emergencia/urgencia, sin planificación, comprando
-  al momento del desabasto): **${cadena_sel['costo_reactivo']:,.0f} COP**
+- Preventiva (precio normal SISMED, planificada con anticipación gracias
+  a la predicción): ${cadena_sel['costo_preventivo']:,.0f} COP
+- Reactiva (precio de emergencia/urgencia, sin planificación, comprando
+  al momento del desabasto): ${cadena_sel['costo_reactivo']:,.0f} COP
 
-**Ahorro = Reactivo − Preventivo = ${cadena_sel['ahorro']:,.0f} COP**
+Ahorro = Reactivo − Preventivo = ${cadena_sel['ahorro']:,.0f} COP
 
 Este ahorro depende de la demanda predicha, no de si el municipio ya tiene
 stock suficiente hoy — así refleja el valor de *anticipar* la compra, no
 solo si hace falta reabastecer en este instante.
 
-**SS dinámico (Chopra & Meindl, SCM 2016):**
+SS dinámico (Chopra & Meindl, SCM 2016):
 ```
 SS = Z(95%) × σ_error × √lead_time
 SS = {z:.3f} × {sigma} × √{lt:.4f}
@@ -1743,7 +1879,7 @@ para garantizar cumplimiento legal y seguridad operativa simultáneamente.
         fig_h.update_yaxes(gridcolor=_colores_tema()['grid'])
         st.plotly_chart(fig_h, use_container_width=True)
         st.caption("IC = MAE×(1+35%/paso). "
-                   + ("**×1.5 Modo Degradado.**" if modo_degradado else ""))
+                   + ("×1.5 Modo Degradado." if modo_degradado else ""))
 
 # ══════════════════════════════════════════════
 # SECCIÓN 2 — CADENA DE ABASTECIMIENTO
@@ -1757,13 +1893,13 @@ elif seccion_activa == SECCIONES[2]:
 
     with st.expander("Eficiencia Farmacoeconómica — Logística de Precisión vs Adivinación"):
         st.success(
-            "**De la logística de adivinación a la logística de precisión:**\n\n"
+            "De la logística de adivinación a la logística de precisión:\n\n"
             "Los sistemas tradicionales de abastecimiento hospitalario usan "
             "reglas empíricas (stock = 2-4 semanas de demanda promedio) porque "
-            "**no conocen su error de predicción**.\n\n"
+            "no conocen su error de predicción.\n\n"
             f"Data Sentinel usa `SS = Z(95%) × σ_error({METRICAS['mae']} casos) × √LT` "
-            "porque **conoce exactamente cuánto se equivoca** y en qué contextos.\n\n"
-            "**Consecuencia:** el costo preventivo/reactivo y el ahorro se calculan "
+            "porque conoce exactamente cuánto se equivoca y en qué contextos.\n\n"
+            "Consecuencia: el costo preventivo/reactivo y el ahorro se calculan "
             "sobre la demanda predicha de cada semana, no solo sobre la cantidad a "
             "ordenar — así el ahorro refleja el valor de anticipar la compra aunque "
             "el municipio ya tenga stock suficiente en este instante. En producción "
@@ -1862,7 +1998,7 @@ elif seccion_activa == SECCIONES[2]:
         st.subheader(f"Detalle Cadena — {municipio_sel}")
         cd1, cd2, cd3 = st.columns(3)
         with cd1:
-            st.markdown("**Estado de Stock**")
+            st.markdown('<span class="ds-colhead">Estado de Stock</span>', unsafe_allow_html=True)
             sigma_mun = cadena_sel.get('sigma_error', 'N/A')
             st.dataframe(pd.DataFrame({
                 'Insumo':          ['Acetaminofén','Ringer'],
@@ -1879,7 +2015,7 @@ elif seccion_activa == SECCIONES[2]:
             }), hide_index=True, use_container_width=True)
             st.caption(f"σ_error: {sigma_mun} casos/sem · {cadena_sel['metodo_ss']}")
         with cd2:
-            st.markdown("**Red Logística**")
+            st.markdown('<span class="ds-colhead">Red Logística</span>', unsafe_allow_html=True)
             st.dataframe(pd.DataFrame({
                 'Parámetro': ['Centro dist.','Dist. aérea','Dist. carretera',
                               'Tortuosidad','Velocidad','Lead time','Cobertura'],
@@ -1894,7 +2030,7 @@ elif seccion_activa == SECCIONES[2]:
                 ]
             }), hide_index=True, use_container_width=True)
         with cd3:
-            st.markdown("**Orden de Despacho**")
+            st.markdown('<span class="ds-colhead">Orden de Despacho</span>', unsafe_allow_html=True)
             st.metric("Aceta. a ordenar", f"{cadena_sel['orden_aceta']:,} tab")
             st.metric("Ringer a ordenar", f"{cadena_sel['orden_ringer']:,} bol")
             st.metric("Despachar en",     f"≤{cadena_sel['despachar_en_dias']} día(s)")
@@ -1932,14 +2068,14 @@ elif seccion_activa == SECCIONES[2]:
 elif seccion_activa == SECCIONES[3]:
     st.markdown("### Nowcasting — Conexión SIVIGILA en Tiempo Real")
     st.info(
-        "**Data Gap 2018→2026 — Contexto COVID-19:**\n\n"
+        "Data Gap 2018→2026 — Contexto COVID-19:\n\n"
         "El modelo fue entrenado con datos SIVIGILA 2007–2018. La pandemia "
         "COVID-19 alteró los ciclos de reporte por tres mecanismos documentados: "
-        "(1) **Subregistro** por reorientación diagnóstica; "
-        "(2) **Cambio vectorial** de *Aedes aegypti*; "
-        "(3) **Discontinuidades 2020–2022** con cobertura <60% en municipios "
+        "(1) Subregistro por reorientación diagnóstica; "
+        "(2) Cambio vectorial de *Aedes aegypti*; "
+        "(3) Discontinuidades 2020–2022 con cobertura <60% en municipios "
         "categoría 5 y 6.\n\n"
-        "**Solución técnica:** Re-entrenamiento continuo vía esta misma API "
+        "Solución técnica: Re-entrenamiento continuo vía esta misma API "
         "cuando SIVIGILA restablezca flujo post-2022. Nowcasting inmediato "
         "disponible con datos frescos sin necesidad de re-entrenamiento."
     )
@@ -2008,7 +2144,7 @@ elif seccion_activa == SECCIONES[3]:
 
                 if abs(pred_live - pred_hist) > 10:
                     st.warning(
-                        f"**Divergencia {abs(pred_live-pred_hist)} casos** entre API "
+                        f"Divergencia {abs(pred_live-pred_hist)} casos entre API "
                         f"y histórico 2018. Evidencia de data drift post-pandemia. "
                         f"Re-entrenamiento con datos 2023+ recomendado."
                     )
@@ -2041,7 +2177,7 @@ elif seccion_activa == SECCIONES[3]:
                 st.warning(f"No hay registros suficientes para {municipio_nw}. "
                            "Posible discontinuidad post-COVID.")
     else:
-        st.info("Selecciona un municipio y presiona **Consultar API SIVIGILA**.")
+        st.info("Selecciona un municipio y presiona Consultar API SIVIGILA.")
 
     st.divider()
     with st.expander("Arquitectura de Re-entrenamiento Continuo"):
@@ -2059,7 +2195,7 @@ Validación holdout temporal (rechazar si R² < 0.80)
      ↓
 Exportar modelo_municipal_vX.pkl con métricas y hash incrustados
 ```
-**Condición de exclusión COVID:** Años 2020–2022 con flag de subregistro documentado.
+Condición de exclusión COVID: Años 2020–2022 con flag de subregistro documentado.
 Re-entrenamiento inicia desde datos 2023+ para capturar nueva dinámica vectorial.
         """)
 
@@ -2125,7 +2261,7 @@ elif seccion_activa == SECCIONES[5]:
 elif seccion_activa == SECCIONES[6]:
     st.subheader("Validación Retrospectiva — Brote Cali 2016–2017")
     st.markdown(
-        "Demostración de que el sistema **hubiera detectado** el mayor brote "
+        "Demostración de que el sistema hubiera detectado el mayor brote "
         "del dataset con anticipación suficiente. Predicciones genuinamente "
         "*out-of-sample* (modelo entrenado hasta 2015)."
     )
@@ -2170,318 +2306,4 @@ elif seccion_activa == SECCIONES[6]:
         fig_retro.add_trace(go.Scatter(
             x=df_r16['fecha'], y=df_r16['pred_casos'],
             name='Predicción', line=dict(color='#DC2626', width=2, dash='dash'),
-            hovertemplate='%{x|%d %b %Y}<br>Pred: %{y}<extra></extra>'
-        ), row=1, col=1)
-        fig_retro.add_vline(x=pico_fec, line_dash='dot',
-                            line_color='#533AB7', opacity=0.7)
-        fig_retro.add_annotation(x=pico_fec, y=pico_val,
-                                  text=f" Pico: {pico_val}", showarrow=False,
-                                  font=dict(color='#533AB7', size=10))
-
-        fig_retro.add_trace(go.Scatter(
-            x=df_r16['fecha'], y=df_r16['stock_aceta'],
-            name='Stock aceta.', line=dict(color='#333', width=1.8),
-            hovertemplate='%{x|%d %b %Y}<br>Stock: %{y:,}<extra></extra>'
-        ), row=2, col=1)
-        fig_retro.add_hline(y=rop_aceta, line_dash='dash', line_color='#EF9F27',
-                             annotation_text=f'ROP ({rop_aceta:,})',
-                             annotation_position='top right', row=2, col=1)
-        fig_retro.add_hline(y=ss_aceta, line_dash='dash', line_color='#E24B4A',
-                             annotation_text=f'SS ({ss_aceta:,})',
-                             annotation_position='bottom right', row=2, col=1)
-
-        colors_sem = [COLOR_URG[u] for u in df_r16['urgencia']]
-        fig_retro.add_trace(go.Bar(
-            x=df_r16['fecha'], y=[1] * len(df_r16),
-            marker_color=colors_sem, name='Urgencia',
-            hovertemplate='%{x|%d %b %Y}<br>%{customdata}<extra></extra>',
-            customdata=df_r16['urgencia'].tolist()
-        ), row=3, col=1)
-        if idx_primera_al is not None:
-            fig_retro.add_vline(
-                x=df_r16.loc[idx_primera_al, 'fecha'],
-                line_dash='solid', line_color='#EF9F27',
-                line_width=2.5, opacity=0.9
-            )
-
-        _t = _colores_tema()
-        fig_retro.update_layout(
-            height=700, hovermode='x unified',
-            plot_bgcolor=_t['plot'], paper_bgcolor=_t['paper'],
-            margin=dict(l=0, r=0, t=40, b=0),
-            font=dict(family='Nunito, sans-serif', color=_t['font']),
-        )
-        fig_retro.update_yaxes(gridcolor=_t['grid'])
-        fig_retro.update_xaxes(showgrid=False)
-        st.plotly_chart(fig_retro, use_container_width=True)
-
-        mae_r  = round(np.mean(np.abs(df_r16['real_casos'] - df_r16['pred_casos'])), 2)
-        rmse_r = round(np.sqrt(np.mean((df_r16['real_casos'] - df_r16['pred_casos'])**2)), 2)
-        denom  = np.sum((df_r16['real_casos'] - df_r16['real_casos'].mean())**2)
-        r2_r   = round(1 - np.sum((df_r16['real_casos'] - df_r16['pred_casos'])**2) /
-                       denom, 3) if denom > 0 else 0
-        mr1, mr2, mr3 = st.columns(3)
-        mr1.metric("MAE (Cali 2016–17)",  f"{mae_r} casos/sem")
-        mr2.metric("RMSE (Cali 2016–17)", f"{rmse_r} casos/sem")
-        mr3.metric("R² (Cali 2016–17)",   f"{r2_r}")
-    else:
-        st.warning("No hay suficiente histórico de CALI desde 2015 para esta validación.")
-
-# ══════════════════════════════════════════════
-# SECCIÓN 7 — AUDITORÍA ALCOA+
-# ══════════════════════════════════════════════
-elif seccion_activa == SECCIONES[7]:
-    st.subheader("Auditoría Técnica Completa — Compliance ALCOA+")
-
-    st.subheader("Sellos de Integridad de Datos")
-    df_sellos = pd.DataFrame({
-        'Artefacto': ['modelo_municipal_v4.pkl','dengue_valle_semanal.csv',
-                      'logistica_params.json','API SIVIGILA (en vivo)',
-],
-        'Hash MD5':  [sello_modelo['hash_md5'], sello_datos['hash_md5'],
-                      sello_log['hash_md5'], 'Calculado en tiempo real (sección Nowcasting)',
-],
-        'Cargado en':[sello_modelo['cargado_en'], sello_datos['cargado_en'],
-                      sello_log['cargado_en'], 'Bajo demanda'],
-        'Fuente':    [sello_modelo['fuente'], sello_datos['fuente'],
-                      sello_log['fuente'], 'datos.gov.co/resource/4hyg-wa9d · Socrata',
-],
-        'Estado':    ['Atención', 'Verificado', 'Verificado', 'Verificado'],
-        'ALCOA+ Original': [
-            'Artefacto local — MLflow/DVC recomendado en producción',
-            'Descargado de datos.gov.co',
-            'Calculado de IGAC + INVIAS + MINSALUD',
-            'Dato original en tiempo real',
-        ],
-    })
-
-    def _color_estado(val):
-        mapa = {'Verificado': 'background-color:#d4edda',
-                'Atención':   'background-color:#fff3cd'}
-        return mapa.get(val, '')
-
-    st.dataframe(df_sellos.style.map(_color_estado, subset=['Estado']),
-                 hide_index=True, use_container_width=True)
-
-    st.divider()
-    ca1, ca2 = st.columns(2)
-
-    with ca1:
-        st.markdown("#### Ficha Técnica")
-        st.table(pd.DataFrame.from_dict({
-            'Algoritmo':            'Random Forest Regressor',
-            'N° árboles':           '300',
-            'Profundidad máxima':   '12',
-            'Min. muestras hoja':   '3',
-            'Max features':         'sqrt',
-            'Semilla':              '42',
-            'Encoding municipio':   'Target encoding + IQR histórico',
-            'N° features':          str(len(FEATURES)),
-            'Municipios':           f"{len(MUNICIPIOS)} (100% Valle del Cauca)",
-            'Versión':              VERSION,
-            'Entrenado con':        paquete['entrenado_con'],
-            'Evaluado en':          paquete['evaluado_en'],
-            'Fecha entreno':        paquete['fecha_entreno'],
-            'Hash modelo':          sello_modelo['hash_md5'],
-        }, orient='index', columns=['Valor']))
-
-    with ca2:
-        st.markdown("#### Métricas Oficiales — Holdout Temporal 2018")
-        st.dataframe(pd.DataFrame({
-            'Métrica':        ['MAE','RMSE','R²','Gap Train-Val R²','Municipios test'],
-            'Valor':          [f"{METRICAS['mae']} casos/sem",
-                               f"{METRICAS['rmse']} casos/sem",
-                               f"{METRICAS['r2']}", f"{GAP_TRAIN_VAL}",
-                               f"{len(MUNICIPIOS)} municipios"],
-            'Interpretación': [
-                'Error promedio absoluto en datos no vistos',
-                'Error cuadrático medio (penaliza outliers)',
-                f"{METRICAS['r2']*100:.1f}% de la varianza explicada",
-                'Sin overfitting',
-                '100% cobertura departamental',
-            ]
-        }), hide_index=True, use_container_width=True)
-
-        mae_n = ERROR_ESTRAT.get('mae_normal', 'N/A')
-        mae_p = ERROR_ESTRAT.get('mae_pico',   'N/A')
-        fac   = ERROR_ESTRAT.get('factor_deg', 'N/A')
-        pct   = ERROR_ESTRAT.get('pct_pico',   'N/A')
-        met   = ERROR_ESTRAT.get('metodo_umbral', 'OPS 2015')
-
-        st.markdown("#### Análisis de Error Estratificado")
-        st.dataframe(pd.DataFrame({
-            'Contexto':       ['Semanas normales','Semanas de pico','Factor degradación'],
-            'MAE':            [f"{mae_n} casos/sem", f"{mae_p} casos/sem", f"{fac}x"],
-            'Muestra':        [
-                f"{ERROR_ESTRAT.get('n_normal','N/A')} semanas (84.5%)",
-                f"{ERROR_ESTRAT.get('n_pico','N/A')} semanas ({pct}%)",
-                '—'
-            ],
-            'Método umbral':  [met, met, 'Chopra & Meindl SCM 2016'],
-        }), hide_index=True, use_container_width=True)
-        st.caption(
-            f"El modelo se degrada {fac}x en picos. Mitigado con SS dinámico "
-            f"Z(95%)×σ×√LT que absorbe la varianza estructural del error."
-        )
-
-        if df_justificacion is not None:
-            st.markdown("#### Justificación de Municipios")
-            st.dataframe(
-                df_justificacion[['municipio_ocurrencia','total_casos',
-                                  'anos_activos','carga_pct','carga_acum_pct']]
-                .rename(columns={'municipio_ocurrencia':'Municipio',
-                                 'total_casos':'Total','anos_activos':'Años',
-                                 'carga_pct':'Carga %','carga_acum_pct':'Acum. %'}),
-                hide_index=True, use_container_width=True, height=260
-            )
-
-    st.divider()
-    with st.expander("Limitaciones Documentadas — Respuestas Preparadas para el Jurado"):
-        fac_limit = ERROR_ESTRAT.get('factor_deg', 'N/A')
-        st.warning(f"""
-**1. Data Gap 2018→2026 (COVID-19):**
-Entrenado hasta 2018. Re-entrenamiento continuo vía API SIVIGILA planificado
-desde datos 2023+. La sección Nowcasting es la solución operativa inmediata.
-
-**2. Dependencia de inercia (casos_t-1 dominante):**
-Estructural en modelos de lags. Mitigado con: detección de semanas faltantes,
-imputación por mediana móvil, IC ×1.5 en Modo Degradado, y Nowcasting con API.
-
-**3. Degradación en picos (factor {fac_limit}x):**
-Esperado y documentado — calculado comparando el error del modelo en semanas
-normales vs. semanas de pico epidémico (holdout 2018), no es una versión ni
-un año. Respuesta: SS dinámico Z×σ×√LT absorbe este error estructuralmente.
-En picos, el sistema emite ALERTA antes del desbordamiento.
-
-**4. Stock simulado (no en tiempo real):**
-El inventario hospitalario en tiempo real no es dato abierto en Colombia.
-Normativo (Res. 1403/2007). En producción: integrar con SISMED/SISPRO.
-En presentación: `max(SS_dinámico, SS_normativo)` como piso legal.
-
-**5. Ahorro calculado sobre demanda predicha, no sobre orden a realizar:**
-El ahorro mostrado compara comprar la demanda predicha de la semana a precio
-preventivo vs precio reactivo de urgencia. Es independiente de si el stock
-actual ya alcanza, porque mide el valor de *anticipar* la compra.
-
-**6. Variables climáticas ausentes:**
-Estacionalidad capturada vía seno/coseno de semana. Open-Meteo planificado v5.0.
-        """)
-
-    with st.expander("Argumento de Farmacia Clínica — Para el Evaluador del Sector Salud"):
-        st.info("""
-Data Sentinel no es una herramienta para científicos de datos.
-
-**Es una herramienta para el Químico Farmacéutico hospitalario** que necesita
-saber si el Lactato de Ringer llega a Buenaventura antes de que la curva de
-contagio sature la urgencia, o si Acetaminofén 500mg está disponible en Buga
-cuando el sistema de alerta temprana dice que la próxima semana habrá 15 casos.
-
-**La cadena de decisión completa:**
-```
-SIVIGILA (dato real) → Modelo RF (predicción semana t+1 a t+4)
-→ Motor logístico (SS dinámico + lead time real)
-→ Orden de despacho priorizada (CRÍTICO/ALERTA/NORMAL)
-→ Químico Farmacéutico activa la compra antes del desabasto
-```
-
-Esto es lo que diferencia un sistema de soporte a decisiones clínicas
-de un dashboard de visualización. La norma (Res. MINSALUD 1403/2007)
-y la evidencia (SIVIGILA + modelo) hablan el mismo idioma.
-        """)
-
-# ══════════════════════════════════════════════
-# SECCIÓN 8 — AGENTE IA
-# ══════════════════════════════════════════════
-elif seccion_activa == SECCIONES[8]:
-    st.subheader("Agente IA — Pregúntale a Denguard")
-    st.caption(
-        "Agente con acceso a herramientas en tiempo real sobre el modelo, el "
-        "histórico SIVIGILA y la cadena logística — no improvisa cifras, las consulta."
-    )
-
-    with st.expander("Arquitectura del agente — para el jurado", expanded=False):
-        st.markdown("""
-Esto **no** es un chatbot que alucina números: es un agente con **tool-use real**
-sobre Gemini (Google). Cada vez que el usuario pregunta algo, el modelo
-decide si necesita datos del sistema y llama una o varias de estas herramientas
-*antes* de redactar la respuesta:
-
-| Herramienta | Qué consulta |
-|---|---|
-| `consultar_prediccion_municipio` | Predicción de la próxima semana + urgencia logística |
-| `consultar_resumen_departamental` | Estado CRÍTICO / ALERTA / NORMAL de los 42 municipios |
-| `consultar_metricas_modelo` | MAE, RMSE, R² y ficha técnica del Random Forest |
-| `consultar_historico_municipio` | Casos reales SIVIGILA por semana |
-| `consultar_logistica_municipio` | Distancia, lead time, stock, ROP, SS |
-
-```
-Pregunta del usuario
-     ↓
-Gemini decide qué función(es) necesita (function calling)
-     ↓
-Denguard ejecuta la(s) función(es) sobre los datos reales del sistema
-     ↓
-El resultado (JSON) vuelve a Gemini como function_response
-     ↓
-Gemini redacta la respuesta final citando las cifras obtenidas
-```
-
-Si una pregunta no tiene una herramienta para resolverla, el agente lo dice
-en vez de inventar un número.
-        """)
-
-    try:
-        api_key = st.secrets["GEMINI_API_KEY"]
-    except (KeyError, FileNotFoundError):
-        api_key = None
-
-    if not GEMINI_DISPONIBLE:
-        st.error("Falta instalar el SDK de Gemini: `pip install google-genai`")
-    elif not api_key:
-        st.error(
-            "No se encontró `GEMINI_API_KEY` en *Secrets*.\n\n"
-            "**En Streamlit Cloud:** ⋮ → Settings → Secrets, agrega:\n"
-            "```toml\nGEMINI_API_KEY = \"tu-key-aquí\"\n```\n"
-            "y reinicia la app (⋮ → Reboot app).\n\n"
-            "**En local:** crea `.streamlit/secrets.toml` con la misma línea.\n\n"
-            "Consigue tu key gratis en aistudio.google.com/apikey"
-        )
-    else:
-        if "agente_chat" not in st.session_state:
-            st.session_state.agente_chat = []         # historial visible (solo texto)
-        if "agente_contenidos" not in st.session_state:
-            st.session_state.agente_contenidos = []    # historial completo (incluye tool calls)
-
-        for m in st.session_state.agente_chat:
-            with st.chat_message(m["role"]):
-                st.markdown(m["content"])
-
-        pregunta = st.chat_input(
-            "Ej: ¿Qué municipios están en CRÍTICO esta semana? · "
-            "¿Cuántos casos se predicen para Buga?"
-        )
-        if pregunta:
-            st.session_state.agente_chat.append({"role": "user", "content": pregunta})
-            st.session_state.agente_contenidos.append(
-                genai_types.Content(role="user", parts=[genai_types.Part.from_text(text=pregunta)])
-            )
-            with st.chat_message("user"):
-                st.markdown(pregunta)
-            with st.chat_message("assistant"):
-                with st.spinner("Consultando herramientas..."):
-                    try:
-                        cliente_ia = genai.Client(api_key=api_key)
-                        texto, st.session_state.agente_contenidos = ejecutar_agente(
-                            cliente_ia, st.session_state.agente_contenidos
-                        )
-                    except Exception as e:
-                        texto = f"Error consultando al agente: {e}"
-                st.markdown(texto)
-            st.session_state.agente_chat.append({"role": "assistant", "content": texto})
-
-        if st.session_state.agente_chat and st.button("Limpiar conversación"):
-            st.session_state.agente_chat = []
-            st.session_state.agente_contenidos = []
-            st.rerun()
-
-st.markdown('</div>', unsafe_allow_html=True)
+            hovertemplate='%{x|%d %b %Y}<br>Pred: %{y}<extra
