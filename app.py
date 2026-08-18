@@ -413,10 +413,15 @@ h3 { font-size: 1.02rem !important; font-weight: 700 !important; }
   transition: transform 0.22s cubic-bezier(.22,1,.36,1), box-shadow 0.22s ease, border-color 0.22s ease;
 }
 .ds-pill:hover {
-  transform: translateY(-3px);
+  transform: translateY(-4px);
   box-shadow: var(--shadow2);
+  border-color: var(--pill-accent, var(--primary));
+}
+.ds-pill:hover .ds-pill-icon {
+  transform: scale(1.08);
 }
 .ds-pill-icon {
+  transition: transform 0.22s cubic-bezier(.22,1,.36,1);
   flex: 0 0 auto;
   width: 38px; height: 38px;
   border-radius: 11px;
@@ -502,44 +507,54 @@ h3 { font-size: 1.02rem !important; font-weight: 700 !important; }
   color: var(--text2) !important;
 }
 
-/* ── Navegación tipo pilar en sidebar (fallback st.radio) ── */
-[data-testid="stSidebar"] [data-testid="stRadio"] > label { display: none !important; }
-[data-testid="stSidebar"] [data-testid="stRadio"] > div[role="radiogroup"] {
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 0.3rem !important;
+/* ── Menú de navegación horizontal (superior) ── */
+.ds-topnav {
+  margin-bottom: 0.2rem;
 }
-[data-testid="stSidebar"] [data-testid="stRadio"] > div[role="radiogroup"] > label {
+.ds-topnav .nav-link,
+.nav-link {
+  transition: transform 0.2s cubic-bezier(.22,1,.36,1), box-shadow 0.2s ease,
+              border-color 0.2s ease, color 0.2s ease !important;
+}
+.ds-topnav .nav-link:hover,
+.nav-link:hover {
+  transform: translateY(-2px) !important;
+  border-color: var(--primary-lt) !important;
+  color: var(--primary) !important;
+  box-shadow: var(--shadow) !important;
+}
+.ds-topnav .nav-link.active:hover,
+.nav-link.active:hover {
+  color: #ffffff !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 22px rgba(36,84,199,0.4) !important;
+}
+
+/* ── Radio horizontal (fallback de navegación / selectores tipo tab) ── */
+div[role="radiogroup"] {
+  gap: 0.4rem !important;
+}
+div[role="radiogroup"] > label {
   font-family: 'Manrope', sans-serif !important;
-  font-size: 0.82rem !important;
   font-weight: 600 !important;
-  color: var(--text2) !important;
   background: var(--surface) !important;
   border: 1px solid var(--border) !important;
   border-radius: 10px !important;
-  padding: 0.62rem 0.9rem !important;
-  margin: 0 !important;
-  cursor: pointer !important;
-  transition: color 0.18s ease, background 0.18s ease, border-color 0.18s ease, transform 0.18s ease !important;
+  padding: 0.5rem 0.9rem !important;
+  transition: color 0.18s ease, border-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease !important;
 }
-[data-testid="stSidebar"] [data-testid="stRadio"] > div[role="radiogroup"] > label:hover {
+div[role="radiogroup"] > label:hover {
   color: var(--primary) !important;
   border-color: var(--primary-lt) !important;
-  transform: translateX(4px) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: var(--shadow) !important;
 }
-[data-testid="stSidebar"] [data-testid="stRadio"] > div[role="radiogroup"] > label:has(input:checked) {
+div[role="radiogroup"] > label:has(input:checked) {
   color: #ffffff !important;
   background: var(--grad-brand) !important;
   border-color: transparent !important;
   box-shadow: 0 4px 16px rgba(36,84,199,0.32) !important;
 }
-[data-testid="stSidebar"] [data-testid="stRadio"] [data-testid="stMarkdownContainer"] p {
-  font-size: inherit !important;
-  color: inherit !important;
-}
-[data-testid="stSidebar"] [data-testid="stRadio"] svg { display: none !important; }
-[data-testid="stSidebar"] .nav-link { margin-bottom: 4px !important; transition: transform 0.18s ease !important; }
-[data-testid="stSidebar"] .nav-link:hover { transform: translateX(4px) !important; }
 
 /* ── Botones ── */
 [data-testid="stButton"] > button {
@@ -1710,8 +1725,7 @@ st.caption(
 st.divider()
 
 # ─────────────────────────────────────────────
-# NAVEGACIÓN — menú lateral tipo "pilar" (vertical, dentro del sidebar
-# colapsable nativo de Streamlit)
+# NAVEGACIÓN — menú horizontal superior
 # ─────────────────────────────────────────────
 SECCIONES = [
     "Vista General",
@@ -1727,38 +1741,41 @@ SECCIONES = [
 ICONOS_SECCION = ["house-fill", "graph-up-arrow", "truck", "broadcast",
                    "clock-history", "geo-alt", "search", "shield-check", "robot"]
 
-st.sidebar.header("Navegación")
 if OPTION_MENU_DISPONIBLE:
-    with st.sidebar:
-        seccion_activa = option_menu(
-            menu_title=None,
-            options=SECCIONES,
-            icons=ICONOS_SECCION,
-            default_index=0,
-            styles={
-                "container": {"padding": "0!important", "background-color": "transparent"},
-                "icon": {"color": "var(--primary)", "font-size": "13px"},
-                "nav-link": {
-                    "font-family": "Manrope, sans-serif", "font-size": "13px",
-                    "font-weight": "600",
-                    "color": "var(--text2)", "background-color": "var(--surface)",
-                    "border": "1px solid var(--border)", "border-radius": "10px",
-                    "margin": "0 0 4px 0", "padding": "10px 12px",
-                    "transition": "transform 0.18s ease",
-                },
-                "nav-link-selected": {
-                    "background-image": "linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%)",
-                    "color": "#ffffff", "font-weight": "700",
-                    "box-shadow": "0 4px 16px rgba(36,84,199,0.32)",
-                },
+    st.markdown('<div class="ds-topnav">', unsafe_allow_html=True)
+    seccion_activa = option_menu(
+        menu_title=None,
+        options=SECCIONES,
+        icons=ICONOS_SECCION,
+        default_index=0,
+        orientation="horizontal",
+        styles={
+            "container": {"padding": "0!important", "background-color": "transparent",
+                           "flex-wrap": "wrap"},
+            "icon": {"color": "var(--primary)", "font-size": "13px"},
+            "nav-link": {
+                "font-family": "Manrope, sans-serif", "font-size": "13px",
+                "font-weight": "600",
+                "color": "var(--text2)", "background-color": "var(--surface)",
+                "border": "1px solid var(--border)", "border-radius": "10px",
+                "margin": "0 6px 6px 0", "padding": "9px 14px",
+                "transition": "all 0.18s ease", "white-space": "nowrap",
             },
-        )
+            "nav-link-selected": {
+                "background-image": "linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%)",
+                "color": "#ffffff", "font-weight": "700",
+                "box-shadow": "0 4px 16px rgba(36,84,199,0.32)",
+            },
+        },
+    )
+    st.markdown('</div>', unsafe_allow_html=True)
 else:
-    seccion_activa = st.sidebar.radio(
-        "Navegación", SECCIONES, label_visibility="collapsed"
+    seccion_activa = st.radio(
+        "Navegación", SECCIONES, horizontal=True, label_visibility="collapsed"
     )
 
-st.sidebar.divider()
+st.divider()
+
 st.sidebar.header("Parámetros de Simulación")
 municipio_sel = st.sidebar.selectbox(
     "Municipio objetivo:", sorted(MUNICIPIOS),
@@ -2144,17 +2161,10 @@ elif seccion_activa == SECCIONES[2]:
     alertas  = df_sorted[df_sorted['urgencia'] == 'ALERTA']
     normales = df_sorted[df_sorted['urgencia'] == 'NORMAL']
 
-    render_pill_row([
-        {"label": "Municipios en CRÍTICO", "value": f"{len(criticos)}",
-         "icon": "alert-octagon", "color": "#dc2626",
-         "tip": "Stock por debajo del Stock de Seguridad (SS): despacho inmediato."},
-        {"label": "Municipios en ALERTA", "value": f"{len(alertas)}",
-         "icon": "alert-triangle", "color": "#d97706",
-         "tip": "Stock por debajo del Punto de Reorden (ROP): generar pedido pronto."},
-        {"label": "Municipios en NORMAL", "value": f"{len(normales)}",
-         "icon": "shield-check", "color": "#16a34a",
-         "tip": "Cobertura dentro de los márgenes operativos actuales."},
-    ])
+    cs1, cs2, cs3 = st.columns(3)
+    cs1.error(  f"CRÍTICO: {len(criticos)} municipios")
+    cs2.warning(f"ALERTA:  {len(alertas)} municipios")
+    cs3.success(f"NORMAL:  {len(normales)} municipios")
 
     st.divider()
 
@@ -2351,16 +2361,11 @@ elif seccion_activa == SECCIONES[3]:
             ].sort_values(['ano','semana'], ascending=False)
 
             st.success("Dato fresco obtenido directamente de la API SIVIGILA")
-            render_pill_row([
-                {"label": "Año más reciente",  "value": f"{sello_live['ano_max']}",
-                 "icon": "target", "color": "#2454c7"},
-                {"label": "Registros (total)", "value": f"{sello_live['registros']}",
-                 "icon": "database", "color": "#0891b2"},
-                {"label": "Hash MD5",          "value": f"{sello_live['hash_response']}",
-                 "icon": "shield-check", "color": "#2454c7"},
-                {"label": "Consultado",        "value": f"{sello_live['timestamp']}",
-                 "icon": "pulse", "color": "#0891b2"},
-            ])
+            s1, s2, s3, s4 = st.columns(4)
+            s1.metric("Año más reciente",   sello_live['ano_max'])
+            s2.metric("Registros (total)",  sello_live['registros'])
+            s3.metric("Hash MD5",           sello_live['hash_response'])
+            s4.metric("Consultado",         sello_live['timestamp'])
             st.caption("Original — SIVIGILA directo · Contemporáneo — tiempo real · "
                        "Cacheado 1h para los 42 municipios")
 
