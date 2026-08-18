@@ -256,6 +256,192 @@ h3 { font-size: 1.02rem !important; font-weight: 700 !important; }
   border-bottom: 1.5px solid var(--border);
 }
 
+/* ══════════════════════════════════════
+   HERO — encabezado principal con
+   tarjetas de estadísticas flotantes
+   ══════════════════════════════════════ */
+.ds-hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2.2rem;
+  background: linear-gradient(155deg, var(--surface) 0%, var(--surface2) 68%, var(--surface3) 100%);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  padding: 2.1rem 2.4rem;
+  margin-bottom: 1.4rem;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  animation: fadeUp 0.5s cubic-bezier(.22,1,.36,1) both;
+}
+.ds-hero::before {
+  content: '';
+  position: absolute;
+  top: -30%; right: -12%;
+  width: 420px; height: 420px;
+  background: radial-gradient(circle, rgba(36,84,199,0.14), transparent 68%);
+  pointer-events: none;
+}
+.ds-hero::after {
+  content: '';
+  position: absolute;
+  bottom: -35%; left: 8%;
+  width: 320px; height: 320px;
+  background: radial-gradient(circle, rgba(8,145,178,0.10), transparent 68%);
+  pointer-events: none;
+}
+.ds-hero-text { position: relative; z-index: 1; flex: 1 1 340px; min-width: 260px; }
+.ds-hero-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: 'Manrope', sans-serif;
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--accent);
+  margin-bottom: 0.7rem;
+}
+.ds-hero-kicker::before {
+  content: '';
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--grad-brand);
+  box-shadow: 0 0 0 3px rgba(8,145,178,0.16);
+}
+.ds-hero-title {
+  font-family: 'Manrope', sans-serif;
+  font-size: 2.15rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.14;
+  margin: 0 0 0.7rem 0;
+  color: var(--text);
+}
+.ds-hero-title span {
+  display: block;
+  background: linear-gradient(120deg, var(--primary-dk), var(--primary) 55%, var(--accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.ds-hero-sub {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--text2);
+  max-width: 46ch;
+  margin: 0;
+}
+.ds-hero-badges {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(126px, 1fr));
+  gap: 0.85rem;
+  flex: 0 0 auto;
+}
+.ds-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 0.75rem 0.95rem;
+  box-shadow: var(--shadow2);
+  transition: transform 0.25s cubic-bezier(.22,1,.36,1), box-shadow 0.25s ease, border-color 0.25s ease;
+}
+.ds-badge:hover {
+  transform: translateY(-4px);
+  border-color: var(--primary-lt);
+}
+.ds-badge:nth-child(2) { transform: translateY(10px); }
+.ds-badge:nth-child(2):hover { transform: translateY(6px); }
+.ds-badge:nth-child(4) { transform: translateY(10px); }
+.ds-badge:nth-child(4):hover { transform: translateY(6px); }
+.ds-badge-icon {
+  flex: 0 0 auto;
+  width: 34px; height: 34px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--icon-bg, rgba(36,84,199,0.12));
+}
+.ds-badge-value {
+  font-family: 'Manrope', sans-serif;
+  font-size: 1.02rem;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.15;
+  white-space: nowrap;
+}
+.ds-badge-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.66rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+@media (max-width: 900px) {
+  .ds-hero { flex-direction: column; align-items: stretch; }
+  .ds-badge:nth-child(2), .ds-badge:nth-child(4) { transform: none; }
+}
+
+/* ── Fila de tarjetas de resumen (por sección) ── */
+.ds-pill-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin: 0.4rem 0 1.1rem 0;
+}
+.ds-pill {
+  flex: 1 1 200px;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--pill-accent, var(--primary));
+  border-radius: 14px;
+  padding: 0.9rem 1.1rem;
+  box-shadow: var(--shadow);
+  transition: transform 0.22s cubic-bezier(.22,1,.36,1), box-shadow 0.22s ease, border-color 0.22s ease;
+}
+.ds-pill:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow2);
+}
+.ds-pill-icon {
+  flex: 0 0 auto;
+  width: 38px; height: 38px;
+  border-radius: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--icon-bg, rgba(36,84,199,0.12));
+}
+.ds-pill-value {
+  font-family: 'Manrope', sans-serif;
+  font-size: 1.18rem;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.15;
+}
+.ds-pill-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  cursor: help;
+}
+
 /* ── Métricas ── */
 [data-testid="stMetric"] {
   background: var(--surface) !important;
@@ -850,6 +1036,68 @@ def icono_svg(nombre, color='currentColor', size=14):
             f'style="vertical-align:-2px;display:inline-block">'
             f'<path d="{path}"/></svg>')
 
+# ── Iconografía adicional para tarjetas hero / pills de resumen ────────
+# Trazos simples (línea), no rellenos, para diferenciarse de los íconos
+# de estado del mapa y encajar con el lenguaje visual de las tarjetas.
+def _hero_icon(nombre, color='#2454c7', size=18):
+    sw = 1.8
+    iconos = {
+        'cpu': f'<path d="M7 7h10v10H7z"/><path d="M9 3v3M12 3v3M15 3v3M9 18v3M12 18v3M15 18v3M3 9h3M3 12h3M3 15h3M18 9h3M18 12h3M18 15h3"/>',
+        'pin': f'<path d="M12 21s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/>',
+        'target': f'<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="{color}"/>',
+        'pulse': f'<path d="M3 12h4l2-7 4 14 2-7h6"/>',
+        'coin': f'<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5v9M9.6 9.6c0-1.2 1.1-2 2.4-2s2.4.8 2.4 1.8c0 2.7-4.8 1.5-4.8 4.2 0 1 1.1 1.9 2.4 1.9s2.4-.9 2.4-2"/>',
+        'database': f'<ellipse cx="12" cy="6" rx="7.5" ry="2.6"/><path d="M4.5 6v6c0 1.4 3.4 2.6 7.5 2.6s7.5-1.2 7.5-2.6V6M4.5 12v6c0 1.4 3.4 2.6 7.5 2.6s7.5-1.2 7.5-2.6v-6"/>',
+        'shield-check': f'<path d="M12 3 19.5 6v6c0 4.6-3.1 7.7-7.5 9-4.4-1.3-7.5-4.4-7.5-9V6z"/><path d="M8.7 12 11 14.3 15.3 9"/>',
+        'truck': f'<rect x="2.5" y="7" width="11" height="9"/><path d="M13.5 10h4l3 3v3h-7z"/><circle cx="6" cy="18" r="1.7"/><circle cx="17" cy="18" r="1.7"/>',
+        'capsule': f'<rect x="4" y="9.5" width="16" height="7" rx="3.5" transform="rotate(-38 12 12)"/><path d="M9.3 8.4 14.7 15.6" stroke-width="1.4"/>',
+        'drop': f'<path d="M12 3.5c-4 5-6.5 8-6.5 11.3a6.5 6.5 0 0 0 13 0c0-3.3-2.5-6.3-6.5-11.3z"/>',
+        'alert-octagon': f'<path d="M8 2.5h8l5.5 5.5v8L16 21.5H8L2.5 16v-8z"/><path d="M12 8v5.2M12 16.7v.01"/>',
+        'alert-triangle': f'<path d="M12 3 22 20.5H2z"/><path d="M12 9.3v5M12 16.9v.01"/>',
+    }
+    inner = iconos.get(nombre, '<circle cx="12" cy="12" r="8"/>')
+    return (f'<svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" '
+            f'stroke="{color}" stroke-width="{sw}" stroke-linecap="round" '
+            f'stroke-linejoin="round">{inner}</svg>')
+
+def render_hero(kicker, titulo, titulo_acento, subtitulo, badges):
+    """Encabezado tipo 'hero' con tarjetas de estadísticas flotantes.
+    badges: lista de dicts {label, value, icon, color}."""
+    badges_html = ''.join(
+        f'<div class="ds-badge">'
+        f'<div class="ds-badge-icon" style="--icon-bg:{b.get("color","#2454c7")}1f">'
+        f'{_hero_icon(b.get("icon","target"), b.get("color","#2454c7"))}</div>'
+        f'<div><div class="ds-badge-value">{b["value"]}</div>'
+        f'<div class="ds-badge-label">{b["label"]}</div></div></div>'
+        for b in badges
+    )
+    st.markdown(
+        f'<div class="ds-hero">'
+        f'<div class="ds-hero-text">'
+        f'<div class="ds-hero-kicker">{kicker}</div>'
+        f'<h1 class="ds-hero-title">{titulo}<span>{titulo_acento}</span></h1>'
+        f'<p class="ds-hero-sub">{subtitulo}</p>'
+        f'</div>'
+        f'<div class="ds-hero-badges">{badges_html}</div>'
+        f'</div>',
+        unsafe_allow_html=True
+    )
+
+def render_pill_row(items):
+    """Fila de tarjetas de resumen estilo 'stat pill'.
+    items: lista de dicts {label, value, icon, color, tip(opcional)}."""
+    pills_html = ''.join(
+        f'<div class="ds-pill" style="--pill-accent:{it.get("color","#2454c7")}">'
+        f'<div class="ds-pill-icon" style="--icon-bg:{it.get("color","#2454c7")}1f">'
+        f'{_hero_icon(it.get("icon","target"), it.get("color","#2454c7"))}</div>'
+        f'<div><div class="ds-pill-value">{it["value"]}</div>'
+        f'<div class="ds-pill-label'
+        + (' ds-tip" data-tip="' + it["tip"] + '"' if it.get('tip') else '"')
+        + f'>{it["label"]}</div></div></div>'
+        for it in items
+    )
+    st.markdown(f'<div class="ds-pill-row">{pills_html}</div>', unsafe_allow_html=True)
+
 # ─────────────────────────────────────────────
 # FUNCIONES CORE
 # ─────────────────────────────────────────────
@@ -1437,38 +1685,27 @@ def ejecutar_agente(client, historial_contenidos, max_iter=5):
             "Intenta reformular la pregunta."), historial_contenidos
 
 # ─────────────────────────────────────────────
-# ENCABEZADO
+# ENCABEZADO — hero con tarjetas de estadísticas flotantes
 # ─────────────────────────────────────────────
-_LOGO_SVG = (
-    '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" '
-    'viewBox="0 0 16 16" style="vertical-align:-6px;flex-shrink:0">'
-    '<path d="M8 1 14 3.2v4.6c0 4-2.6 6.7-6 8.2-3.4-1.5-6-4.2-6-8.2V3.2z" '
-    'fill="url(#dsGrad)"/>'
-    '<path d="M5.4 8.1 7.2 9.9 10.6 6" stroke="#ffffff" stroke-width="1.4" '
-    'stroke-linecap="round" stroke-linejoin="round" fill="none"/>'
-    '<defs><linearGradient id="dsGrad" x1="0" y1="0" x2="16" y2="16">'
-    '<stop offset="0" stop-color="#2454c7"/>'
-    '<stop offset="1" stop-color="#0891b2"/>'
-    '</linearGradient></defs></svg>'
+render_hero(
+    kicker="Ecosistema Predictivo Spatial-Aware",
+    titulo="Denguard",
+    titulo_acento="Logística Farmacéutica de Última Milla",
+    subtitulo=(
+        "De la predicción epidemiológica a la orden de despacho · "
+        "Valle del Cauca · 42 municipios · SIVIGILA 2007–2018"
+    ),
+    badges=[
+        {"label": "Modelo",          "value": f"RF {VERSION}",              "icon": "cpu",          "color": "#2454c7"},
+        {"label": "Municipios",      "value": f"{len(MUNICIPIOS)} / 42",    "icon": "pin",          "color": "#0891b2"},
+        {"label": "R² holdout 2018", "value": f"{METRICAS['r2']}",          "icon": "target",       "color": "#2454c7"},
+        {"label": "MAE",             "value": f"{METRICAS['mae']} c/sem",   "icon": "pulse",        "color": "#0891b2"},
+    ],
 )
-st.markdown(
-    f'<h1 class="ds-main-title">{_LOGO_SVG}'
-    f'Denguard: Logística Farmacéutica de Última Milla</h1>',
-    unsafe_allow_html=True
-)
-st.markdown(
-    "Ecosistema Predictivo Spatial-Aware — De la predicción epidemiológica "
-    "a la orden de despacho · Valle del Cauca · 42 municipios · SIVIGILA 2007–2018"
-)
-c1, c2, c3, c4, c5 = st.columns(5)
-c1.metric("Modelo",          f"Random Forest {VERSION}")
-c2.metric("Municipios",      f"{len(MUNICIPIOS)} / 42")
-c3.metric("R² holdout 2018", f"{METRICAS['r2']}")
-c4.metric("MAE",             f"{METRICAS['mae']} casos/sem")
-c5.metric("RMSE",            f"{METRICAS['rmse']} casos/sem")
 st.caption(
     f"Entrenado: SIVIGILA 2007–2017 · Evaluado: holdout temporal 2018 · "
-    f"Gap Train-Val R²: {GAP_TRAIN_VAL} · Sin overfitting · MD5: `{sello_modelo['hash_md5']}`"
+    f"Gap Train-Val R²: {GAP_TRAIN_VAL} · RMSE: {METRICAS['rmse']} casos/sem · "
+    f"Sin overfitting · MD5: `{sello_modelo['hash_md5']}`"
 )
 st.divider()
 
@@ -1639,27 +1876,24 @@ if seccion_activa == SECCIONES[0]:
     )
 
     # ── 4 métricas clave en lenguaje simple ──────────────────────────────
-    g1, g2, g3, g4 = st.columns(4)
-    g1.metric(
-        "Casos previstos la próxima semana",
-        f"{pred_sel}",
-        help="Número de personas que probablemente necesitarán atención médica por dengue."
-    )
-    g2.metric(
-        "Pastillas de acetaminofén necesarias",
-        f"{cadena_simple['req_aceta']:,}" if cadena_simple else "—",
-        help="Cantidad de tabletas de acetaminofén 500mg para tratar los casos previstos."
-    )
-    g3.metric(
-        "Bolsas de suero necesarias",
-        f"{cadena_simple['req_ringer']:,}" if cadena_simple else "—",
-        help="Bolsas de Lactato de Ringer para los casos graves que requieren hospitalización."
-    )
-    g4.metric(
-        "Ahorro al planificar con anticipación",
-        f"${cadena_simple['ahorro']:,.0f} COP" if cadena_simple else "—",
-        help="Dinero que se ahorra comprando a precio normal (planificado) en vez de a precio de emergencia."
-    )
+    render_pill_row([
+        {"label": "Casos previstos la próxima semana",
+         "value": f"{pred_sel}",
+         "icon": "pulse", "color": "#2454c7",
+         "tip": "Número de personas que probablemente necesitarán atención médica por dengue."},
+        {"label": "Pastillas de acetaminofén necesarias",
+         "value": f"{cadena_simple['req_aceta']:,}" if cadena_simple else "—",
+         "icon": "capsule", "color": "#0891b2",
+         "tip": "Cantidad de tabletas de acetaminofén 500mg para tratar los casos previstos."},
+        {"label": "Bolsas de suero necesarias",
+         "value": f"{cadena_simple['req_ringer']:,}" if cadena_simple else "—",
+         "icon": "drop", "color": "#2454c7",
+         "tip": "Bolsas de Lactato de Ringer para los casos graves que requieren hospitalización."},
+        {"label": "Ahorro al planificar con anticipación",
+         "value": f"${cadena_simple['ahorro']:,.0f} COP" if cadena_simple else "—",
+         "icon": "coin", "color": "#0891b2",
+         "tip": "Dinero que se ahorra comprando a precio normal (planificado) en vez de a precio de emergencia."},
+    ])
 
     st.divider()
 
@@ -1910,10 +2144,17 @@ elif seccion_activa == SECCIONES[2]:
     alertas  = df_sorted[df_sorted['urgencia'] == 'ALERTA']
     normales = df_sorted[df_sorted['urgencia'] == 'NORMAL']
 
-    cs1, cs2, cs3 = st.columns(3)
-    cs1.error(  f"CRÍTICO: {len(criticos)} municipios")
-    cs2.warning(f"ALERTA:  {len(alertas)} municipios")
-    cs3.success(f"NORMAL:  {len(normales)} municipios")
+    render_pill_row([
+        {"label": "Municipios en CRÍTICO", "value": f"{len(criticos)}",
+         "icon": "alert-octagon", "color": "#dc2626",
+         "tip": "Stock por debajo del Stock de Seguridad (SS): despacho inmediato."},
+        {"label": "Municipios en ALERTA", "value": f"{len(alertas)}",
+         "icon": "alert-triangle", "color": "#d97706",
+         "tip": "Stock por debajo del Punto de Reorden (ROP): generar pedido pronto."},
+        {"label": "Municipios en NORMAL", "value": f"{len(normales)}",
+         "icon": "shield-check", "color": "#16a34a",
+         "tip": "Cobertura dentro de los márgenes operativos actuales."},
+    ])
 
     st.divider()
 
@@ -2110,11 +2351,16 @@ elif seccion_activa == SECCIONES[3]:
             ].sort_values(['ano','semana'], ascending=False)
 
             st.success("Dato fresco obtenido directamente de la API SIVIGILA")
-            s1, s2, s3, s4 = st.columns(4)
-            s1.metric("Año más reciente",   sello_live['ano_max'])
-            s2.metric("Registros (total)",  sello_live['registros'])
-            s3.metric("Hash MD5",           sello_live['hash_response'])
-            s4.metric("Consultado",         sello_live['timestamp'])
+            render_pill_row([
+                {"label": "Año más reciente",  "value": f"{sello_live['ano_max']}",
+                 "icon": "target", "color": "#2454c7"},
+                {"label": "Registros (total)", "value": f"{sello_live['registros']}",
+                 "icon": "database", "color": "#0891b2"},
+                {"label": "Hash MD5",          "value": f"{sello_live['hash_response']}",
+                 "icon": "shield-check", "color": "#2454c7"},
+                {"label": "Consultado",        "value": f"{sello_live['timestamp']}",
+                 "icon": "pulse", "color": "#0891b2"},
+            ])
             st.caption("Original — SIVIGILA directo · Contemporáneo — tiempo real · "
                        "Cacheado 1h para los 42 municipios")
 
