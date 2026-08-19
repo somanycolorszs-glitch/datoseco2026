@@ -2603,7 +2603,22 @@ elif seccion_activa == SECCIONES[3]:
                                "Imputación aplicada. Posible discontinuidad post-COVID.")
 
                 pred_live, _ = predecir(municipio_nw, t1_l, t2_l, t3_l, sem_l, md_l)
-                pred_hist, _ = predecir(municipio_nw, ult(-1), ult(-2), ult(-3), semana_actual)
+
+                # FIX: "Pred. histórico 2018" comparaba siempre contra los lags
+                # del municipio elegido en la BARRA LATERAL (municipio_sel, vía
+                # ult()), sin importar qué municipio se seleccionara acá en
+                # Nowcasting (municipio_nw). Resultado: al cambiar de municipio
+                # en esta pestaña, solo variaba el término de codificación del
+                # modelo (que pesa poco) y la predicción "histórica" casi no
+                # se movía — daba la sensación de que el nowcasting siempre
+                # arroja el mismo resultado. Ahora se recalculan los lags
+                # históricos (t-1, t-2, t-3) propios de municipio_nw.
+                hist_mun_nw  = df_hist[df_hist['municipio_ocurrencia'] == municipio_nw].sort_values('fecha')
+                serie_rec_nw = hist_mun_nw['casos'].tail(12).reset_index(drop=True)
+                serie_imp_nw, _, _ = imputar_semanas_faltantes(serie_rec_nw)
+                ult_nw = lambda i: int(serie_imp_nw.iloc[i]) if len(serie_imp_nw) > abs(i) else 3
+
+                pred_hist, _ = predecir(municipio_nw, ult_nw(-1), ult_nw(-2), ult_nw(-3), semana_actual)
 
                 nl1, nl2, nl3, nl4 = st.columns(4)
                 nl1.metric("Año/Sem API",          f"{ano_l}/S{sem_l}")
