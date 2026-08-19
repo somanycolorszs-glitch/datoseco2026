@@ -10,3 +10,6 @@ requests>=2.31.0
 streamlit-option-menu>=0.3.6
 google-genai>=2.15.0
 pymupdf>=1.23.0
+streamlit-extras>=0.4.0
+streamlit-antd-components>=0.3.2
+streamlit-elements==0.1.*
