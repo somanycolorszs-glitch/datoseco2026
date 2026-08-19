@@ -532,6 +532,12 @@ h3 { font-size: 1.02rem !important; font-weight: 700 !important; }
 .ds-topnav {
   margin-bottom: 0.2rem;
 }
+.ds-subnav {
+  margin-top: 2px;
+}
+.ds-subnav [data-testid="stSelectbox"] > div > div {
+  border-color: var(--primary-lt) !important;
+}
 .ds-topnav .nav-link,
 .nav-link {
   transition: transform 0.2s cubic-bezier(.22,1,.36,1), box-shadow 0.2s ease,
@@ -1772,7 +1778,8 @@ def ejecutar_agente(client, historial_contenidos, max_iter=5):
             "Intenta reformular la pregunta."), historial_contenidos
 
 # ─────────────────────────────────────────────
-# NAVEGACIÓN — menú horizontal superior
+# NAVEGACIÓN — jerarquía de 2 niveles
+# (5 pestañas principales + selector de subsección dinámico a la derecha)
 # ─────────────────────────────────────────────
 SECCIONES = [
     "Vista General",
@@ -1788,49 +1795,89 @@ SECCIONES = [
 ICONOS_SECCION = ["house-fill", "graph-up-arrow", "truck", "broadcast",
                    "clock-history", "geo-alt", "search", "shield-check", "robot"]
 
-if ANTD_DISPONIBLE:
-    st.markdown('<div class="ds-topnav">', unsafe_allow_html=True)
-    seccion_activa = sac.tabs(
-        items=[sac.TabsItem(label=s, icon=i) for s, i in zip(SECCIONES, ICONOS_SECCION)],
-        index=0,
-        align='start',
-        variant='outline',
-        color='blue',
-        use_container_width=True,
-    )
-    st.markdown('</div>', unsafe_allow_html=True)
-elif OPTION_MENU_DISPONIBLE:
-    st.markdown('<div class="ds-topnav">', unsafe_allow_html=True)
-    seccion_activa = option_menu(
-        menu_title=None,
-        options=SECCIONES,
-        icons=ICONOS_SECCION,
-        default_index=0,
-        orientation="horizontal",
-        styles={
-            "container": {"padding": "0!important", "background-color": "transparent",
-                           "flex-wrap": "wrap"},
-            "icon": {"color": "var(--primary)", "font-size": "13px"},
-            "nav-link": {
-                "font-family": "Manrope, sans-serif", "font-size": "13px",
-                "font-weight": "600",
-                "color": "var(--text2)", "background-color": "var(--surface)",
-                "border": "1px solid var(--border)", "border-radius": "10px",
-                "margin": "0 6px 6px 0", "padding": "9px 14px",
-                "transition": "all 0.18s ease", "white-space": "nowrap",
+# Agrupación de las 9 secciones originales en 5 pestañas principales.
+# Los grupos con más de un elemento despliegan un selector de subsección
+# a la derecha; los de un solo elemento navegan directo, sin selector.
+GRUPOS_NAV = [
+    {"label": "Vista General",       "icon": "house-fill",
+     "items": ["Vista General"]},
+    {"label": "Dashboard",           "icon": "graph-up-arrow",
+     "items": ["Dashboard"]},
+    {"label": "Logística",           "icon": "truck",
+     "items": ["Cadena de Abastecimiento", "Serie Histórica", "Mapa"]},
+    {"label": "Validación & Datos",  "icon": "shield-check",
+     "items": ["Nowcasting", "Validación Retrospectiva", "Auditoría ALCOA+"]},
+    {"label": "Agente IA",           "icon": "robot",
+     "items": ["Agente IA"]},
+]
+GRUPOS_LABELS = [g["label"] for g in GRUPOS_NAV]
+GRUPOS_ICONOS = [g["icon"]  for g in GRUPOS_NAV]
+
+if "grupo_nav_activo" not in st.session_state:
+    st.session_state.grupo_nav_activo = GRUPOS_LABELS[0]
+idx_grupo_actual = GRUPOS_LABELS.index(st.session_state.grupo_nav_activo)
+
+col_nav, col_sub = st.columns([5, 2])
+
+with col_nav:
+    if ANTD_DISPONIBLE:
+        st.markdown('<div class="ds-topnav">', unsafe_allow_html=True)
+        grupo_activo = sac.tabs(
+            items=[sac.TabsItem(label=l, icon=i) for l, i in zip(GRUPOS_LABELS, GRUPOS_ICONOS)],
+            index=idx_grupo_actual,
+            align='start',
+            variant='outline',
+            color='blue',
+            use_container_width=True,
+        )
+        st.markdown('</div>', unsafe_allow_html=True)
+    elif OPTION_MENU_DISPONIBLE:
+        st.markdown('<div class="ds-topnav">', unsafe_allow_html=True)
+        grupo_activo = option_menu(
+            menu_title=None,
+            options=GRUPOS_LABELS,
+            icons=GRUPOS_ICONOS,
+            default_index=idx_grupo_actual,
+            orientation="horizontal",
+            styles={
+                "container": {"padding": "0!important", "background-color": "transparent",
+                               "flex-wrap": "wrap"},
+                "icon": {"color": "var(--primary)", "font-size": "13px"},
+                "nav-link": {
+                    "font-family": "Manrope, sans-serif", "font-size": "13px",
+                    "font-weight": "600",
+                    "color": "var(--text2)", "background-color": "var(--surface)",
+                    "border": "1px solid var(--border)", "border-radius": "10px",
+                    "margin": "0 6px 6px 0", "padding": "9px 14px",
+                    "transition": "all 0.18s ease", "white-space": "nowrap",
+                },
+                "nav-link-selected": {
+                    "background-image": "linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%)",
+                    "color": "#ffffff", "font-weight": "700",
+                    "box-shadow": "0 4px 16px rgba(36,84,199,0.32)",
+                },
             },
-            "nav-link-selected": {
-                "background-image": "linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%)",
-                "color": "#ffffff", "font-weight": "700",
-                "box-shadow": "0 4px 16px rgba(36,84,199,0.32)",
-            },
-        },
-    )
-    st.markdown('</div>', unsafe_allow_html=True)
-else:
-    seccion_activa = st.radio(
-        "Navegación", SECCIONES, horizontal=True, label_visibility="collapsed"
-    )
+        )
+        st.markdown('</div>', unsafe_allow_html=True)
+    else:
+        grupo_activo = st.radio(
+            "Navegación", GRUPOS_LABELS, index=idx_grupo_actual,
+            horizontal=True, label_visibility="collapsed"
+        )
+
+st.session_state.grupo_nav_activo = grupo_activo
+grupo_info = next(g for g in GRUPOS_NAV if g["label"] == grupo_activo)
+
+with col_sub:
+    if len(grupo_info["items"]) > 1:
+        st.markdown('<div class="ds-subnav">', unsafe_allow_html=True)
+        seccion_activa = st.selectbox(
+            "Subsección", grupo_info["items"],
+            key=f"sub_{grupo_activo}", label_visibility="collapsed"
+        )
+        st.markdown('</div>', unsafe_allow_html=True)
+    else:
+        seccion_activa = grupo_info["items"][0]
 
 st.divider()
 
@@ -2283,7 +2330,6 @@ para garantizar cumplimiento legal y seguridad operativa simultáneamente.
         st.plotly_chart(fig_h, use_container_width=True)
         st.caption("IC = MAE×(1+35%/paso). "
                    + ("×1.5 Modo Degradado." if modo_degradado else ""))
-
 
 # ══════════════════════════════════════════════
 # SECCIÓN 2 — CADENA DE ABASTECIMIENTO
