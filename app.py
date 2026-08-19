@@ -2284,27 +2284,7 @@ para garantizar cumplimiento legal y seguridad operativa simultáneamente.
         st.caption("IC = MAE×(1+35%/paso). "
                    + ("×1.5 Modo Degradado." if modo_degradado else ""))
 
-# ══════════════════════════════════════════════
-# SECCIÓN 2 — CADENA DE ABASTECIMIENTO
-# ══════════════════════════════════════════════
-elif seccion_activa == SECCIONES[2]:
-    render_section_title(
-        "Motor Logístico — De la Predicción a la Orden de Despacho",
-        "42 municipios · SS dinámico Z×σ×√LT (95% nivel servicio) · "
-        "Chopra & Meindl SCM 2016 · Res. MINSALUD 1403/2007"
-    )
 
-    with st.expander("Eficiencia Farmacoeconómica — Logística de Precisión vs Adivinación"):
-        st.success(
-            "De la logística de adivinación a la logística de precisión:\n\n"
-            "Los sistemas tradicionales de abastecimiento hospitalario usan "
-            "reglas empíricas (stock = 2-4 semanas de demanda promedio) porque "
-            "no conocen su error de predicción.\n\n"
-            f"Data Sentinel usa `SS = Z(95%) × σ_error({METRICAS['mae']} casos) × √LT` "
-            "porque conoce exactamente cuánto se equivoca y en qué contextos.\n\n"
-            "Consecuencia: el costo preventivo/reactivo y el ahorro se calculan "
-            "sobre la demanda predicha de cada semana, no solo sobre la cantidad a "
-            "ordenar — así el ahorro refleja el valor de anticipar la compra aunque "
 # ══════════════════════════════════════════════
 # SECCIÓN 2 — CADENA DE ABASTECIMIENTO
 # ══════════════════════════════════════════════
