@@ -28,6 +28,27 @@ try:
 except ImportError:
     OPTION_MENU_DISPONIBLE = False
 
+# ── Librerías de diseño (todas opcionales — degradación elegante) ──
+try:
+    from streamlit_extras.colored_header import colored_header
+    from streamlit_extras.stylable_container import stylable_container
+    from streamlit_extras.add_vertical_space import add_vertical_space
+    EXTRAS_DISPONIBLE = True
+except ImportError:
+    EXTRAS_DISPONIBLE = False
+
+try:
+    import streamlit_antd_components as sac
+    ANTD_DISPONIBLE = True
+except ImportError:
+    ANTD_DISPONIBLE = False
+
+try:
+    from streamlit_elements import elements, mui
+    ELEMENTS_DISPONIBLE = True
+except ImportError:
+    ELEMENTS_DISPONIBLE = False
+
 # ─────────────────────────────────────────────
 # CONFIGURACIÓN
 # ─────────────────────────────────────────────
@@ -35,7 +56,7 @@ st.set_page_config(
     page_title="Denguard — Última Milla",
     page_icon="",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
 # ─────────────────────────────────────────────
@@ -528,6 +549,32 @@ h3 { font-size: 1.02rem !important; font-weight: 700 !important; }
   color: #ffffff !important;
   transform: translateY(-2px) !important;
   box-shadow: 0 8px 22px rgba(36,84,199,0.4) !important;
+}
+
+/* ── Ant Design (streamlit-antd-components): armonizar con la paleta ── */
+.ds-topnav [class*="ant-tabs-tab"] {
+  font-family: 'Manrope', sans-serif !important;
+  font-weight: 600 !important;
+  font-size: 13px !important;
+  border-radius: 10px !important;
+  transition: transform 0.2s cubic-bezier(.22,1,.36,1), color 0.2s ease !important;
+}
+.ds-topnav [class*="ant-tabs-tab"]:hover {
+  transform: translateY(-2px) !important;
+  color: var(--primary) !important;
+}
+.ds-topnav [class*="ant-tabs-tab-active"] {
+  color: var(--primary) !important;
+  font-weight: 700 !important;
+}
+.ds-topnav [class*="ant-tabs-ink-bar"] {
+  background: var(--grad-brand) !important;
+  height: 3px !important;
+}
+[class*="ant-alert"] {
+  font-family: 'Inter', sans-serif !important;
+  border-radius: var(--radius) !important;
+  box-shadow: var(--shadow) !important;
 }
 
 /* ── Radio horizontal (fallback de navegación / selectores tipo tab) ── */
@@ -1112,6 +1159,31 @@ def render_pill_row(items):
         for it in items
     )
     st.markdown(f'<div class="ds-pill-row">{pills_html}</div>', unsafe_allow_html=True)
+
+def render_section_title(titulo, descripcion=None):
+    """Título de sección — usa colored_header (streamlit-extras) si está
+    disponible para un acabado más premium; si no, cae al patrón nativo."""
+    if EXTRAS_DISPONIBLE:
+        colored_header(label=titulo, description=descripcion or "", color_name="blue-70")
+    else:
+        st.subheader(titulo)
+        if descripcion:
+            st.caption(descripcion)
+        st.divider()
+
+def render_status_alert(tipo, mensaje, titulo=None):
+    """Alerta de estado — usa sac.alert (Ant Design) si está disponible
+    para un acabado más premium con ícono y cierre; si no, st.error/warning/info."""
+    if ANTD_DISPONIBLE:
+        color_map = {'error': 'red', 'warning': 'orange', 'info': 'blue', 'success': 'green'}
+        sac.alert(label=titulo or mensaje, description=mensaje if titulo else '',
+                  color=color_map.get(tipo, 'blue'), banner=False, icon=True, closable=True)
+    elif tipo == 'error':
+        st.error(mensaje)
+    elif tipo == 'warning':
+        st.warning(mensaje)
+    else:
+        st.info(mensaje)
 
 # ─────────────────────────────────────────────
 # FUNCIONES CORE
@@ -1700,31 +1772,6 @@ def ejecutar_agente(client, historial_contenidos, max_iter=5):
             "Intenta reformular la pregunta."), historial_contenidos
 
 # ─────────────────────────────────────────────
-# ENCABEZADO — hero con tarjetas de estadísticas flotantes
-# ─────────────────────────────────────────────
-render_hero(
-    kicker="Ecosistema Predictivo Spatial-Aware",
-    titulo="Denguard",
-    titulo_acento="Logística Farmacéutica de Última Milla",
-    subtitulo=(
-        "De la predicción epidemiológica a la orden de despacho · "
-        "Valle del Cauca · 42 municipios · SIVIGILA 2007–2018"
-    ),
-    badges=[
-        {"label": "Modelo",          "value": f"RF {VERSION}",              "icon": "cpu",          "color": "#2454c7"},
-        {"label": "Municipios",      "value": f"{len(MUNICIPIOS)} / 42",    "icon": "pin",          "color": "#0891b2"},
-        {"label": "R² holdout 2018", "value": f"{METRICAS['r2']}",          "icon": "target",       "color": "#2454c7"},
-        {"label": "MAE",             "value": f"{METRICAS['mae']} c/sem",   "icon": "pulse",        "color": "#0891b2"},
-    ],
-)
-st.caption(
-    f"Entrenado: SIVIGILA 2007–2017 · Evaluado: holdout temporal 2018 · "
-    f"Gap Train-Val R²: {GAP_TRAIN_VAL} · RMSE: {METRICAS['rmse']} casos/sem · "
-    f"Sin overfitting · MD5: `{sello_modelo['hash_md5']}`"
-)
-st.divider()
-
-# ─────────────────────────────────────────────
 # NAVEGACIÓN — menú horizontal superior
 # ─────────────────────────────────────────────
 SECCIONES = [
@@ -1741,7 +1788,18 @@ SECCIONES = [
 ICONOS_SECCION = ["house-fill", "graph-up-arrow", "truck", "broadcast",
                    "clock-history", "geo-alt", "search", "shield-check", "robot"]
 
-if OPTION_MENU_DISPONIBLE:
+if ANTD_DISPONIBLE:
+    st.markdown('<div class="ds-topnav">', unsafe_allow_html=True)
+    seccion_activa = sac.tabs(
+        items=[sac.TabsItem(label=s, icon=i) for s, i in zip(SECCIONES, ICONOS_SECCION)],
+        index=0,
+        align='start',
+        variant='outline',
+        color='blue',
+        use_container_width=True,
+    )
+    st.markdown('</div>', unsafe_allow_html=True)
+elif OPTION_MENU_DISPONIBLE:
     st.markdown('<div class="ds-topnav">', unsafe_allow_html=True)
     seccion_activa = option_menu(
         menu_title=None,
@@ -1787,10 +1845,13 @@ serie_rec = hist_mun['casos'].tail(12).reset_index(drop=True)
 serie_imp, idx_imp, modo_degradado = imputar_semanas_faltantes(serie_rec)
 
 if modo_degradado:
-    st.sidebar.warning(
-        f"Modo Degradado — {len(idx_imp)} semana(s) con reporte cero "
-        f"sospechoso detectadas. IC ampliado ×1.5 automáticamente."
-    )
+    with st.sidebar:
+        render_status_alert(
+            'warning',
+            f"{len(idx_imp)} semana(s) con reporte cero sospechoso detectadas. "
+            f"IC ampliado ×1.5 automáticamente.",
+            titulo="Modo Degradado"
+        )
 
 ult = lambda i: int(serie_imp.iloc[i]) if len(serie_imp) > abs(i) else 3
 
@@ -1847,6 +1908,31 @@ st.markdown('<div class="ds-animate-in">', unsafe_allow_html=True)
 # SECCIÓN 0 — VISTA GENERAL (lenguaje simple, para cualquier persona)
 # ══════════════════════════════════════════════
 if seccion_activa == SECCIONES[0]:
+    render_hero(
+        kicker="Ecosistema Predictivo Spatial-Aware",
+        titulo="Denguard",
+        titulo_acento="Logística Farmacéutica de Última Milla",
+        subtitulo=(
+            "De la predicción epidemiológica a la orden de despacho · "
+            "Valle del Cauca · 42 municipios · SIVIGILA 2007–2018"
+        ),
+        badges=[
+            {"label": "Modelo",          "value": f"RF {VERSION}",              "icon": "cpu",          "color": "#2454c7"},
+            {"label": "Municipios",      "value": f"{len(MUNICIPIOS)} / 42",    "icon": "pin",          "color": "#0891b2"},
+            {"label": "R² holdout 2018", "value": f"{METRICAS['r2']}",          "icon": "target",       "color": "#2454c7"},
+            {"label": "MAE",             "value": f"{METRICAS['mae']} c/sem",   "icon": "pulse",        "color": "#0891b2"},
+        ],
+    )
+    st.caption(
+        f"Entrenado: SIVIGILA 2007–2017 · Evaluado: holdout temporal 2018 · "
+        f"Gap Train-Val R²: {GAP_TRAIN_VAL} · RMSE: {METRICAS['rmse']} casos/sem · "
+        f"Sin overfitting · MD5: `{sello_modelo['hash_md5']}`"
+    )
+    st.divider()
+
+    if EXTRAS_DISPONIBLE:
+        add_vertical_space(1)
+
     st.markdown(f"### Resumen para {municipio_sel}")
     st.markdown(
         "Esta pantalla te da lo más importante en un vistazo. "
@@ -1882,15 +1968,35 @@ if seccion_activa == SECCIONES[0]:
         ),
     }
 
-    st.markdown(
-        f'<div style="background:{COLOR_BG[urg]};border:2px solid {COLOR_BRD[urg]};'
-        f'border-radius:16px;padding:1.5rem 2rem;margin-bottom:1.2rem">'
-        f'<div style="font-size:1.05rem;font-weight:700;color:{COLOR_BRD[urg]};'
-        f'margin-bottom:0.4rem">{LABEL_URG[urg]}</div>'
-        f'<div style="font-size:0.92rem;color:#334">{DESC_URG[urg]}</div>'
-        f'</div>',
-        unsafe_allow_html=True
-    )
+    if EXTRAS_DISPONIBLE:
+        with stylable_container(
+            key=f"semaforo_{urg}",
+            css_styles=f"""
+            {{
+                background: {COLOR_BG[urg]};
+                border: 2px solid {COLOR_BRD[urg]};
+                border-radius: 16px;
+                padding: 1.5rem 2rem;
+                margin-bottom: 1.2rem;
+            }}
+            """
+        ):
+            st.markdown(
+                f'<div style="font-size:1.05rem;font-weight:700;color:{COLOR_BRD[urg]};'
+                f'margin-bottom:0.4rem">{LABEL_URG[urg]}</div>'
+                f'<div style="font-size:0.92rem;color:#334">{DESC_URG[urg]}</div>',
+                unsafe_allow_html=True
+            )
+    else:
+        st.markdown(
+            f'<div style="background:{COLOR_BG[urg]};border:2px solid {COLOR_BRD[urg]};'
+            f'border-radius:16px;padding:1.5rem 2rem;margin-bottom:1.2rem">'
+            f'<div style="font-size:1.05rem;font-weight:700;color:{COLOR_BRD[urg]};'
+            f'margin-bottom:0.4rem">{LABEL_URG[urg]}</div>'
+            f'<div style="font-size:0.92rem;color:#334">{DESC_URG[urg]}</div>'
+            f'</div>',
+            unsafe_allow_html=True
+        )
 
     # ── 4 métricas clave en lenguaje simple ──────────────────────────────
     render_pill_row([
@@ -1915,8 +2021,7 @@ if seccion_activa == SECCIONES[0]:
     st.divider()
 
     # ── Explicación sencilla del sistema ─────────────────────────────────
-    with st.expander("Cómo funciona este sistema", expanded=False):
-        st.markdown(f"""
+    texto_pasos = f"""
 Este sistema predice cuántos casos de dengue habrá en {municipio_sel} la
 próxima semana, y calcula automáticamente cuántos medicamentos se necesitan
 y si el stock actual alcanza.
@@ -1938,24 +2043,71 @@ En 3 pasos:
 Por qué importa: un sistema reactivo (comprar cuando ya falta) paga
 precios de emergencia y pone en riesgo a los pacientes. Este sistema
 planifica con anticipación y ahorra dinero público.
-        """)
+    """
+    with st.expander("Cómo funciona este sistema", expanded=False):
+        mostrado_premium = False
+        if ELEMENTS_DISPONIBLE:
+            try:
+                with elements(f"como_funciona_{municipio_sel}"):
+                    mui.Typography(
+                        f"Este sistema predice cuántos casos de dengue habrá en "
+                        f"{municipio_sel} la próxima semana, y calcula automáticamente "
+                        f"cuántos medicamentos se necesitan y si el stock actual alcanza.",
+                        sx={"mb": 2, "color": "text.secondary"}
+                    )
+                    with mui.Stepper(orientation="vertical", activeStep=3):
+                        with mui.Step(active=True, completed=True):
+                            mui.StepLabel("Predice")
+                            with mui.StepContent():
+                                mui.Typography(
+                                    f"Usa los casos reportados de las últimas semanas y "
+                                    f"el histórico SIVIGILA 2007–2018 para estimar la "
+                                    f"próxima semana: {pred_sel} casos."
+                                )
+                        with mui.Step(active=True, completed=True):
+                            mui.StepLabel("Evalúa")
+                            with mui.StepContent():
+                                mui.Typography(
+                                    "Compara la predicción con el stock actual de "
+                                    "medicamentos y determina el nivel de urgencia."
+                                )
+                        with mui.Step(active=True, completed=True):
+                            mui.StepLabel("Actúa")
+                            with mui.StepContent():
+                                mui.Typography(
+                                    "Genera la cantidad exacta a pedir y el plazo "
+                                    "máximo para el despacho."
+                                )
+                    mui.Typography(
+                        "Por qué importa: un sistema reactivo paga precios de "
+                        "emergencia y pone en riesgo a los pacientes. Este sistema "
+                        "planifica con anticipación y ahorra dinero público.",
+                        sx={"mt": 2, "fontStyle": "italic", "color": "text.secondary"}
+                    )
+                mostrado_premium = True
+            except Exception:
+                mostrado_premium = False
+        if not mostrado_premium:
+            st.markdown(texto_pasos)
 
-    st.markdown("Para ver el análisis técnico completo, usa el menú de la izquierda.")
+    st.markdown("Para ver el análisis técnico completo, usa el menú de arriba.")
 
 # ══════════════════════════════════════════════
 # SECCIÓN 1 — DASHBOARD PREDICTIVO (antes sección 0)
 # ══════════════════════════════════════════════
 elif seccion_activa == SECCIONES[1]:
-    st.markdown(f"### Reporte Predictivo — {municipio_sel}")
+    render_section_title(f"Reporte Predictivo — {municipio_sel}",
+                          "Proyección de casos, insumos requeridos y eficiencia farmacoeconómica")
 
     if modo_degradado:
-        st.error(
-            f"MODO DEGRADADO — Gestión de Riesgo Epidemiológico\n\n"
+        render_status_alert(
+            'error',
             f"Se detectaron {len(idx_imp)} semana(s) con reporte cero sospechoso "
-            f"en {municipio_sel}. Posible falla de reporte SIVIGILA.\n\n"
+            f"en {municipio_sel}. Posible falla de reporte SIVIGILA. "
             f"Medidas automáticas: Imputación por mediana móvil ±2 semanas · "
             f"IC ampliado de ±{METRICAS['rmse']:.2f} → ±{rmse_ef:.2f} casos/sem · "
-            f"Verificar en sección Nowcasting."
+            f"Verificar en sección Nowcasting.",
+            titulo="Modo Degradado — Gestión de Riesgo Epidemiológico"
         )
 
     col1, col2, col3 = st.columns(3)
@@ -2136,8 +2288,29 @@ para garantizar cumplimiento legal y seguridad operativa simultáneamente.
 # SECCIÓN 2 — CADENA DE ABASTECIMIENTO
 # ══════════════════════════════════════════════
 elif seccion_activa == SECCIONES[2]:
-    st.markdown("### Motor Logístico — De la Predicción a la Orden de Despacho")
-    st.caption(
+    render_section_title(
+        "Motor Logístico — De la Predicción a la Orden de Despacho",
+        "42 municipios · SS dinámico Z×σ×√LT (95% nivel servicio) · "
+        "Chopra & Meindl SCM 2016 · Res. MINSALUD 1403/2007"
+    )
+
+    with st.expander("Eficiencia Farmacoeconómica — Logística de Precisión vs Adivinación"):
+        st.success(
+            "De la logística de adivinación a la logística de precisión:\n\n"
+            "Los sistemas tradicionales de abastecimiento hospitalario usan "
+            "reglas empíricas (stock = 2-4 semanas de demanda promedio) porque "
+            "no conocen su error de predicción.\n\n"
+            f"Data Sentinel usa `SS = Z(95%) × σ_error({METRICAS['mae']} casos) × √LT` "
+            "porque conoce exactamente cuánto se equivoca y en qué contextos.\n\n"
+            "Consecuencia: el costo preventivo/reactivo y el ahorro se calculan "
+            "sobre la demanda predicha de cada semana, no solo sobre la cantidad a "
+            "ordenar — así el ahorro refleja el valor de anticipar la compra aunque "
+# ══════════════════════════════════════════════
+# SECCIÓN 2 — CADENA DE ABASTECIMIENTO
+# ══════════════════════════════════════════════
+elif seccion_activa == SECCIONES[2]:
+    render_section_title(
+        "Motor Logístico — De la Predicción a la Orden de Despacho",
         "42 municipios · SS dinámico Z×σ×√LT (95% nivel servicio) · "
         "Chopra & Meindl SCM 2016 · Res. MINSALUD 1403/2007"
     )
@@ -2317,7 +2490,8 @@ elif seccion_activa == SECCIONES[2]:
 # SECCIÓN 3 — NOWCASTING
 # ══════════════════════════════════════════════
 elif seccion_activa == SECCIONES[3]:
-    st.markdown("### Nowcasting — Conexión SIVIGILA en Tiempo Real")
+    render_section_title("Nowcasting — Conexión SIVIGILA en Tiempo Real",
+                          "Ingesta en vivo para mitigar el vacío de datos post-pandemia")
     st.info(
         "Data Gap 2018→2026 — Contexto COVID-19:\n\n"
         "El modelo fue entrenado con datos SIVIGILA 2007–2018. La pandemia "
@@ -2454,7 +2628,8 @@ Re-entrenamiento inicia desde datos 2023+ para capturar nueva dinámica vectoria
 # SECCIÓN 4 — SERIE HISTÓRICA
 # ══════════════════════════════════════════════
 elif seccion_activa == SECCIONES[4]:
-    st.subheader("Serie Temporal Completa — SIVIGILA 2007–2018 · 42 Municipios")
+    render_section_title("Serie Temporal Completa",
+                          "SIVIGILA 2007–2018 · 42 municipios del Valle del Cauca")
 
     col_f1, col_f2 = st.columns([1, 3])
     with col_f1:
@@ -2495,9 +2670,11 @@ elif seccion_activa == SECCIONES[4]:
 # SECCIÓN 5 — MAPA DEPARTAMENTAL
 # ══════════════════════════════════════════════
 elif seccion_activa == SECCIONES[5]:
-    st.subheader("Mapa de Riesgo Departamental — 42 Municipios Valle del Cauca")
-    st.caption("Color = urgencia logística · Tamaño = casos predichos · "
-               "Líneas = rutas desde SECCIONED Cali")
+    render_section_title(
+        "Mapa de Riesgo Departamental",
+        "42 municipios del Valle del Cauca · Color = urgencia logística · "
+        "Tamaño = casos predichos · Líneas = rutas desde SECCIONED Cali"
+    )
 
     mapa = construir_mapa(semana_actual)
     st_folium(mapa, width=None, height=550)
@@ -2510,7 +2687,7 @@ elif seccion_activa == SECCIONES[5]:
 # SECCIÓN 6 — VALIDACIÓN RETROSPECTIVA
 # ══════════════════════════════════════════════
 elif seccion_activa == SECCIONES[6]:
-    st.subheader("Validación Retrospectiva — Brote Cali 2016–2017")
+    render_section_title("Validación Retrospectiva", "Brote Cali 2016–2017")
     st.markdown(
         "Demostración de que el sistema hubiera detectado el mayor brote "
         "del dataset con anticipación suficiente. Predicciones genuinamente "
@@ -2618,7 +2795,7 @@ elif seccion_activa == SECCIONES[6]:
 # SECCIÓN 7 — AUDITORÍA ALCOA+
 # ══════════════════════════════════════════════
 elif seccion_activa == SECCIONES[7]:
-    st.subheader("Auditoría Técnica Completa — Compliance ALCOA+")
+    render_section_title("Auditoría Técnica Completa", "Compliance ALCOA+")
 
     st.subheader("Sellos de Integridad de Datos")
     df_sellos = pd.DataFrame({
@@ -2780,10 +2957,10 @@ y la evidencia (SIVIGILA + modelo) hablan el mismo idioma.
 # SECCIÓN 8 — AGENTE IA
 # ══════════════════════════════════════════════
 elif seccion_activa == SECCIONES[8]:
-    st.subheader("Agente IA — Pregúntale a Denguard")
-    st.caption(
-        "Agente con acceso a herramientas en tiempo real sobre el modelo, el "
-        "histórico SIVIGILA y la cadena logística — no improvisa cifras, las consulta."
+    render_section_title(
+        "Agente IA — Pregúntale a Denguard",
+        "Acceso a herramientas en tiempo real sobre el modelo, el histórico "
+        "SIVIGILA y la cadena logística — no improvisa cifras, las consulta."
     )
 
     with st.expander("Arquitectura del agente — para el jurado", expanded=False):
